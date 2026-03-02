@@ -684,6 +684,8 @@ const commands = [
   new SlashCommandBuilder().setName("myprediction").setDescription("View your own predictions (only visible to you)"),
   new SlashCommandBuilder().setName("listpredictions").setDescription("List everyone's predictions for the current Everton fixture"),
   new SlashCommandBuilder().setName("fixtures").setDescription("Show the next 5 upcoming Everton fixtures"),
+  new SlashCommandBuilder().setName("help")
+    .setDescription("Show Blue Frontier Committee commands (only visible to you)"),
   new SlashCommandBuilder().setName("clearprediction").setDescription("Delete one of your predictions")
     .addStringOption((o) => o.setName("fixture").setDescription("Which fixture to clear").setRequired(true)
       .addChoices(...ALL_FIXTURES.map((f) => ({ name: `${f.home} vs ${f.away} (${f.label})`, value: f.id })))),
@@ -865,6 +867,31 @@ client.on("interactionCreate", async (interaction) => {
       return interaction.reply({ content: "😔 No upcoming Everton fixtures found!", flags: MessageFlags.Ephemeral });
     }
     return interaction.reply({ embeds: [buildFixturesEmbed(upcoming)] });
+  }
+
+  if (interaction.isChatInputCommand() && interaction.commandName === "help") {
+    const isBlueFrontierGuild = BLUE_FRONTIER_GUILD_ID && interaction.guildId === BLUE_FRONTIER_GUILD_ID;
+    const descLines = [
+      "**/fixtures** — show the next 5 Everton matches.",
+      "**/predict** — submit a score prediction (Everton vs opponent).",
+      "**/myprediction** — view your own predictions (only you can see).",
+      "**/listpredictions** — list predictions for the current or last-kicked-off fixture.",
+      "**/clearprediction** — delete one of your predictions.",
+      "**/final** — MOD only; enter final score + scorers to award points.",
+      "**/leaderboard [scope]** — view current-season or all-time points.",
+      "**/resetleaderboard [scope]** — MOD only; reset season or all-time (all-time asks for confirm).",
+      "",
+      isBlueFrontierGuild
+        ? "In this server, prediction commands only work in the score-predictions channel."
+        : "In this server, prediction commands work in any channel."
+    ];
+    const embed = new EmbedBuilder()
+      .setColor(BOT_COLOUR)
+      .setTitle("🔵 The Blue Frontier Committee — Help")
+      .setDescription(descLines.join("\n"))
+      .setFooter({ text: BOT_FOOTER })
+      .setTimestamp();
+    return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
   }
 
   if (interaction.isChatInputCommand() && interaction.commandName === "predict") {

@@ -103,7 +103,8 @@ git push -u origin main
 3. In the service **Settings**:
    - **Root Directory:** leave default (repo root).
    - **Build Command:** `cd blue_frontier && npm install`
-   - **Start Command:** `cd blue_frontier && node index.js`
+   - **Start Command:** `cd blue_frontier && npm install && node index.js`  
+     _(Installs deps at startup so `blue_frontier/node_modules` exists in the container.)_
 4. **Variables:** add the same keys as in `.env`:
    - **Required:** `DISCORD_TOKEN`, `CLIENT_ID`, `GUILD_ID` (e.g. your test server `609194510660009995` — used for reference; commands are **global** so they appear in every server the bot is in).
    - **Optional:** `MOD_ROLE_ID` (e.g. test server), `BLUE_FRONTIER_MOD_ROLE_ID` (MOD role in The Blue Frontier server, e.g. `1306013527961501812`), `RESULTS_CHANNEL_ID`, `PREDICTIONS_CHANNEL_ID`, `SPORTRADAR_KEY`. To restrict **prediction commands** (e.g. `/predict`, `/final`) to the score-predictions channel **only in The Blue Frontier server** (test server stays unrestricted), set `BLUE_FRONTIER_GUILD_ID` to that server’s ID and `ALLOWED_PREDICTION_CHANNEL_IDS=1306046468846522378` (or add more channel IDs comma-separated).
