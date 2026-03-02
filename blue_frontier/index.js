@@ -691,7 +691,7 @@ function sameOutcome(pEve, pOpp, rEve, rOpp) {
 //  SLASH COMMAND DEFINITIONS
 // ───────────────────────────────────────────────────────────────
 const commands = [
-  new SlashCommandBuilder().setName("predict").setDescription("Submit your score prediction for an upcoming Everton match"),
+  new SlashCommandBuilder().setName("predict").setDescription("Submit a score prediction — press Enter, then pick a match from the menu"),
   new SlashCommandBuilder().setName("myprediction").setDescription("View your own predictions (only visible to you)"),
   new SlashCommandBuilder().setName("listpredictions").setDescription("List everyone's predictions for the current Everton fixture"),
   new SlashCommandBuilder().setName("fixtures").setDescription("Show the next 5 upcoming Everton fixtures"),
