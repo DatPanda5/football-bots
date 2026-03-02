@@ -1,7 +1,7 @@
 # Football Bots — Project Status Summary
 
 **Project root:** `football-bots/`  
-**Last updated:** 02 Mar 2026
+**Last updated:** 02 Mar 2026 (later same day — /help + guild command registration)
 
 ---
 
@@ -40,7 +40,7 @@ See [CHANGELOG.md](../CHANGELOG.md) at Discord Bots root for workspace-wide entr
 
 | Component           | Status | Notes |
 |--------------------|--------|--------|
-| **Blue Frontier**  | Ready | **Local:** `cd blue_frontier && npm install && npm start`. **Railway:** repo root → Build `cd blue_frontier && npm ci --omit=dev`, Start `cd blue_frontier && node index.js`, `NODE_VERSION=18`. Global slash commands; bot invited to test + The Blue Frontier servers. |
+| **Blue Frontier**  | Ready | **Local:** `cd blue_frontier && npm install && npm start`. **Railway:** repo root → Build `cd blue_frontier && npm ci --omit=dev`, Start `cd blue_frontier && node index.js`, `NODE_VERSION=18`. Global slash commands **plus guild-level registration** for test + The Blue Frontier servers (ensures new commands like `/help` appear instantly). |
 | **Footy Bot**      | Ready | Run from `football-bots`: `cd footy_bot && npm install && npm start`. Wire `fetchScores(league)` to your API for real fixtures. Discord name: **footy_bot**. |
 | **core**           | In use | Shared by both bots; no standalone run. |
 | **SportRadar**     | Stub | Blue Frontier: set `SPORTRADAR_KEY` and uncomment fetch in `_fetchFinalScore` to enable auto results. |

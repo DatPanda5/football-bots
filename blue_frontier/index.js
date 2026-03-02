@@ -951,11 +951,11 @@ client.on("interactionCreate", async (interaction) => {
     }
     const row = new ActionRowBuilder().addComponents(
       new StringSelectMenuBuilder().setCustomId("tbfc_select_fixture")
-        .setPlaceholder("Choose a match to predict...")
+        .setPlaceholder("Click here to choose a match…")
         .addOptions(upcoming.map((f) => ({ label: `${f.home} vs ${f.away}`, description: f.label, value: f.id })))
     );
     return interaction.reply({
-      content: `## 🔵 ${BOT_NAME} — Score Predictor\nWhich fixture do you want to predict?`,
+      content: `## 🔵 ${BOT_NAME} — Score Predictor\nWhich fixture do you want to predict?\n\n_↓ **Click the menu below** to pick a match → a form will open for score + optional scorers._`,
       components: [row], flags: MessageFlags.Ephemeral,
     });
   }

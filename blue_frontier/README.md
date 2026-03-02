@@ -106,7 +106,10 @@ git push -u origin main
    - **Start Command:** `cd blue_frontier && npm install && node index.js`  
      _(Installs deps at startup so `blue_frontier/node_modules` exists in the container.)_
 4. **Variables:** add the same keys as in `.env`:
-   - **Required:** `DISCORD_TOKEN`, `CLIENT_ID`, `GUILD_ID` (e.g. your test server `609194510660009995` — used for reference; commands are **global** so they appear in every server the bot is in).
+   - **Required:** `DISCORD_TOKEN`, `CLIENT_ID`, `GUILD_ID` (your **test server** ID, e.g. `609194510660009995`). Commands are registered **globally** and also **per-guild** for:
+     - The test server (`GUILD_ID`) and
+     - The Blue Frontier server (`BLUE_FRONTIER_GUILD_ID`, see below),
+     so new commands (like `/help`) appear almost instantly in those servers.
    - **Optional:** `MOD_ROLE_ID` (e.g. test server), `BLUE_FRONTIER_MOD_ROLE_ID` (MOD role in The Blue Frontier server, e.g. `1306013527961501812`), `RESULTS_CHANNEL_ID`, `PREDICTIONS_CHANNEL_ID`, `SPORTRADAR_KEY`. To restrict **prediction commands** (e.g. `/predict`, `/final`) to the score-predictions channel **only in The Blue Frontier server** (test server stays unrestricted), set `BLUE_FRONTIER_GUILD_ID` to that server’s ID and `ALLOWED_PREDICTION_CHANNEL_IDS=1306046468846522378` (or add more channel IDs comma-separated).
 5. Redeploy after adding variables. The bot will stay online and reconnect if Discord drops.
 
@@ -144,6 +147,7 @@ Use this OAuth2 URL to add the bot to a different Discord server:
 | `/final` | MOD only: enter final score + optional scorers; awards points | MODs |
 | `/leaderboard` | View prediction leaderboard (current season or all-time) | Everyone |
 | `/resetleaderboard` | MOD only: reset **current season** or **all-time** points (all-time asks for confirm) | MODs |
+| `/help` | Show all Blue Frontier Committee commands and how they work (ephemeral, only visible to you) | You only |
 
 ---
 
