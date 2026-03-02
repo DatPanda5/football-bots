@@ -103,10 +103,10 @@ git push -u origin main
 3. In the service **Settings**:
    - **Root Directory:** leave default (repo root).
    - **Build Command:** `cd blue_frontier && npm install`
-   - **Start Command:** `node blue_frontier/index.js`
+   - **Start Command:** `cd blue_frontier && node index.js`
 4. **Variables:** add the same keys as in `.env`:
    - **Required:** `DISCORD_TOKEN`, `CLIENT_ID`, `GUILD_ID` (e.g. your test server `609194510660009995` — used for reference; commands are **global** so they appear in every server the bot is in).
-   - **Optional:** `MOD_ROLE_ID`, `RESULTS_CHANNEL_ID`, `PREDICTIONS_CHANNEL_ID`, `SPORTRADAR_KEY`. For The Blue Frontier server you can set `ALLOWED_PREDICTION_CHANNEL_IDS` (comma-separated channel IDs) so prediction commands only work in certain channels; leave unset for no restriction.
+   - **Optional:** `MOD_ROLE_ID` (e.g. test server), `BLUE_FRONTIER_MOD_ROLE_ID` (MOD role in The Blue Frontier server, e.g. `1306013527961501812`), `RESULTS_CHANNEL_ID`, `PREDICTIONS_CHANNEL_ID`, `SPORTRADAR_KEY`. To restrict **prediction commands** (e.g. `/predict`, `/final`) to the score-predictions channel **only in The Blue Frontier server** (test server stays unrestricted), set `BLUE_FRONTIER_GUILD_ID` to that server’s ID and `ALLOWED_PREDICTION_CHANNEL_IDS=1306046468846522378` (or add more channel IDs comma-separated).
 5. Redeploy after adding variables. The bot will stay online and reconnect if Discord drops.
 
 ### 3. Ongoing deploys
