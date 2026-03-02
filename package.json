@@ -1,0 +1,13 @@
+{
+  "name": "football-bots",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Blue Frontier (Everton) + Footy Bot — two Discord bots",
+  "scripts": {
+    "start:blue": "node blue_frontier/index.js",
+    "start:footy": "node footy_bot/index.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

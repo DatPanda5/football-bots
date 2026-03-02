@@ -1,0 +1,18 @@
+{
+  "name": "footy-bot",
+  "version": "1.0.0",
+  "description": "Footy Bot — multi-league predictions + leaderboard (Discord name: footy_bot)",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.16.1",
+    "dotenv": "^16.4.5",
+    "better-sqlite3": "^9.4.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
