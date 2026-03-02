@@ -905,6 +905,9 @@ client.on("interactionCreate", async (interaction) => {
   }
 
   if (interaction.isChatInputCommand() && interaction.commandName === "help") {
+    if (interaction.replied || interaction.deferred) {
+      return;
+    }
     const isBlueFrontierGuild = BLUE_FRONTIER_GUILD_ID && interaction.guildId === BLUE_FRONTIER_GUILD_ID;
     const descLines = [
       "**/fixtures** — show the next 5 Everton matches.",
@@ -926,7 +929,16 @@ client.on("interactionCreate", async (interaction) => {
       .setDescription(descLines.join("\n"))
       .setFooter({ text: BOT_FOOTER })
       .setTimestamp();
-    return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+    try {
+      return await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+    } catch (err) {
+      // If Discord reports that the interaction was already acknowledged, just log and ignore.
+      if (err?.code === 40060) {
+        console.warn(`[${BOT_NAME}] Help command: interaction already acknowledged (code 40060), ignoring.`);
+        return;
+      }
+      throw err;
+    }
   }
 
   if (interaction.isChatInputCommand() && interaction.commandName === "predict") {
