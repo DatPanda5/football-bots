@@ -722,9 +722,33 @@ const commands = [
 // ───────────────────────────────────────────────────────────────
 async function registerCommands() {
   const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN);
+  const clientId        = process.env.CLIENT_ID;
+  const testGuildId     = process.env.GUILD_ID;
+  const blueFrontierId  = process.env.BLUE_FRONTIER_GUILD_ID;
+
   console.log(`[${BOT_NAME}] Registering slash commands (global)...`);
-  await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), { body: commands });
-  console.log(`[${BOT_NAME}] ✅ Slash commands registered (visible in all servers the bot is in).`);
+  await rest.put(Routes.applicationCommands(clientId), { body: commands });
+  console.log(`[${BOT_NAME}] ✅ Global slash commands registered.`);
+
+  if (testGuildId) {
+    console.log(
+      `[${BOT_NAME}] Registering slash commands for test guild ${testGuildId} (instant update)...`
+    );
+    await rest.put(Routes.applicationGuildCommands(clientId, testGuildId), { body: commands });
+    console.log(
+      `[${BOT_NAME}] ✅ Slash commands registered for test guild ${testGuildId}.`
+    );
+  }
+
+  if (blueFrontierId) {
+    console.log(
+      `[${BOT_NAME}] Registering slash commands for Blue Frontier guild ${blueFrontierId} (instant update)...`
+    );
+    await rest.put(Routes.applicationGuildCommands(clientId, blueFrontierId), { body: commands });
+    console.log(
+      `[${BOT_NAME}] ✅ Slash commands registered for Blue Frontier guild ${blueFrontierId}.`
+    );
+  }
 }
 
 // ───────────────────────────────────────────────────────────────
