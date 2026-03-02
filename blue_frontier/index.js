@@ -289,6 +289,12 @@ const EVERTON_SQUAD_2025_26 = [
   { number: 58, name: "Braiden Graham",         positions: "ST" },
 ];
 
+// Short-name / nickname aliases for scorer matching — keys and values lowercase.
+// Example: "kdh" should count as Kiernan Dewsbury-Hall.
+const EVERTON_SCORER_ALIASES = {
+  "kdh": "kiernan dewsbury-hall",
+};
+
 // ───────────────────────────────────────────────────────────────
 //  OPPONENT SQUADS 2025-26 — remaining fixtures (verified Feb 2026)
 //  Key = opponent name as in ALL_FIXTURES. Value = array of player names for placeholders.
@@ -600,7 +606,12 @@ function _buildScoreEmbed(game) {
 // ───────────────────────────────────────────────────────────────
 function normalizeScorers(str) {
   if (!str?.trim()) return [];
-  return String(str).split(/[,/\n]+/).map((s) => s.trim().toLowerCase()).filter(Boolean).sort();
+  return String(str)
+    .split(/[,/\n]+/)
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean)
+    .map((name) => EVERTON_SCORER_ALIASES[name] || name)
+    .sort();
 }
 
 function scorersMatch(actualStr, predictedStr) {
