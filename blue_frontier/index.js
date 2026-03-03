@@ -289,12 +289,13 @@ const EVERTON_SQUAD_2025_26 = [
   { number: 58, name: "Braiden Graham",         positions: "ST" },
 ];
 
-// Short-name / nickname aliases for scorer matching — keys and values lowercase.
-// Example: "kdh" should count as Kiernan Dewsbury-Hall.
-const EVERTON_SCORER_ALIASES = {
-  "kdh": "kiernan dewsbury-hall",
-  "job": "jake o'brien",
-};
+// Diacritic normalization so "Merlin Rohl" and "Merlin Röhl" match (ASCII vs special chars).
+function normalizeDiacritics(str) {
+  return String(str)
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .replace(/ß/g, "ss");
+}
 
 // ───────────────────────────────────────────────────────────────
 //  OPPONENT SQUADS 2025-26 — remaining fixtures (verified Feb 2026)
@@ -404,6 +405,25 @@ const OPPONENT_SQUADS_2025_26 = {
     "Evanilson", "Ben Doak", "Justin Kluivert", "Amine Adli", "Junior Kroupi", "Enes Ünal", "Rayan",
   ],
 };
+
+// Short-name / nickname aliases for scorer matching — keys and values lowercase.
+// Includes Everton + opponent players; ASCII spellings and shortenings map to canonical form.
+function buildScorerAliases() {
+  const aliases = {
+    "kdh": "kiernan dewsbury-hall",
+    "job": "jake o'brien",
+    "rohl": "merlin röhl",
+  };
+  const addFromName = (name) => {
+    const lower = name.toLowerCase();
+    const ascii = normalizeDiacritics(lower);
+    if (ascii !== lower) aliases[ascii] = lower;
+  };
+  EVERTON_SQUAD_2025_26.forEach((p) => addFromName(p.name));
+  Object.values(OPPONENT_SQUADS_2025_26).flat().forEach(addFromName);
+  return aliases;
+}
+const SCORER_ALIASES = buildScorerAliases();
 
 // ───────────────────────────────────────────────────────────────
 //  TEAM ALIASES — for !score command
@@ -611,7 +631,8 @@ function normalizeScorers(str) {
     .split(/[,/\n]+/)
     .map((s) => s.replace(/^\s*[^:,]+:\s*/, "").trim().toLowerCase()) // strip "Everton: " / "Burnley: " etc.
     .filter(Boolean)
-    .map((name) => EVERTON_SCORER_ALIASES[name] || name)
+    .map((name) => SCORER_ALIASES[name] || name)
+    .map(normalizeDiacritics)
     .sort();
 }
 
