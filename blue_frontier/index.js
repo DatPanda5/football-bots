@@ -730,6 +730,14 @@ function scorersMatch(actualStr, predictedStr) {
   return a.length === b.length && a.every((t, i) => t === b[i]);
 }
 
+/** True if predicted string has at least one scorer in common with actual (after normalization). */
+function scorersMatchAtLeastOne(actualStr, predictedStr) {
+  if (!actualStr?.trim() || !predictedStr?.trim()) return false;
+  const actualSet = new Set(normalizeScorers(actualStr));
+  const predicted = normalizeScorers(predictedStr);
+  return predicted.some((name) => actualSet.has(name));
+}
+
 function getRandomScorersPlaceholder(opponentName) {
   const shuffle = (arr) => arr.sort(() => Math.random() - 0.5);
   const pick    = (arr, n) => shuffle([...arr]).slice(0, n);
@@ -779,12 +787,11 @@ function getListableFixture() {
 // ───────────────────────────────────────────────────────────────
 //  POINTS EVALUATION (same as footy_bot: exact 5, result 2, each scorer 1)
 // ───────────────────────────────────────────────────────────────
+/** Returns list of predicted scorer names that match an actual scorer (same normalization as scorersMatchAtLeastOne). 1 pt per returned name. */
 function _matchedScorers(predScorersStr, actualScorersStr) {
+  const actualSet = new Set(normalizeScorers(actualScorersStr || ""));
   const pred = normalizeScorers(predScorersStr || "");
-  const real = normalizeScorers(actualScorersStr || "");
-  return pred.filter((name) =>
-    real.some((r) => name.includes(r) || r.includes(name))
-  );
+  return pred.filter((name) => actualSet.has(name));
 }
 
 function awardPointsForFixture(fixtureId, evertonGoals, opponentGoals, actualScorersStr) {
@@ -1433,6 +1440,10 @@ client.on("interactionCreate", async (interaction) => {
     const correctAll = entries.filter((p) => p.evertonScore === eStr && p.opponentScore === oStr);
     const withScorers= actualScorers ? correctAll.filter((p) => p.scorers?.trim() && scorersMatch(actualScorers, p.scorers)) : [];
     const scoreOnly  = correctAll.filter((p) => !withScorers.includes(p));
+    // Users who predicted at least one actual scorer
+    const atLeastOneScorer = actualScorers
+      ? entries.filter((p) => p.scorers?.trim() && scorersMatchAtLeastOne(actualScorers, p.scorers))
+      : [];
 
     const scoreLine = fixture.evertonHome
       ? `Everton **${everton}** – **${opponent}** ${fixture.opponent}`
@@ -1445,26 +1456,17 @@ client.on("interactionCreate", async (interaction) => {
 
     const nWith = await Promise.all(withScorers.map((p) => getDisplayName(interaction.guild, p.userId, p.displayName)));
     const nOnly = await Promise.all(scoreOnly.map((p) => getDisplayName(interaction.guild, p.userId, p.displayName)));
+    const atLeastOnePreds = atLeastOneScorer.filter((p, i, arr) => arr.findIndex((q) => q.userId === p.userId) === i);
+    const nAtLeastOne = await Promise.all(atLeastOnePreds.map((p) => getDisplayName(interaction.guild, p.userId, p.displayName)));
 
     embed.addFields(
       { name: "✅ Correct score + goal scorers", value: nWith.length ? nWith.join(", ") : "_None_", inline: false },
       { name: "✅ Correct score only",           value: nOnly.length ? nOnly.join(", ") : "_None_", inline: false }
     );
-
-    const scorersRows = await Promise.all(
-      entries.filter((p) => p.scorers?.trim())
-        .map(async (p) => `**${await getDisplayName(interaction.guild, p.userId, p.displayName)}**: ${p.scorers.trim()}`)
-    );
-    const scorersVal = scorersRows.length ? scorersRows.join("\n") : "_No one entered goal scorers._";
-    if (scorersVal.length > 1020) {
-      let rest = scorersVal, first = true;
-      while (rest.length) {
-        const chunk = rest.slice(0, 1020), cut = chunk.lastIndexOf("\n") > 500 ? chunk.lastIndexOf("\n") + 1 : 1020;
-        embed.addFields({ name: first ? "⚽ Goal scorers (predicted)" : "​", value: chunk.slice(0, cut).trim(), inline: false });
-        rest = rest.slice(cut).trim(); first = false;
-      }
-    } else {
-      embed.addFields({ name: "⚽ Goal scorers (predicted)", value: scorersVal, inline: false });
+    if (actualScorers) {
+      embed.addFields(
+        { name: "✅ At least one correct goal scorer", value: nAtLeastOne.length ? nAtLeastOne.join(", ") : "_None_", inline: false }
+      );
     }
 
     return interaction.editReply({ embeds: [embed] });

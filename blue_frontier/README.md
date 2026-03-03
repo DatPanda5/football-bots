@@ -127,6 +127,17 @@ From the **football-bots** repo root, run `./deploy.sh` or `./deploy.sh "Your co
 
 ---
 
+## Environments
+
+| Environment | Where it runs | Alfred keyword |
+|-------------|---------------|----------------|
+| **Production** | Railway → The Blue Frontier server | **updatetbf** — commit + push main → Railway deploys |
+| **Blue Frontier Lab** | Local (your Mac); test in server **DATPANDA BOT TESTING** | **tbflabon** = start lab, **tbflabpush** = restart lab, **tbflaboff** = stop lab |
+
+**tbf** = The Blue Frontier (so you can reuse the pattern for other bots, e.g. wdlabon for WokeDyche). Lab uses a separate Discord app and `blue_frontier/.env`; production uses Railway variables only. Run the regression checklist in the lab before **updatetbf** (see PROJECT_STATUS_SUMMARY or the plan in `.cursor/plans`).
+
+---
+
 ## Invite bot to another server
 
 Use this OAuth2 URL to add the bot to a different Discord server:
