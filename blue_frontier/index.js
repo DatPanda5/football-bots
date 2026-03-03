@@ -646,11 +646,11 @@ function getUpcomingFixtures() {
 }
 
 function getListableFixture() {
-  const now     = Date.now();
-  const started = ALL_FIXTURES
-    .filter((f) => new Date(f.kickoffUTC).getTime() <= now)
-    .sort((a, b) => new Date(b.kickoffUTC) - new Date(a.kickoffUTC));
-  return started[0] ?? null;
+  const now = Date.now();
+  const upcoming = ALL_FIXTURES
+    .filter((f) => new Date(f.kickoffUTC).getTime() > now)
+    .sort((a, b) => new Date(a.kickoffUTC) - new Date(b.kickoffUTC));
+  return upcoming[0] ?? null;
 }
 
 // ───────────────────────────────────────────────────────────────
@@ -914,7 +914,7 @@ client.on("interactionCreate", async (interaction) => {
       "**/fixtures** — show the next 5 Everton matches.",
       "**/predict** — submit a score prediction (Everton vs opponent).",
       "**/myprediction** — view your own predictions (only you can see).",
-      "**/listpredictions** — list predictions for the current or last-kicked-off fixture.",
+      "**/listpredictions** — list predictions for the next fixture.",
       "**/clearprediction** — delete one of your predictions.",
       "**/final** — MOD only; enter final score + scorers to award points.",
       "**/leaderboard [scope]** — view current-season or all-time points.",
@@ -1052,7 +1052,8 @@ client.on("interactionCreate", async (interaction) => {
       });
     }
     const embed = await buildListEmbed(fixture, interaction.guild);
-    if (!listableFixture && hasModRole) embed.setDescription(`${embed.data.description || ""}\n\n_👀 MOD view — match has not kicked off yet._`);
+    const isUpcoming = fixture && new Date(fixture.kickoffUTC).getTime() > Date.now();
+    if (hasModRole && isUpcoming) embed.setDescription(`${embed.data.description || ""}\n\n_👀 MOD view — match has not kicked off yet._`);
     return interaction.editReply({ embeds: [embed] });
   }
 
