@@ -199,7 +199,7 @@ window — no manual updates needed until the end of the season.
 
 ## Notes
 
-- **Predictions are stored in SQLite** (`blue_frontier/data/predictions.db`) and persist across restarts and Railway redeploys.
+- **Predictions are stored in SQLite** (`<DATA_DIR>/predictions.db`, default `./data/`). They persist across restarts. **If the bot runs on Railway (or another host):** use a persistent volume and set `DATA_DIR` to the mount path so the DB survives redeploys. See **[DEPLOY.md](DEPLOY.md)** for step-by-step instructions that keep your existing predictions when you add the volume.
 - Each member can have **one prediction per fixture**. Re-submitting overwrites.
 - Optional **ALLOWED_PREDICTION_CHANNEL_IDS** (see `.env.example`): when set, score-prediction commands only work in those channels (e.g. on the Blue Frontier server).
 - The bot is structured so additional feature modules can easily be added — this is the predictions module of The Blue Frontier Committee.

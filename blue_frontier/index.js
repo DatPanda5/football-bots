@@ -54,13 +54,29 @@ const BOT_FOOTER = "The Blue Frontier Committee • COYB! 🔵";
 
 // ───────────────────────────────────────────────────────────────
 //  SQLITE PERSISTENCE
-//  Predictions survive bot restarts and Railway redeploys.
-//  DB file: ./data/predictions.db
+//  DB file: <DATA_DIR>/predictions.db
+//  Set DATA_DIR in env (e.g. /data on Railway) to use a persistent volume.
 // ───────────────────────────────────────────────────────────────
-const DATA_DIR = path.join(__dirname, "data");
+const DATA_DIR = process.env.DATA_DIR
+  ? path.resolve(process.env.DATA_DIR)
+  : path.join(__dirname, "data");
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 
-const db = new Database(path.join(DATA_DIR, "predictions.db"));
+const DB_PATH = path.join(DATA_DIR, "predictions.db");
+// One-time restore: set RESTORE_DB_BASE64 to a base64-encoded backup of predictions.db (e.g. after adding a volume).
+if (process.env.RESTORE_DB_BASE64) {
+  const existing = fs.existsSync(DB_PATH) ? fs.statSync(DB_PATH).size : 0;
+  if (existing === 0) {
+    try {
+      fs.writeFileSync(DB_PATH, Buffer.from(process.env.RESTORE_DB_BASE64, "base64"));
+      console.log("[DB] Restored predictions from RESTORE_DB_BASE64. Remove the env var after confirming.");
+    } catch (e) {
+      console.error("[DB] Restore failed:", e.message);
+    }
+  }
+}
+
+const db = new Database(DB_PATH);
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS predictions (
@@ -102,10 +118,55 @@ db.exec(`
   );
 `);
 
+// Seed from seed-predictions.json: when table is empty, or when SEED_PREDICTIONS=1 (merge/update from file).
+const SEED_PATH = path.join(__dirname, "seed-predictions.json");
+const forceSeed = /^1|true|yes$/i.test(process.env.SEED_PREDICTIONS || "");
+(function seedPredictions() {
+  const count = db.prepare("SELECT COUNT(*) as n FROM predictions").get().n;
+  if (count > 0 && !forceSeed) {
+    console.log(`[DB] Seed skipped: table has ${count} row(s) and SEED_PREDICTIONS is not set. Set SEED_PREDICTIONS=1 to re-run seed.`);
+    return;
+  }
+  if (!fs.existsSync(SEED_PATH)) {
+    console.warn("[DB] Seed skipped: seed-predictions.json not found at", SEED_PATH);
+    return;
+  }
+  let list;
+  try {
+    list = JSON.parse(fs.readFileSync(SEED_PATH, "utf8"));
+  } catch (e) {
+    console.warn("[DB] seed-predictions.json invalid or empty:", e.message);
+    return;
+  }
+  const insert = db.prepare(`
+    INSERT OR REPLACE INTO predictions (key, userId, displayName, fixture, evertonScore, opponentScore, scorers, submittedAt)
+    VALUES (@key, @userId, @displayName, @fixture, @evertonScore, @opponentScore, @scorers, @submittedAt)
+  `);
+  const now = new Date().toISOString();
+  let n = 0;
+  for (const row of list) {
+    if (!row.userId || !row.displayName || !row.fixture || row.evertonScore === undefined || row.opponentScore === undefined) continue;
+    const key = `${row.userId}_${row.fixture}`;
+    insert.run({
+      key,
+      userId: String(row.userId),
+      displayName: String(row.displayName),
+      fixture: String(row.fixture),
+      evertonScore: String(row.evertonScore),
+      opponentScore: String(row.opponentScore),
+      scorers: row.scorers != null ? String(row.scorers) : null,
+      submittedAt: now,
+    });
+    n++;
+  }
+  if (n) console.log(`[DB] Seeded ${n} prediction(s) from seed-predictions.json` + (forceSeed ? " (SEED_PREDICTIONS=1). Remove the var after deploy." : ""));
+  else console.warn("[DB] Seed ran but no valid rows in seed-predictions.json (check userId, displayName, fixture, scores).");
+})();
+
 // Normalize prediction row from DB (SQLite/better-sqlite3 may return different column name casing).
 function normalizePredRow(row) {
   if (!row) return row;
-  return {
+  const r = {
     key: row.key ?? row.KEY,
     userId: row.userId ?? row.userid ?? row.USERID,
     displayName: row.displayName ?? row.displayname ?? row.DISPLAYNAME,
@@ -115,6 +176,12 @@ function normalizePredRow(row) {
     scorers: row.scorers ?? row.SCORERS,
     submittedAt: row.submittedAt ?? row.submittedat ?? row.SUBMITTEDAT,
   };
+  if (r.fixture != null) r.fixture = String(r.fixture).trim();
+  return r;
+}
+
+function sameFixture(storedFixtureId, fixtureId) {
+  return storedFixtureId != null && fixtureId != null && String(storedFixtureId).trim() === String(fixtureId).trim();
 }
 
 // ── Drop-in replacement for the original in-memory Map ──────────
@@ -218,10 +285,10 @@ const ALL_FIXTURES = [
     evertonHome: false, srMatchId: null,
   },
   {
-    id: "fix03", kickoffUTC: "2026-03-03T19:30:00Z", label: "Tue 03 Mar 2:30 PM EST",
+    id: "fix03", kickoffUTC: "2026-03-03T19:30:00Z", label: "Tue 03 Mar 2:30 PM ET",
     home: "Everton", away: "Burnley", opponent: "Burnley",
     evertonHome: true, srMatchId: null,
-  },
+  }, // Next match: Everton vs Burnley, 2:30 PM ET today
   {
     id: "fix04", kickoffUTC: "2026-03-15T14:00:00Z", label: "Sun 15 Mar 10:00 AM EDT",
     home: "Arsenal", away: "Everton", opponent: "Arsenal",
@@ -536,7 +603,7 @@ async function _fetchFinalScore(srMatchId, fixture) {
 
 const { scheduleResultCheck } = createResultChecker({
   db,
-  getPredictionsForFixture: (fixtureId) => predStore.values().filter((p) => p.fixture === fixtureId),
+  getPredictionsForFixture: (fixtureId) => predStore.values().filter((p) => sameFixture(p.fixture, fixtureId)),
   fetchFinalScore: _fetchFinalScore,
   EmbedBuilder,
   color: BOT_COLOUR,
@@ -687,7 +754,20 @@ function getListableFixture() {
   const upcoming = ALL_FIXTURES
     .filter((f) => new Date(f.kickoffUTC).getTime() > now)
     .sort((a, b) => new Date(a.kickoffUTC) - new Date(b.kickoffUTC));
-  return upcoming[0] ?? null;
+  const next = upcoming[0] ?? null;
+  if (next) {
+    const countForNext = predStore.values().filter((p) => sameFixture(p.fixture, next.id)).length;
+    if (countForNext > 0) return next;
+    // Next fixture has no predictions; show the fixture that has the most predictions (e.g. seeded Burnley).
+    const byFixture = {};
+    for (const p of predStore.values()) {
+      const fid = (p.fixture || "").trim();
+      if (fid) byFixture[fid] = (byFixture[fid] || 0) + 1;
+    }
+    const [fixtureId] = Object.entries(byFixture).sort((a, b) => b[1] - a[1])[0] || [];
+    if (fixtureId) return getFixtureById(fixtureId) || next;
+  }
+  return next;
 }
 
 // ───────────────────────────────────────────────────────────────
@@ -702,7 +782,7 @@ function _matchedScorers(predScorersStr, actualScorersStr) {
 }
 
 function awardPointsForFixture(fixtureId, evertonGoals, opponentGoals, actualScorersStr) {
-  const entries = predStore.values().filter((p) => p.fixture === fixtureId);
+  const entries = predStore.values().filter((p) => sameFixture(p.fixture, fixtureId));
   const eStr = String(evertonGoals), oStr = String(opponentGoals);
   for (const pred of entries) {
     const exact = pred.evertonScore === eStr && pred.opponentScore === oStr;
@@ -826,7 +906,7 @@ function buildFixturesEmbed(fixtures) {
 }
 
 async function buildListEmbed(fixture, guild) {
-  const entries = predStore.values().filter((p) => p.fixture === fixture.id);
+  const entries = predStore.values().filter((p) => sameFixture(p.fixture, fixture.id));
   const embed   = new EmbedBuilder().setColor(BOT_COLOUR)
     .setTitle(`📋 Predictions — ${fixture.home} vs ${fixture.away}`)
     .setDescription(`📅 ${fixture.label}`)
@@ -1074,7 +1154,7 @@ client.on("interactionCreate", async (interaction) => {
     if (!(await isAllowedPredictionChannelAsync(interaction))) {
       return interaction.reply({ content: PREDICTION_CHANNEL_MSG, flags: MessageFlags.Ephemeral });
     }
-    const mine = predStore.values().filter((p) => p.userId === interaction.user.id);
+    const mine = predStore.values().filter((p) => String(p.userId || "").trim() === String(interaction.user.id).trim());
     if (!mine.length) {
       return interaction.reply({ content: "You haven't made any predictions yet! Use `/predict`.", flags: MessageFlags.Ephemeral });
     }
@@ -1141,7 +1221,7 @@ client.on("interactionCreate", async (interaction) => {
       awardPointsForFixture(fixtureId, everton, opponent, actualScorersStr);
     }
 
-    const entries    = predStore.values().filter((p) => p.fixture === fixtureId);
+    const entries    = predStore.values().filter((p) => sameFixture(p.fixture, fixtureId));
     const eStr       = String(everton), oStr = String(opponent);
     const correctAll = entries.filter((p) => p.evertonScore === eStr && p.opponentScore === oStr);
     const withScorers= actualScorers ? correctAll.filter((p) => p.scorers?.trim() && scorersMatch(actualScorers, p.scorers)) : [];

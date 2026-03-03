@@ -13,5 +13,6 @@
   { "userId": "matt_clevy_rhymes_with_chevy", "displayName": "Matt Clevy Rhymes With Chevy", "fixture": "fix03", "evertonScore": "3", "opponentScore": "1", "scorers": "KDH, Ndiaye, Barry" },
   { "userId": "robert_morrison", "displayName": "Robert Morrison", "fixture": "fix03", "evertonScore": "2", "opponentScore": "0", "scorers": "Iliman Ndiaye, Thierno Barry" },
   { "userId": "micks_long_balls", "displayName": "Mick's Long Balls", "fixture": "fix03", "evertonScore": "2", "opponentScore": "0", "scorers": null },
-  { "userId": "nweins00", "displayName": "nweins00", "fixture": "fix03", "evertonScore": "2", "opponentScore": "0", "scorers": "Barry, Ndiaye" }
+  { "userId": "nweins00", "displayName": "nweins00", "fixture": "fix03", "evertonScore": "2", "opponentScore": "0", "scorers": "Barry, Ndiaye" },
+  { "userId": "abm", "displayName": "abm", "fixture": "fix03", "evertonScore": "2", "opponentScore": "1", "scorers": "Barry, Ndiaye" }
 ]
