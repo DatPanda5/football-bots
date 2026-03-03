@@ -984,6 +984,32 @@ async function isAllowedPredictionChannelAsync(interaction) {
 }
 const PREDICTION_CHANNEL_MSG = "Score prediction commands are only allowed in the score-predictions channel (or mod-chat / mod-bot-logs for MODs).";
 
+// Predict flow logging — grep logs for [predict] to troubleshoot "command not working" reports
+function logPredict(step, interaction, extra = {}) {
+  const ctx = {
+    step,
+    userId: interaction?.user?.id ?? "?",
+    username: interaction?.user?.username ?? "?",
+    guildId: interaction?.guildId ?? "?",
+    channelId: interaction?.channelId ?? "?",
+    ...extra,
+  };
+  console.log(`[predict] ${JSON.stringify(ctx)}`);
+}
+function logPredictError(step, interaction, err, extra = {}) {
+  const ctx = {
+    step,
+    reason: "system_error",
+    error: err?.message ?? String(err),
+    userId: interaction?.user?.id ?? "?",
+    guildId: interaction?.guildId ?? "?",
+    channelId: interaction?.channelId ?? "?",
+    ...extra,
+  };
+  console.error(`[predict] ERROR ${JSON.stringify(ctx)}`);
+  if (err?.stack) console.error(`[predict] stack: ${err.stack}`);
+}
+
 // MOD role: use BLUE_FRONTIER_MOD_ROLE_ID when in Blue Frontier server, else MOD_ROLE_ID (e.g. test server).
 function getModRoleIdForGuild(guildId) {
   if (BLUE_FRONTIER_GUILD_ID && guildId === BLUE_FRONTIER_GUILD_ID) {
@@ -1075,79 +1101,123 @@ client.on("interactionCreate", async (interaction) => {
   }
 
   if (interaction.isChatInputCommand() && interaction.commandName === "predict") {
-    if (!(await isAllowedPredictionChannelAsync(interaction))) {
-      return interaction.reply({ content: PREDICTION_CHANNEL_MSG, flags: MessageFlags.Ephemeral });
+    try {
+      logPredict("predict_cmd", interaction, { upcomingCount: getUpcomingFixtures().length });
+      if (!(await isAllowedPredictionChannelAsync(interaction))) {
+        logPredict("predict_cmd_blocked_channel", interaction, { reason: "user_error", detail: "channel_not_allowed" });
+        return interaction.reply({ content: PREDICTION_CHANNEL_MSG, flags: MessageFlags.Ephemeral });
+      }
+      const upcoming = getUpcomingFixtures();
+      if (!upcoming.length) {
+        logPredict("predict_cmd_no_fixtures", interaction, { reason: "user_error", detail: "no_upcoming_fixtures" });
+        return interaction.reply({ content: "😔 No upcoming fixtures to predict right now!", flags: MessageFlags.Ephemeral });
+      }
+      const row = new ActionRowBuilder().addComponents(
+        new StringSelectMenuBuilder().setCustomId("tbfc_select_fixture")
+          .setPlaceholder("Click here to choose a match…")
+          .addOptions(upcoming.map((f) => ({ label: `${f.home} vs ${f.away}`, description: f.label, value: f.id })))
+      );
+      await interaction.reply({
+        content: `## 🔵 ${BOT_NAME} — Score Predictor\nWhich fixture do you want to predict?\n\n_↓ **Click the menu below** to pick a match → a form will open for score + optional scorers._`,
+        components: [row], flags: MessageFlags.Ephemeral,
+      });
+      logPredict("predict_cmd_ok", interaction, { optionCount: upcoming.length });
+    } catch (err) {
+      logPredictError("predict_cmd", interaction, err);
+      try {
+        if (!interaction.replied && !interaction.deferred) {
+          await interaction.reply({ content: "Something went wrong showing the predictor. Please try `/predict` again.", flags: MessageFlags.Ephemeral });
+        }
+      } catch (_) { /* already replied or expired */ }
     }
-    const upcoming = getUpcomingFixtures();
-    if (!upcoming.length) {
-      return interaction.reply({ content: "😔 No upcoming fixtures to predict right now!", flags: MessageFlags.Ephemeral });
-    }
-    const row = new ActionRowBuilder().addComponents(
-      new StringSelectMenuBuilder().setCustomId("tbfc_select_fixture")
-        .setPlaceholder("Click here to choose a match…")
-        .addOptions(upcoming.map((f) => ({ label: `${f.home} vs ${f.away}`, description: f.label, value: f.id })))
-    );
-    return interaction.reply({
-      content: `## 🔵 ${BOT_NAME} — Score Predictor\nWhich fixture do you want to predict?\n\n_↓ **Click the menu below** to pick a match → a form will open for score + optional scorers._`,
-      components: [row], flags: MessageFlags.Ephemeral,
-    });
+    return;
   }
 
   if (interaction.isStringSelectMenu() && interaction.customId === "tbfc_select_fixture") {
-    if (!(await isAllowedPredictionChannelAsync(interaction))) {
-      return interaction.reply({ content: PREDICTION_CHANNEL_MSG, flags: MessageFlags.Ephemeral });
+    try {
+      const fixtureId = interaction.values?.[0];
+      logPredict("predict_select", interaction, { fixtureId });
+      if (!(await isAllowedPredictionChannelAsync(interaction))) {
+        logPredict("predict_select_blocked_channel", interaction, { fixtureId, reason: "user_error", detail: "channel_not_allowed" });
+        return interaction.reply({ content: PREDICTION_CHANNEL_MSG, flags: MessageFlags.Ephemeral });
+      }
+      const f = getFixtureById(fixtureId);
+      if (!f || new Date(f.kickoffUTC).getTime() <= Date.now()) {
+        logPredict("predict_select_fixture_expired", interaction, { fixtureId, reason: "user_error", detail: "fixture_expired" });
+        return interaction.update({ content: "⚠️ That fixture has already kicked off. Run `/predict` again.", components: [] });
+      }
+      const modal = new ModalBuilder().setCustomId(`tbfc_score_modal_${fixtureId}`).setTitle(`${f.home} vs ${f.away}`);
+      modal.addComponents(
+        new ActionRowBuilder().addComponents(
+          new TextInputBuilder().setCustomId("everton_score").setLabel("Everton — how many goals?")
+            .setStyle(TextInputStyle.Short).setPlaceholder("e.g. 2").setMinLength(1).setMaxLength(2).setRequired(true)
+        ),
+        new ActionRowBuilder().addComponents(
+          new TextInputBuilder().setCustomId("opponent_score").setLabel(`${f.opponent} — how many goals?`)
+            .setStyle(TextInputStyle.Short).setPlaceholder("e.g. 1").setMinLength(1).setMaxLength(2).setRequired(true)
+        ),
+        new ActionRowBuilder().addComponents(
+          new TextInputBuilder().setCustomId("scorers").setLabel("Goal scorers (optional)")
+            .setStyle(TextInputStyle.Paragraph).setPlaceholder(`e.g. ${getRandomScorersPlaceholder(f.opponent)}`).setRequired(false)
+        )
+      );
+      await interaction.showModal(modal);
+      logPredict("predict_select_ok", interaction, { fixtureId });
+    } catch (err) {
+      logPredictError("predict_select", interaction, err, { fixtureId: interaction.values?.[0] });
+      try {
+        if (!interaction.replied && !interaction.deferred) {
+          await interaction.reply({ content: "Something went wrong opening the form. Please try `/predict` again.", flags: MessageFlags.Ephemeral });
+        } else {
+          await interaction.update({ content: "Something went wrong. Please try `/predict` again.", components: [] }).catch(() => {});
+        }
+      } catch (_) { /* already replied or expired */ }
     }
-    const fixtureId = interaction.values[0];
-    const f         = getFixtureById(fixtureId);
-    if (!f || new Date(f.kickoffUTC).getTime() <= Date.now()) {
-      return interaction.update({ content: "⚠️ That fixture has already kicked off. Run `/predict` again.", components: [] });
-    }
-    const modal = new ModalBuilder().setCustomId(`tbfc_score_modal_${fixtureId}`).setTitle(`${f.home} vs ${f.away}`);
-    modal.addComponents(
-      new ActionRowBuilder().addComponents(
-        new TextInputBuilder().setCustomId("everton_score").setLabel("Everton — how many goals?")
-          .setStyle(TextInputStyle.Short).setPlaceholder("e.g. 2").setMinLength(1).setMaxLength(2).setRequired(true)
-      ),
-      new ActionRowBuilder().addComponents(
-        new TextInputBuilder().setCustomId("opponent_score").setLabel(`${f.opponent} — how many goals?`)
-          .setStyle(TextInputStyle.Short).setPlaceholder("e.g. 1").setMinLength(1).setMaxLength(2).setRequired(true)
-      ),
-      new ActionRowBuilder().addComponents(
-        new TextInputBuilder().setCustomId("scorers").setLabel("Goal scorers (optional)")
-          .setStyle(TextInputStyle.Paragraph).setPlaceholder(`e.g. ${getRandomScorersPlaceholder(f.opponent)}`).setRequired(false)
-      )
-    );
-    return interaction.showModal(modal);
+    return;
   }
 
   if (interaction.isModalSubmit() && interaction.customId.startsWith("tbfc_score_modal_")) {
-    if (!(await isAllowedPredictionChannelAsync(interaction))) {
-      return interaction.reply({ content: PREDICTION_CHANNEL_MSG, flags: MessageFlags.Ephemeral });
+    const fixtureId = interaction.customId.replace("tbfc_score_modal_", "");
+    try {
+      logPredict("predict_modal", interaction, { fixtureId });
+      if (!(await isAllowedPredictionChannelAsync(interaction))) {
+        logPredict("predict_modal_blocked_channel", interaction, { fixtureId, reason: "user_error", detail: "channel_not_allowed" });
+        return interaction.reply({ content: PREDICTION_CHANNEL_MSG, flags: MessageFlags.Ephemeral });
+      }
+      const evertonScore  = interaction.fields.getTextInputValue("everton_score").trim();
+      const opponentScore = interaction.fields.getTextInputValue("opponent_score").trim();
+      const scorers       = interaction.fields.getTextInputValue("scorers").trim();
+
+      if (!/^\d+$/.test(evertonScore) || !/^\d+$/.test(opponentScore)) {
+        logPredict("predict_modal_invalid_scores", interaction, { fixtureId, evertonScore, opponentScore, reason: "user_error", detail: "invalid_scores" });
+        return interaction.reply({ content: "❌ Scores must be whole numbers. Run `/predict` again.", flags: MessageFlags.Ephemeral });
+      }
+
+      let displayName = interaction.user.globalName || interaction.user.username;
+      try { displayName = (await interaction.guild.members.fetch(interaction.user.id)).displayName; } catch {}
+
+      const key  = `${interaction.user.id}_${fixtureId}`;
+      const pred = { userId: interaction.user.id, displayName, fixture: fixtureId, evertonScore, opponentScore, scorers: scorers || null, submittedAt: new Date().toISOString() };
+      predStore.set(key, pred);
+
+      // Schedule result check on first prediction for this fixture
+      const f = getFixtureById(fixtureId);
+      if (f?.srMatchId) {
+        const chId = getResultsChannelId();
+        if (chId) scheduleResultCheck(f, client, chId);
+      }
+
+      await interaction.reply({ content: "✅ **Prediction locked in!**", embeds: [buildPredictionEmbed(pred, displayName)] });
+      logPredict("predict_modal_ok", interaction, { fixtureId, key });
+    } catch (err) {
+      logPredictError("predict_modal", interaction, err, { fixtureId });
+      try {
+        if (!interaction.replied && !interaction.deferred) {
+          await interaction.reply({ content: "Something went wrong saving your prediction. Please try `/predict` again.", flags: MessageFlags.Ephemeral });
+        }
+      } catch (_) { /* already replied or expired */ }
     }
-    const fixtureId     = interaction.customId.replace("tbfc_score_modal_", "");
-    const evertonScore  = interaction.fields.getTextInputValue("everton_score").trim();
-    const opponentScore = interaction.fields.getTextInputValue("opponent_score").trim();
-    const scorers       = interaction.fields.getTextInputValue("scorers").trim();
-
-    if (!/^\d+$/.test(evertonScore) || !/^\d+$/.test(opponentScore)) {
-      return interaction.reply({ content: "❌ Scores must be whole numbers. Run `/predict` again.", flags: MessageFlags.Ephemeral });
-    }
-
-    let displayName = interaction.user.globalName || interaction.user.username;
-    try { displayName = (await interaction.guild.members.fetch(interaction.user.id)).displayName; } catch {}
-
-    const key  = `${interaction.user.id}_${fixtureId}`;
-    const pred = { userId: interaction.user.id, displayName, fixture: fixtureId, evertonScore, opponentScore, scorers: scorers || null, submittedAt: new Date().toISOString() };
-    predStore.set(key, pred);
-
-    // Schedule result check on first prediction for this fixture
-    const f = getFixtureById(fixtureId);
-    if (f?.srMatchId) {
-      const chId = getResultsChannelId();
-      if (chId) scheduleResultCheck(f, client, chId);
-    }
-
-    return interaction.reply({ content: "✅ **Prediction locked in!**", embeds: [buildPredictionEmbed(pred, displayName)] });
+    return;
   }
 
   if (interaction.isChatInputCommand() && interaction.commandName === "myprediction") {
