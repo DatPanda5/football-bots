@@ -293,6 +293,7 @@ const EVERTON_SQUAD_2025_26 = [
 // Example: "kdh" should count as Kiernan Dewsbury-Hall.
 const EVERTON_SCORER_ALIASES = {
   "kdh": "kiernan dewsbury-hall",
+  "job": "jake o'brien",
 };
 
 // ───────────────────────────────────────────────────────────────

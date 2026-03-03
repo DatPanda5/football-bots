@@ -32,6 +32,7 @@
 
 See [CHANGELOG.md](../CHANGELOG.md) at Discord Bots root for workspace-wide entries. Recent football-bots changes:
 
+- **02 Mar 2026** — Blue Frontier: `/help` command (ephemeral); slash commands registered globally **and** per-guild for test + The Blue Frontier (instant visibility); `/help` crash fix (40060 already-acknowledged); `/predict` UX: clearer description (“press Enter, then pick a match from the menu”), subtitle and dropdown placeholder so users know to click the menu then fill the form. Alfred workflow to update the Discord app: keyword **`updatetbf`**. Docs: README + PROJECT_STATUS updated.
 - **21 Feb 2026** — Reorganized into football-bots/ (core, blue_frontier, footy_bot). Merged handover v3.0 into Blue Frontier; Footy Bot (renamed from universal_bot, prime v1.0). Primary Everton bot: **blue_frontier**; tbfbot archived in +Archive.
 
 ---
@@ -40,7 +41,7 @@ See [CHANGELOG.md](../CHANGELOG.md) at Discord Bots root for workspace-wide entr
 
 | Component           | Status | Notes |
 |--------------------|--------|--------|
-| **Blue Frontier**  | Ready | **Local:** `cd blue_frontier && npm install && npm start`. **Railway:** repo root → Build `cd blue_frontier && npm ci --omit=dev`, Start `cd blue_frontier && node index.js`, `NODE_VERSION=18`. Global slash commands **plus guild-level registration** for test + The Blue Frontier servers (ensures new commands like `/help` appear instantly). |
+| **Blue Frontier**  | Ready | **Local:** `cd blue_frontier && npm install && npm start`. **Railway:** repo root → Build `cd blue_frontier && npm ci --omit=dev`, Start `cd blue_frontier && node index.js`, `NODE_VERSION=18`. Global slash commands **plus guild-level registration** for test + The Blue Frontier servers (ensures new commands like `/help` appear instantly). **Alfred:** workflow to update the Discord app (commit + push → Railway); keyword **`updatetbf`**. |
 | **Footy Bot**      | Ready | Run from `football-bots`: `cd footy_bot && npm install && npm start`. Wire `fetchScores(league)` to your API for real fixtures. Discord name: **footy_bot**. |
 | **core**           | In use | Shared by both bots; no standalone run. |
 | **SportRadar**     | Stub | Blue Frontier: set `SPORTRADAR_KEY` and uncomment fetch in `_fetchFinalScore` to enable auto results. |

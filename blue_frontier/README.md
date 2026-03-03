@@ -117,6 +117,8 @@ git push -u origin main
 
 From the **football-bots** repo root, run `./deploy.sh` or `./deploy.sh "Your commit message"`. Push to GitHub and Railway auto-deploys in ~30 seconds.
 
+**Alfred workflow:** Keyword **`updatetbf`** runs the update workflow (commit + push to GitHub → Railway deploys the Blue Frontier Discord app).
+
 ### 4. After deploy — Test server + The Blue Frontier
 
 - **Slash commands are global:** they appear in every server the bot has been invited to. No need to change `GUILD_ID` when you add the bot to another server.
