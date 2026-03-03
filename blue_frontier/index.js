@@ -102,6 +102,21 @@ db.exec(`
   );
 `);
 
+// Normalize prediction row from DB (SQLite/better-sqlite3 may return different column name casing).
+function normalizePredRow(row) {
+  if (!row) return row;
+  return {
+    key: row.key ?? row.KEY,
+    userId: row.userId ?? row.userid ?? row.USERID,
+    displayName: row.displayName ?? row.displayname ?? row.DISPLAYNAME,
+    fixture: row.fixture ?? row.FIXTURE,
+    evertonScore: row.evertonScore ?? row.evertonscore ?? row.EVERTONSCORE,
+    opponentScore: row.opponentScore ?? row.opponentscore ?? row.OPPONENTSCORE,
+    scorers: row.scorers ?? row.SCORERS,
+    submittedAt: row.submittedAt ?? row.submittedat ?? row.SUBMITTEDAT,
+  };
+}
+
 // ── Drop-in replacement for the original in-memory Map ──────────
 // All existing commands work identically — they just read from SQLite now.
 const predStore = {
@@ -114,7 +129,8 @@ const predStore = {
     `).run({ ...pred, key, scorers: pred.scorers ?? null });
   },
   get(key) {
-    return db.prepare("SELECT * FROM predictions WHERE key = ?").get(key) ?? undefined;
+    const row = db.prepare("SELECT * FROM predictions WHERE key = ?").get(key);
+    return row ? normalizePredRow(row) : undefined;
   },
   has(key) {
     return !!db.prepare("SELECT 1 FROM predictions WHERE key = ?").get(key);
@@ -123,7 +139,7 @@ const predStore = {
     db.prepare("DELETE FROM predictions WHERE key = ?").run(key);
   },
   values() {
-    return db.prepare("SELECT * FROM predictions").all();
+    return db.prepare("SELECT * FROM predictions").all().map(normalizePredRow);
   },
 };
 
