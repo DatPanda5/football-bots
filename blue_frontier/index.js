@@ -844,10 +844,8 @@ async function registerCommands() {
   const testGuildId     = process.env.GUILD_ID;
   const blueFrontierId  = process.env.BLUE_FRONTIER_GUILD_ID;
 
-  console.log(`[${BOT_NAME}] Registering slash commands (global)...`);
-  await rest.put(Routes.applicationCommands(clientId), { body: commands });
-  console.log(`[${BOT_NAME}] ✅ Global slash commands registered.`);
-
+  // Register only per-guild so users see one set of commands (no global + guild duplicate).
+  await rest.put(Routes.applicationCommands(clientId), { body: [] });
   if (testGuildId) {
     console.log(
       `[${BOT_NAME}] Registering slash commands for test guild ${testGuildId} (instant update)...`
