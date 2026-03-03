@@ -1,7 +1,8 @@
 #!/bin/bash
 
-# Blue Frontier Bot — Update & Deploy Script (same flow as WokeDyche)
+# Blue Frontier Bot — Update & Deploy Script (PRODUCTION only).
 # Run from football-bots repo root or any subfolder. Pushing triggers Railway auto-deploy.
+# Alfred: updatetbf. For local lab (DATPANDA BOT TESTING), use lab-frontier.sh and tbflabon/tbflabpush/tbflaboff.
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 cd "$ROOT"

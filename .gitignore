@@ -10,6 +10,10 @@ node_modules/
 blue_frontier/data/
 footy_bot/data/
 
+# Blue Frontier Lab (local)
+blue_frontier/.lab-pid
+blue_frontier/logs/
+
 # One-time restore artifact (base64 DB backup; do not commit)
 backup_b64.txt
 

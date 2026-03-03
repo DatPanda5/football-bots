@@ -97,6 +97,12 @@ db.exec(`
     finalisedAt TEXT NOT NULL
   );
 
+  -- Tracks which fixtures have had "Predictions locked" posted at kickoff (so we can catch up after restart).
+  CREATE TABLE IF NOT EXISTS kickoff_lock_posted (
+    fixtureId   TEXT PRIMARY KEY,
+    postedAt    TEXT NOT NULL
+  );
+
   -- Points (same system as footy_bot): 5pt exact score, 2pt correct result, 1pt per correct scorer.
   -- Everton-only: single scope, season + all-time.
   CREATE TABLE IF NOT EXISTS points (
@@ -811,7 +817,9 @@ function sameOutcome(pEve, pOpp, rEve, rOpp) {
 const commands = [
   new SlashCommandBuilder().setName("predict").setDescription("Submit a score prediction — press Enter, then pick a match from the menu"),
   new SlashCommandBuilder().setName("myprediction").setDescription("View your own predictions (only visible to you)"),
-  new SlashCommandBuilder().setName("listpredictions").setDescription("List everyone's predictions for the current Everton fixture"),
+  new SlashCommandBuilder().setName("listpredictions").setDescription("List everyone's predictions for an Everton fixture")
+    .addStringOption((o) => o.setName("fixture").setDescription("Which fixture (optional — default: next / most predicted)").setRequired(false)
+      .addChoices(...ALL_FIXTURES.map((f) => ({ name: `${f.home} vs ${f.away} (${f.label})`, value: f.id })))),
   new SlashCommandBuilder().setName("fixtures").setDescription("Show the next 5 upcoming Everton fixtures"),
   new SlashCommandBuilder().setName("help")
     .setDescription("Show Blue Frontier Committee commands (only visible to you)"),
@@ -960,7 +968,18 @@ function getPredictionsChannelId() {
 }
 
 // ── At kickoff: post "Predictions locked for Everton v [Opponent]!" + list of predictions (in score-predictions channel)
+function kickoffLockAlreadyPosted(fixtureId) {
+  return !!db.prepare("SELECT 1 FROM kickoff_lock_posted WHERE fixtureId = ?").get(fixtureId);
+}
+function markKickoffLockPosted(fixtureId) {
+  db.prepare("INSERT OR REPLACE INTO kickoff_lock_posted (fixtureId, postedAt) VALUES (?, ?)").run(fixtureId, new Date().toISOString());
+}
+
 async function postKickoffLockMessage(fixture, botClient, channelId) {
+  if (kickoffLockAlreadyPosted(fixture.id)) {
+    console.log(`[${BOT_NAME}] Kickoff lock already posted for ${fixture.id}, skipping.`);
+    return;
+  }
   const channel = botClient.channels?.cache?.get(channelId);
   if (!channel) {
     console.warn(`[${BOT_NAME}] Kickoff lock: channel ${channelId} not found.`);
@@ -971,6 +990,7 @@ async function postKickoffLockMessage(fixture, botClient, channelId) {
   const embed = await buildListEmbed(fixture, guild);
   try {
     await channel.send({ content: lockLine, embeds: [embed] });
+    markKickoffLockPosted(fixture.id);
     console.log(`[${BOT_NAME}] Posted kickoff lock for ${fixture.id} (${fixture.home} vs ${fixture.away}).`);
   } catch (err) {
     console.error(`[${BOT_NAME}] Kickoff lock post failed for ${fixture.id}:`, err?.message || err);
@@ -1070,12 +1090,24 @@ client.on("clientReady", () => {
   const resultsChannelId = getResultsChannelId();
   const predictionsChannelId = getPredictionsChannelId();
   const now = Date.now();
+  const kickoffCatchUpFixtures = [];
   for (const fixture of ALL_FIXTURES) {
     if (new Date(fixture.kickoffUTC).getTime() <= now) {
       if (resultsChannelId) scheduleResultCheck(fixture, client, resultsChannelId);
+      if (predictionsChannelId && !kickoffLockAlreadyPosted(fixture.id)) kickoffCatchUpFixtures.push(fixture);
     } else {
       if (predictionsChannelId) scheduleKickoffLockPost(fixture, client, predictionsChannelId);
     }
+  }
+  if (kickoffCatchUpFixtures.length && predictionsChannelId) {
+    setTimeout(() => {
+      for (const fixture of kickoffCatchUpFixtures) {
+        postKickoffLockMessage(fixture, client, predictionsChannelId).catch((e) =>
+          console.error(`[${BOT_NAME}] Kickoff lock catch-up error for ${fixture.id}:`, e)
+        );
+      }
+    }, 5000);
+    console.log(`[${BOT_NAME}] Kickoff lock catch-up: ${kickoffCatchUpFixtures.length} fixture(s) (post in 5s).`);
   }
   if (!resultsChannelId) {
     console.warn(`[${BOT_NAME}] ⚠️ No RESULTS_CHANNEL_ID / PREDICTIONS_CHANNEL_ID in .env — auto result checker disabled.`);
@@ -1110,7 +1142,7 @@ client.on("interactionCreate", async (interaction) => {
       "**/fixtures** — show the next 5 Everton matches.",
       "**/predict** — submit a score prediction (Everton vs opponent).",
       "**/myprediction** — view your own predictions (only you can see).",
-      "**/listpredictions** — list predictions for the next fixture.",
+      "**/listpredictions** — list predictions for a fixture (optional: pick which match).",
       "**/clearprediction** — delete one of your predictions.",
       "**/final** — MOD only; enter final score + scorers to award points.",
       "**/leaderboard [scope]** — view current-season or all-time points.",
@@ -1339,6 +1371,8 @@ client.on("interactionCreate", async (interaction) => {
       return interaction.reply({ content: PREDICTION_CHANNEL_MSG, flags: MessageFlags.Ephemeral });
     }
     await interaction.deferReply();
+    const fixtureIdOption = interaction.options.getString("fixture");
+    const fixtureFromOption = fixtureIdOption ? getFixtureById(fixtureIdOption) : null;
     const listableFixture = getListableFixture();
     const modRoleId       = getModRoleIdForGuild(interaction.guildId);
     let hasModRole = false;
@@ -1346,7 +1380,7 @@ client.on("interactionCreate", async (interaction) => {
       try { hasModRole = (await interaction.guild.members.fetch(interaction.user.id)).roles.cache.has(modRoleId); }
       catch { hasModRole = interaction.member?.roles?.cache?.has(modRoleId) ?? false; }
     }
-    let fixture = listableFixture ?? (hasModRole ? getUpcomingFixtures()[0] ?? null : null);
+    let fixture = fixtureFromOption ?? listableFixture ?? (hasModRole ? getUpcomingFixtures()[0] ?? null : null);
     if (!fixture) {
       return interaction.editReply({
         content: hasModRole
@@ -1382,6 +1416,8 @@ client.on("interactionCreate", async (interaction) => {
     if (new Date(fixture.kickoffUTC).getTime() > Date.now()) {
       return interaction.reply({ content: "❌ That fixture hasn't kicked off yet.", flags: MessageFlags.Ephemeral });
     }
+
+    await interaction.deferReply();
 
     // Mark finalised so auto-checker stops (skip awarding if already finalised, e.g. by auto result)
     const alreadyFinalised = db.prepare("SELECT 1 FROM finalised WHERE fixtureId = ?").get(fixtureId);
@@ -1431,7 +1467,7 @@ client.on("interactionCreate", async (interaction) => {
       embed.addFields({ name: "⚽ Goal scorers (predicted)", value: scorersVal, inline: false });
     }
 
-    return interaction.reply({ embeds: [embed] });
+    return interaction.editReply({ embeds: [embed] });
   }
 
   if (interaction.isChatInputCommand() && interaction.commandName === "clearprediction") {
