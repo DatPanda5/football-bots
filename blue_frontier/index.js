@@ -860,18 +860,33 @@ function getResultsChannelId() {
 
 // Optional: restrict score-prediction commands to specific channels in The Blue Frontier server only.
 // BLUE_FRONTIER_GUILD_ID = that server's ID; ALLOWED_PREDICTION_CHANNEL_IDS = comma-separated channel IDs there.
-// In other servers (e.g. test server), prediction commands work in any channel.
+// MODs can also run all commands in mod-chat and mod-bot-logs.
 const BLUE_FRONTIER_GUILD_ID = process.env.BLUE_FRONTIER_GUILD_ID?.trim() || null;
 const ALLOWED_PREDICTION_CHANNEL_IDS = new Set(
   (process.env.ALLOWED_PREDICTION_CHANNEL_IDS || "").split(",").map((s) => s.trim()).filter(Boolean)
 );
-function isAllowedPredictionChannel(channelId, guildId) {
+const MOD_ALLOWED_CHANNEL_IDS = new Set([
+  "1306020728847466598",  // mod-chat
+  "1334604409643991212",  // mod-bot-logs
+]);
+async function isAllowedPredictionChannelAsync(interaction) {
+  const { channelId, guildId } = interaction;
   if (!channelId) return true;
   if (!BLUE_FRONTIER_GUILD_ID || guildId !== BLUE_FRONTIER_GUILD_ID) return true;
   if (ALLOWED_PREDICTION_CHANNEL_IDS.size === 0) return true;
-  return ALLOWED_PREDICTION_CHANNEL_IDS.has(channelId);
+  if (ALLOWED_PREDICTION_CHANNEL_IDS.has(channelId)) return true;
+  if (MOD_ALLOWED_CHANNEL_IDS.has(channelId)) {
+    const modRoleId = getModRoleIdForGuild(guildId);
+    if (!modRoleId) return false;
+    try {
+      return (await interaction.guild.members.fetch(interaction.user.id)).roles.cache.has(modRoleId);
+    } catch {
+      return interaction.member?.roles?.cache?.has(modRoleId) ?? false;
+    }
+  }
+  return false;
 }
-const PREDICTION_CHANNEL_MSG = "Score prediction commands are only allowed in the score-predictions channel.";
+const PREDICTION_CHANNEL_MSG = "Score prediction commands are only allowed in the score-predictions channel (or mod-chat / mod-bot-logs for MODs).";
 
 // MOD role: use BLUE_FRONTIER_MOD_ROLE_ID when in Blue Frontier server, else MOD_ROLE_ID (e.g. test server).
 function getModRoleIdForGuild(guildId) {
@@ -942,7 +957,7 @@ client.on("interactionCreate", async (interaction) => {
       "**/resetleaderboard [scope]** — MOD only; reset season or all-time (all-time asks for confirm).",
       "",
       isBlueFrontierGuild
-        ? "In this server, prediction commands only work in the score-predictions channel."
+        ? "In this server, prediction commands work in the score-predictions channel (or mod-chat / mod-bot-logs for MODs)."
         : "In this server, prediction commands work in any channel."
     ];
     const embed = new EmbedBuilder()
@@ -964,7 +979,7 @@ client.on("interactionCreate", async (interaction) => {
   }
 
   if (interaction.isChatInputCommand() && interaction.commandName === "predict") {
-    if (!isAllowedPredictionChannel(interaction.channelId, interaction.guildId)) {
+    if (!(await isAllowedPredictionChannelAsync(interaction))) {
       return interaction.reply({ content: PREDICTION_CHANNEL_MSG, flags: MessageFlags.Ephemeral });
     }
     const upcoming = getUpcomingFixtures();
@@ -983,7 +998,7 @@ client.on("interactionCreate", async (interaction) => {
   }
 
   if (interaction.isStringSelectMenu() && interaction.customId === "tbfc_select_fixture") {
-    if (!isAllowedPredictionChannel(interaction.channelId, interaction.guildId)) {
+    if (!(await isAllowedPredictionChannelAsync(interaction))) {
       return interaction.reply({ content: PREDICTION_CHANNEL_MSG, flags: MessageFlags.Ephemeral });
     }
     const fixtureId = interaction.values[0];
@@ -1010,7 +1025,7 @@ client.on("interactionCreate", async (interaction) => {
   }
 
   if (interaction.isModalSubmit() && interaction.customId.startsWith("tbfc_score_modal_")) {
-    if (!isAllowedPredictionChannel(interaction.channelId, interaction.guildId)) {
+    if (!(await isAllowedPredictionChannelAsync(interaction))) {
       return interaction.reply({ content: PREDICTION_CHANNEL_MSG, flags: MessageFlags.Ephemeral });
     }
     const fixtureId     = interaction.customId.replace("tbfc_score_modal_", "");
@@ -1040,7 +1055,7 @@ client.on("interactionCreate", async (interaction) => {
   }
 
   if (interaction.isChatInputCommand() && interaction.commandName === "myprediction") {
-    if (!isAllowedPredictionChannel(interaction.channelId, interaction.guildId)) {
+    if (!(await isAllowedPredictionChannelAsync(interaction))) {
       return interaction.reply({ content: PREDICTION_CHANNEL_MSG, flags: MessageFlags.Ephemeral });
     }
     const mine = predStore.values().filter((p) => p.userId === interaction.user.id);
@@ -1053,7 +1068,7 @@ client.on("interactionCreate", async (interaction) => {
   }
 
   if (interaction.isChatInputCommand() && interaction.commandName === "listpredictions") {
-    if (!isAllowedPredictionChannel(interaction.channelId, interaction.guildId)) {
+    if (!(await isAllowedPredictionChannelAsync(interaction))) {
       return interaction.reply({ content: PREDICTION_CHANNEL_MSG, flags: MessageFlags.Ephemeral });
     }
     await interaction.deferReply();
@@ -1079,7 +1094,7 @@ client.on("interactionCreate", async (interaction) => {
   }
 
   if (interaction.isChatInputCommand() && interaction.commandName === "final") {
-    if (!isAllowedPredictionChannel(interaction.channelId, interaction.guildId)) {
+    if (!(await isAllowedPredictionChannelAsync(interaction))) {
       return interaction.reply({ content: PREDICTION_CHANNEL_MSG, flags: MessageFlags.Ephemeral });
     }
     const modRoleId = getModRoleIdForGuild(interaction.guildId);
@@ -1153,7 +1168,7 @@ client.on("interactionCreate", async (interaction) => {
   }
 
   if (interaction.isChatInputCommand() && interaction.commandName === "clearprediction") {
-    if (!isAllowedPredictionChannel(interaction.channelId, interaction.guildId)) {
+    if (!(await isAllowedPredictionChannelAsync(interaction))) {
       return interaction.reply({ content: PREDICTION_CHANNEL_MSG, flags: MessageFlags.Ephemeral });
     }
     const fixtureId = interaction.options.getString("fixture");
