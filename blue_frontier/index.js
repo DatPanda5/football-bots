@@ -609,7 +609,7 @@ function normalizeScorers(str) {
   if (!str?.trim()) return [];
   return String(str)
     .split(/[,/\n]+/)
-    .map((s) => s.trim().toLowerCase())
+    .map((s) => s.replace(/^\s*[^:,]+:\s*/, "").trim().toLowerCase()) // strip "Everton: " / "Burnley: " etc.
     .filter(Boolean)
     .map((name) => EVERTON_SCORER_ALIASES[name] || name)
     .sort();
