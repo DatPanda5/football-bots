@@ -1,7 +1,7 @@
 # Football Bots — Project Status Summary
 
 **Project root:** `football-bots/`  
-**Last updated:** 03 Mar 2026
+**Last updated:** 03 Mar 2026 (post–Railway outage checklist)
 
 ---
 
@@ -11,6 +11,8 @@
 
 | Version | Date       | Changes |
 |---------|------------|--------|
+| **v3.3** | 03 Mar 2026 | One prediction per match; overwrite warning + confirm. Kickoff lock autopost in score-predictions channel + catch-up; **fixture_results** + MOD view stored result via **/final** (optional everton/opponent). **/listpredictions:** view "Last 2 completed matches" + optional fixture pick. SEED.md cleanup. |
+| **v3.2** | 03 Mar 2026 | **/final:** deferReply + editReply (fix "application did not respond"); "At least one correct goal scorer" field; removed full predicted-scorers list. **Scorer points:** _matchedScorers aligned with same normalization/set logic as display (leaderboard consistent). |
 | **v3.1** | 03 Mar 2026 | Persistent volume: `DATA_DIR` env (e.g. `/data` on Railway); seed from **seed-predictions.json** (empty table or `SEED_PREDICTIONS=1`); scorer aliases (JOB→Jake O'Brien, Rohl→Merlin Röhl) + diacritic normalization; `/listpredictions` shows next fixture, fallback to fixture with most predictions; mod channels (mod-chat, mod-bot-logs); DB row normalization; **SEED.md**, **DEPLOY.md**, backup-db.js. |
 | **v3.0** | 21 Feb 2026 | SQLite persistence (`better-sqlite3`, `data/predictions.db`); auto result checker (polls 1hr 50min after kick-off, 5min retries, `/final` as MOD override); `!score` across 8 leagues with team aliases; `GuildMessages` + `MessageContent` intents; result checker logic moved to **core/result_checker.js**. |
 | **v2.0** | Prior       | In-memory predictions; `/predict`, `/fixtures`, `/listpredictions`, `/myprediction`, `/clearprediction`, `/final`. |
@@ -33,7 +35,9 @@
 
 See [CHANGELOG.md](../CHANGELOG.md) at Discord Bots root for workspace-wide entries. Recent football-bots changes:
 
-- **03 Mar 2026** — Blue Frontier: **Blue Frontier Lab** (local): **lab-frontier.sh** (start/stop/restart), Alfred **tbflabon** / **tbflabpush** / **tbflaboff**; Environments section in README; regression testing checklist; deploy.sh comment (production only). Railway persistent volume (`DATA_DIR=/data`); seed from **seed-predictions.json**; scorer aliases; **SEED.md**, **DEPLOY.md**; backup-db.js.
+- **03 Mar 2026** — Blue Frontier v3.3: One prediction per match + overwrite confirm; kickoff lock autopost (score-predictions channel, catch-up); **fixture_results** + MOD view result via `/final` (omit score to view); `/listpredictions` view "Last 2 completed" + fixture pick; SEED.md cleanup. Deploy via Alfred **updatetbf** when Railway is back; then check `/listpredictions` and `/final`.
+- **03 Mar 2026** — Blue Frontier v3.2: `/final` timeout fix (deferReply + editReply); "At least one correct goal scorer" in Final embed; removed long predicted-scorers list; _matchedScorers/leaderboard scorer logic aligned with same normalization. D002 (fixed) in DEBUG.md.
+- **03 Mar 2026** — Blue Frontier: Lab files moved to **blue_frontier/lab/** (lab-frontier.sh, README; root wrapper kept for Alfred). **Blue Frontier Lab** (local): **lab-frontier.sh** (start/stop/restart), Alfred **tbflabon** / **tbflabpush** / **tbflaboff**; Environments section in README; regression checklist; deploy.sh comment (production only). Railway persistent volume (`DATA_DIR=/data`); seed from **seed-predictions.json**; scorer aliases; **SEED.md**, **DEPLOY.md**; backup-db.js.
 - **02 Mar 2026** — Blue Frontier: `/help` command (ephemeral); slash commands registered globally **and** per-guild for test + The Blue Frontier (instant visibility); `/help` crash fix (40060 already-acknowledged); `/predict` UX: clearer description (“press Enter, then pick a match from the menu”), subtitle and dropdown placeholder so users know to click the menu then fill the form. Alfred workflow to update the Discord app: keyword **`updatetbf`**. Docs: README + PROJECT_STATUS updated.
 - **21 Feb 2026** — Reorganized into football-bots/ (core, blue_frontier, footy_bot). Merged handover v3.0 into Blue Frontier; Footy Bot (renamed from universal_bot, prime v1.0). Primary Everton bot: **blue_frontier**; tbfbot archived in +Archive.
 
@@ -43,7 +47,7 @@ See [CHANGELOG.md](../CHANGELOG.md) at Discord Bots root for workspace-wide entr
 
 | Component           | Status | Notes |
 |--------------------|--------|--------|
-| **Blue Frontier**  | Ready | **Production (Railway):** repo root, volume `/data`, `DATA_DIR=/data`; Build/Start in **blue_frontier**. **Blue Frontier Lab (local only):** run `./lab-frontier.sh start|stop|restart` from repo root; test in server **DATPANDA BOT TESTING**. **Alfred:** **updatetbf** = production deploy; **tbflabon** = start lab, **tbflabpush** = restart lab, **tbflaboff** = stop lab (tbf = The Blue Frontier). Seed via **seed-predictions.json** (or `SEED_PREDICTIONS=1`). |
+| **Blue Frontier**  | Ready | **Production (Railway):** repo root, volume `/data`, `DATA_DIR=/data`; Build/Start in **blue_frontier**. **Blue Frontier Lab (local only):** run `./lab-frontier.sh start|stop|restart` from repo root (script in **blue_frontier/lab/**); test in server **DATPANDA BOT TESTING**. **Alfred:** **updatetbf** = production deploy; **tbflabon** = start lab, **tbflabpush** = restart lab, **tbflaboff** = stop lab (tbf = The Blue Frontier). Seed via **seed-predictions.json** (or `SEED_PREDICTIONS=1`). |
 | **Footy Bot**      | Ready | Run from `football-bots`: `cd footy_bot && npm install && npm start`. Wire `fetchScores(league)` to your API for real fixtures. Discord name: **footy_bot**. |
 | **core**           | In use | Shared by both bots; no standalone run. |
 | **SportRadar**     | Stub | Blue Frontier: set `SPORTRADAR_KEY` and uncomment fetch in `_fetchFinalScore` to enable auto results. |
@@ -55,19 +59,20 @@ Known issues and fixes: see [DEBUG.md](../DEBUG.md) at Discord Bots root.
 
 ## Next steps
 
-1. **Alfred:** Add workflows for **tbflabon**, **tbflabpush**, **tbflaboff** (Run Script with `/bin/zsh`, run `./lab-frontier.sh start`, `restart`, or `stop` from football-bots repo root). Run regression checklist in Blue Frontier Lab before **updatetbf** (see plan or README Environments section).
-2. **Optional:** Remove `SEED_PREDICTIONS` from Railway Variables if still set (so future restarts don't re-seed).
-3. **Test locally**
+1. **When Railway is back:** Run **Update TBF bot** via Alfred (**updatetbf**) to deploy recent Blue Frontier changes; then check **/listpredictions** (view: Last 2 completed, fixture pick) and **/final** (view stored result for a played fixture by omitting everton/opponent).
+2. **Build Blue Frontier Lab bot (tomorrow):** Create second Discord app in Developer Portal (plan section 1a in `.cursor/plans/production_vs_datpanda_lab_b535c3ef.plan.md`); invite to **DATPANDA BOT TESTING** only; put lab token/CLIENT_ID/GUILD_ID in `blue_frontier/.env`. Then add Alfred workflows **tbflabon**, **tbflabpush**, **tbflaboff** (Run Script `/bin/zsh`, run `./lab-frontier.sh start` / `restart` / `stop` from football-bots repo root). Run regression checklist in lab before **updatetbf**.
+3. **Optional:** Remove `SEED_PREDICTIONS` from Railway Variables if still set (so future restarts don't re-seed).
+4. **Test locally**
    - From **football-bots**: `cd blue_frontier && npm install && npm start` (Everton bot). Use `.env` with `DISCORD_TOKEN`, `CLIENT_ID`, `GUILD_ID`; optional `MOD_ROLE_ID`, `RESULTS_CHANNEL_ID`, `SPORTRADAR_KEY`.
    - From **football-bots**: `cd footy_bot && npm install && npm start` (Footy Bot). Use `.env` with `FOOTY_BOT_*` or `DISCORD_TOKEN`/`CLIENT_ID`/`GUILD_ID` and `PREDICTIONS_CHANNEL_ID`.
    - Verify slash commands, `!score`, prediction flow, and (for Blue Frontier) `/final` and auto result checker behaviour.
 
-4. **Deploy Everton bot (blue_frontier)** (production)
+5. **Deploy Everton bot (blue_frontier)** (production)
    - **Primary** Everton bot is **football-bots/blue_frontier**. tbfbot is archived in **+Archive/tbfbot**.
    - If you were deploying from tbfbot (e.g. Railway, GitHub), update the deployment to use **football-bots** as the repo root and **blue_frontier** as the app root (or set start command to `node blue_frontier/index.js` with working directory `football-bots`).
    - Copy over any production `.env` / env vars from the old deployment; ensure `blue_frontier/.env.example` is reflected (e.g. `RESULTS_CHANNEL_ID`, `SPORTRADAR_KEY` if you use them).
 
-5. **Optional**
+6. **Optional**
    - Enable SportRadar: add `SPORTRADAR_KEY` and uncomment the fetch in `blue_frontier/index.js` (`_fetchFinalScore`).
    - Wire Footy Bot fixtures: replace `fetchScores(league)` stub in `footy_bot/index.js` with your sports API.
 

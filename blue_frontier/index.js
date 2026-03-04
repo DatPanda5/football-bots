@@ -97,6 +97,15 @@ db.exec(`
     finalisedAt TEXT NOT NULL
   );
 
+  -- Stored result per fixture so MODs can view /final again (and for auto-posted results).
+  CREATE TABLE IF NOT EXISTS fixture_results (
+    fixtureId    TEXT PRIMARY KEY,
+    evertonGoals INTEGER NOT NULL,
+    opponentGoals INTEGER NOT NULL,
+    scorers      TEXT,
+    finalisedAt  TEXT NOT NULL
+  );
+
   -- Tracks which fixtures have had "Predictions locked" posted at kickoff (so we can catch up after restart).
   CREATE TABLE IF NOT EXISTS kickoff_lock_posted (
     fixtureId   TEXT PRIMARY KEY,
@@ -617,6 +626,7 @@ const { scheduleResultCheck } = createResultChecker({
   onResultsPosted(fixture, result, entries) {
     const scorersStr = Array.isArray(result.scorers) ? result.scorers.join(", ") : (result.scorers || "");
     awardPointsForFixture(fixture.id, result.evertonGoals, result.opponentGoals, scorersStr);
+    storeFixtureResult(fixture.id, result.evertonGoals, result.opponentGoals, scorersStr || null);
   },
 });
 
@@ -738,6 +748,22 @@ function scorersMatchAtLeastOne(actualStr, predictedStr) {
   return predicted.some((name) => actualSet.has(name));
 }
 
+function getStoredResult(fixtureId) {
+  const row = db.prepare("SELECT evertonGoals, opponentGoals, scorers, finalisedAt FROM fixture_results WHERE fixtureId = ?").get(fixtureId);
+  if (!row) return null;
+  return {
+    evertonGoals: row.evertonGoals ?? row.evertongoals,
+    opponentGoals: row.opponentGoals ?? row.opponentgoals,
+    scorers: row.scorers ?? row.SCORERS ?? null,
+    finalisedAt: row.finalisedAt ?? row.finalisedat,
+  };
+}
+function storeFixtureResult(fixtureId, evertonGoals, opponentGoals, scorers) {
+  db.prepare(
+    "INSERT OR REPLACE INTO fixture_results (fixtureId, evertonGoals, opponentGoals, scorers, finalisedAt) VALUES (?, ?, ?, ?, ?)"
+  ).run(fixtureId, evertonGoals, opponentGoals, scorers ?? null, new Date().toISOString());
+}
+
 function getRandomScorersPlaceholder(opponentName) {
   const shuffle = (arr) => arr.sort(() => Math.random() - 0.5);
   const pick    = (arr, n) => shuffle([...arr]).slice(0, n);
@@ -784,6 +810,15 @@ function getListableFixture() {
   return next;
 }
 
+/** Last N fixtures that have already kicked off (most recent first). */
+function getLastCompletedFixtures(n) {
+  const now = Date.now();
+  return ALL_FIXTURES
+    .filter((f) => new Date(f.kickoffUTC).getTime() <= now)
+    .sort((a, b) => new Date(b.kickoffUTC) - new Date(a.kickoffUTC))
+    .slice(0, n);
+}
+
 // ───────────────────────────────────────────────────────────────
 //  POINTS EVALUATION (same as footy_bot: exact 5, result 2, each scorer 1)
 // ───────────────────────────────────────────────────────────────
@@ -825,7 +860,12 @@ const commands = [
   new SlashCommandBuilder().setName("predict").setDescription("Submit a score prediction — press Enter, then pick a match from the menu"),
   new SlashCommandBuilder().setName("myprediction").setDescription("View your own predictions (only visible to you)"),
   new SlashCommandBuilder().setName("listpredictions").setDescription("List everyone's predictions for an Everton fixture")
-    .addStringOption((o) => o.setName("fixture").setDescription("Which fixture (optional — default: next / most predicted)").setRequired(false)
+    .addStringOption((o) => o.setName("view").setDescription("Show one fixture or last 2 completed matches").setRequired(false)
+      .addChoices(
+        { name: "One fixture (default or pick below)", value: "one" },
+        { name: "Last 2 completed matches", value: "last2" }
+      ))
+    .addStringOption((o) => o.setName("fixture").setDescription("Which fixture (when view = one)").setRequired(false)
       .addChoices(...ALL_FIXTURES.map((f) => ({ name: `${f.home} vs ${f.away} (${f.label})`, value: f.id })))),
   new SlashCommandBuilder().setName("fixtures").setDescription("Show the next 5 upcoming Everton fixtures"),
   new SlashCommandBuilder().setName("help")
@@ -834,11 +874,11 @@ const commands = [
     .addStringOption((o) => o.setName("fixture").setDescription("Which fixture to clear").setRequired(true)
       .addChoices(...ALL_FIXTURES.map((f) => ({ name: `${f.home} vs ${f.away} (${f.label})`, value: f.id })))),
   new SlashCommandBuilder().setName("final")
-    .setDescription("MOD only: Enter final score and see correct predictions + goal scorers")
+    .setDescription("MOD only: Enter final score or view result for a played fixture")
     .addStringOption((o) => o.setName("fixture").setDescription("Which fixture (must have kicked off)").setRequired(true)
       .addChoices(...ALL_FIXTURES.map((f) => ({ name: `${f.home} vs ${f.away} (${f.label})`, value: f.id }))))
-    .addIntegerOption((o) => o.setName("everton").setDescription("Everton's final goal count").setRequired(true).setMinValue(0).setMaxValue(20))
-    .addIntegerOption((o) => o.setName("opponent").setDescription("Opponent's final goal count").setRequired(true).setMinValue(0).setMaxValue(20))
+    .addIntegerOption((o) => o.setName("everton").setDescription("Everton's goals (omit to just view stored result)").setRequired(false).setMinValue(0).setMaxValue(20))
+    .addIntegerOption((o) => o.setName("opponent").setDescription("Opponent's goals (omit to just view stored result)").setRequired(false).setMinValue(0).setMaxValue(20))
     .addStringOption((o) => o.setName("scorers").setDescription("Actual goal scorers (optional)").setRequired(false)),
   new SlashCommandBuilder().setName("leaderboard")
     .setDescription("View prediction leaderboard (season or all-time)")
@@ -947,6 +987,38 @@ async function buildListEmbed(fixture, guild) {
     } else { buffer = candidate; }
   }
   if (buffer) embed.addFields({ name: isFirst ? `${entries.length} prediction(s)` : "​", value: buffer.trim() });
+  return embed;
+}
+
+/** Build the final-score embed for a fixture (used when entering result or viewing stored result). */
+async function buildFinalResultEmbed(fixture, everton, opponent, actualScorers, guild) {
+  const fixtureId   = fixture.id;
+  const entries    = predStore.values().filter((p) => sameFixture(p.fixture, fixtureId));
+  const eStr       = String(everton), oStr = String(opponent);
+  const correctAll = entries.filter((p) => p.evertonScore === eStr && p.opponentScore === oStr);
+  const withScorers= actualScorers ? correctAll.filter((p) => p.scorers?.trim() && scorersMatch(actualScorers, p.scorers)) : [];
+  const scoreOnly  = correctAll.filter((p) => !withScorers.includes(p));
+  const atLeastOneScorer = actualScorers
+    ? entries.filter((p) => p.scorers?.trim() && scorersMatchAtLeastOne(actualScorers, p.scorers))
+    : [];
+  const scoreLine = fixture.evertonHome
+    ? `Everton **${everton}** – **${opponent}** ${fixture.opponent}`
+    : `${fixture.opponent} **${opponent}** – **${everton}** Everton`;
+  const embed = new EmbedBuilder().setColor(BOT_COLOUR)
+    .setTitle(`🏁 Final Score — ${fixture.home} vs ${fixture.away}`)
+    .setDescription(`📅 ${fixture.label}\n\n**${scoreLine}**${actualScorers ? `\n\n⚽ _Actual scorers:_ ${actualScorers}` : ""}`)
+    .setFooter({ text: `${BOT_FOOTER} • Entered by MOD` }).setTimestamp();
+  const nWith = await Promise.all(withScorers.map((p) => getDisplayName(guild, p.userId, p.displayName)));
+  const nOnly = await Promise.all(scoreOnly.map((p) => getDisplayName(guild, p.userId, p.displayName)));
+  const atLeastOnePreds = atLeastOneScorer.filter((p, i, arr) => arr.findIndex((q) => q.userId === p.userId) === i);
+  const nAtLeastOne = await Promise.all(atLeastOnePreds.map((p) => getDisplayName(guild, p.userId, p.displayName)));
+  embed.addFields(
+    { name: "✅ Correct score + goal scorers", value: nWith.length ? nWith.join(", ") : "_None_", inline: false },
+    { name: "✅ Correct score only", value: nOnly.length ? nOnly.join(", ") : "_None_", inline: false }
+  );
+  if (actualScorers) {
+    embed.addFields({ name: "✅ At least one correct goal scorer", value: nAtLeastOne.length ? nAtLeastOne.join(", ") : "_None_", inline: false });
+  }
   return embed;
 }
 
@@ -1149,7 +1221,7 @@ client.on("interactionCreate", async (interaction) => {
       "**/fixtures** — show the next 5 Everton matches.",
       "**/predict** — submit a score prediction (Everton vs opponent).",
       "**/myprediction** — view your own predictions (only you can see).",
-      "**/listpredictions** — list predictions for a fixture (optional: pick which match).",
+      "**/listpredictions** — list predictions (one fixture, or last 2 completed matches).",
       "**/clearprediction** — delete one of your predictions.",
       "**/final** — MOD only; enter final score + scorers to award points.",
       "**/leaderboard [scope]** — view current-season or all-time points.",
@@ -1378,6 +1450,20 @@ client.on("interactionCreate", async (interaction) => {
       return interaction.reply({ content: PREDICTION_CHANNEL_MSG, flags: MessageFlags.Ephemeral });
     }
     await interaction.deferReply();
+    const viewOption = interaction.options.getString("view") || "one";
+
+    if (viewOption === "last2") {
+      const completed = getLastCompletedFixtures(2);
+      if (!completed.length) {
+        return interaction.editReply({ content: "No completed matches yet — predictions for past matches will appear here after fixtures have been played." });
+      }
+      const embeds = await Promise.all(completed.map((f) => buildListEmbed(f, interaction.guild)));
+      const content = completed.length === 1
+        ? "Only one match has been played so far."
+        : "Predictions for the last 2 completed matches.";
+      return interaction.editReply({ content, embeds });
+    }
+
     const fixtureIdOption = interaction.options.getString("fixture");
     const fixtureFromOption = fixtureIdOption ? getFixtureById(fixtureIdOption) : null;
     const listableFixture = getListableFixture();
@@ -1424,51 +1510,37 @@ client.on("interactionCreate", async (interaction) => {
       return interaction.reply({ content: "❌ That fixture hasn't kicked off yet.", flags: MessageFlags.Ephemeral });
     }
 
-    await interaction.deferReply();
+    const alreadyFinalised = !!db.prepare("SELECT 1 FROM finalised WHERE fixtureId = ?").get(fixtureId);
 
-    // Mark finalised so auto-checker stops (skip awarding if already finalised, e.g. by auto result)
-    const alreadyFinalised = db.prepare("SELECT 1 FROM finalised WHERE fixtureId = ?").get(fixtureId);
+    if (alreadyFinalised) {
+      const stored = getStoredResult(fixtureId);
+      if (stored) {
+        await interaction.deferReply();
+        const embed = await buildFinalResultEmbed(
+          fixture, stored.evertonGoals, stored.opponentGoals, stored.scorers, interaction.guild
+        );
+        return interaction.editReply({ content: "Result for this fixture (already finalised):", embeds: [embed] });
+      }
+      return interaction.reply({
+        content: "This fixture was finalised but the result wasn't stored (e.g. before this feature was added).",
+        flags: MessageFlags.Ephemeral,
+      });
+    }
+
+    if (everton === null || opponent === null) {
+      return interaction.reply({
+        content: "That fixture hasn't been finalised yet. Enter Everton and opponent goals to post the result.",
+        flags: MessageFlags.Ephemeral,
+      });
+    }
+
+    await interaction.deferReply();
     db.prepare("INSERT OR IGNORE INTO finalised (fixtureId, finalisedAt) VALUES (?,?)")
       .run(fixtureId, new Date().toISOString());
-    if (!alreadyFinalised) {
-      const actualScorersStr = actualScorers || "";
-      awardPointsForFixture(fixtureId, everton, opponent, actualScorersStr);
-    }
-
-    const entries    = predStore.values().filter((p) => sameFixture(p.fixture, fixtureId));
-    const eStr       = String(everton), oStr = String(opponent);
-    const correctAll = entries.filter((p) => p.evertonScore === eStr && p.opponentScore === oStr);
-    const withScorers= actualScorers ? correctAll.filter((p) => p.scorers?.trim() && scorersMatch(actualScorers, p.scorers)) : [];
-    const scoreOnly  = correctAll.filter((p) => !withScorers.includes(p));
-    // Users who predicted at least one actual scorer
-    const atLeastOneScorer = actualScorers
-      ? entries.filter((p) => p.scorers?.trim() && scorersMatchAtLeastOne(actualScorers, p.scorers))
-      : [];
-
-    const scoreLine = fixture.evertonHome
-      ? `Everton **${everton}** – **${opponent}** ${fixture.opponent}`
-      : `${fixture.opponent} **${opponent}** – **${everton}** Everton`;
-
-    const embed = new EmbedBuilder().setColor(BOT_COLOUR)
-      .setTitle(`🏁 Final Score — ${fixture.home} vs ${fixture.away}`)
-      .setDescription(`📅 ${fixture.label}\n\n**${scoreLine}**${actualScorers ? `\n\n⚽ _Actual scorers:_ ${actualScorers}` : ""}`)
-      .setFooter({ text: `${BOT_FOOTER} • Entered by MOD` }).setTimestamp();
-
-    const nWith = await Promise.all(withScorers.map((p) => getDisplayName(interaction.guild, p.userId, p.displayName)));
-    const nOnly = await Promise.all(scoreOnly.map((p) => getDisplayName(interaction.guild, p.userId, p.displayName)));
-    const atLeastOnePreds = atLeastOneScorer.filter((p, i, arr) => arr.findIndex((q) => q.userId === p.userId) === i);
-    const nAtLeastOne = await Promise.all(atLeastOnePreds.map((p) => getDisplayName(interaction.guild, p.userId, p.displayName)));
-
-    embed.addFields(
-      { name: "✅ Correct score + goal scorers", value: nWith.length ? nWith.join(", ") : "_None_", inline: false },
-      { name: "✅ Correct score only",           value: nOnly.length ? nOnly.join(", ") : "_None_", inline: false }
-    );
-    if (actualScorers) {
-      embed.addFields(
-        { name: "✅ At least one correct goal scorer", value: nAtLeastOne.length ? nAtLeastOne.join(", ") : "_None_", inline: false }
-      );
-    }
-
+    const actualScorersStr = actualScorers || "";
+    awardPointsForFixture(fixtureId, everton, opponent, actualScorersStr);
+    storeFixtureResult(fixtureId, everton, opponent, actualScorersStr || null);
+    const embed = await buildFinalResultEmbed(fixture, everton, opponent, actualScorers, interaction.guild);
     return interaction.editReply({ embeds: [embed] });
   }
 

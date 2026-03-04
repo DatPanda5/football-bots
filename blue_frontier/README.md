@@ -134,7 +134,7 @@ From the **football-bots** repo root, run `./deploy.sh` or `./deploy.sh "Your co
 | **Production** | Railway → The Blue Frontier server | **updatetbf** — commit + push main → Railway deploys |
 | **Blue Frontier Lab** | Local (your Mac); test in server **DATPANDA BOT TESTING** | **tbflabon** = start lab, **tbflabpush** = restart lab, **tbflaboff** = stop lab |
 
-**tbf** = The Blue Frontier (so you can reuse the pattern for other bots, e.g. wdlabon for WokeDyche). Lab uses a separate Discord app and `blue_frontier/.env`; production uses Railway variables only. Run the regression checklist in the lab before **updatetbf** (see PROJECT_STATUS_SUMMARY or the plan in `.cursor/plans`).
+**tbf** = The Blue Frontier (so you can reuse the pattern for other bots, e.g. wdlabon for WokeDyche). Lab uses a separate Discord app and `blue_frontier/.env`; production uses Railway variables only. Lab-only script and runtime files live in **blue_frontier/lab/** (see [lab/README.md](lab/README.md)). Run the regression checklist in the lab before **updatetbf** (see PROJECT_STATUS_SUMMARY or the plan in `.cursor/plans`).
 
 ---
 

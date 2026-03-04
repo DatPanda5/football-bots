@@ -109,3 +109,16 @@ Whenever you add or change entries in **`seed-predictions.json`** and want them 
 2. **Commit and push** (e.g. `git add blue_frontier/seed-predictions.json`, `git commit -m "Update seed"`, `git push`). Wait for deploy.
 3. In Railway → **Variables** → set **`SEED_PREDICTIONS`** = **`1`** → Save (redeploy).
 4. After deploy: **Remove** `SEED_PREDICTIONS`, then run **`/listpredictions`** to confirm.
+
+---
+
+## After seeding / post-match cleanup
+
+Once the seed has run and the match (e.g. Burnley) has finished, you only need to **remove one-off env vars** so the next restart doesn’t re-run them:
+
+| If you used it | Do this |
+|-----------------|--------|
+| **SEED_PREDICTIONS=1** | In Railway **Variables**, **delete** `SEED_PREDICTIONS`. Otherwise every restart will re-merge from `seed-predictions.json`. |
+| **RESTORE_DB_BASE64** | In Railway **Variables**, **delete** `RESTORE_DB_BASE64`. Otherwise the next start will overwrite the DB with that backup again. |
+
+**Keep:** `DATA_DIR=/data` (and your volume) so the app keeps using the same DB. No need to delete predictions or the seed file; the bot keeps past predictions for history and leaderboard.
