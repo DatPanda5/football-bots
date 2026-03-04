@@ -320,7 +320,7 @@ const ALL_FIXTURES = [
     evertonHome: false, srMatchId: null,
   },
   {
-    id: "fix07", kickoffUTC: "2026-04-18T14:00:00Z", label: "Sat 18 Apr 10:00 AM EDT",
+    id: "fix07", kickoffUTC: "2026-04-19T13:00:00Z", label: "Sun 19 Apr 2:00 PM BST (9:00 AM EDT)",
     home: "Everton", away: "Liverpool", opponent: "Liverpool",
     evertonHome: true, srMatchId: null,
   },
