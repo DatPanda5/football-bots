@@ -6,7 +6,7 @@ Use this flow **once** so your existing 13 predictions are kept when you switch 
 
 ## 1. Backup the current DB (before changing anything)
 
-You need a copy of the DB from the **currently running** container. Railway’s dashboard (Variables, Settings, etc.) does **not** have a “Run command” or “Execute” button. You do this from your **own machine** using the **Railway CLI** and **SSH into the live container**.
+You need a copy of the DB from the **currently running** container. Railway's dashboard (Variables, Settings, etc.) does **not** have a "Run command" or "Execute" button. You do this from your **own machine** using the **Railway CLI** and **SSH into the live container**.
 
 ### Step 1a: Install and link the CLI
 
@@ -16,7 +16,7 @@ You need a copy of the DB from the **currently running** container. Railway’s 
 
 ### Step 1b: Run the backup inside the container
 
-The DB lives **inside the deployed container**. The container’s shell often breaks inline `node -e "..."` commands, so use the **script** or **interactive** method below.
+The DB lives **inside the deployed container**. The container's shell often breaks inline `node -e "..."` commands, so use the **script** or **interactive** method below.
 
 **Option 1 — Script (recommended)**  
 There is a **`backup-db.js`** at the **repo root** (`football-bots/backup-db.js`) that finds the DB and prints base64.

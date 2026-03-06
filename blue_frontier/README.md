@@ -23,6 +23,8 @@ npm start
 
 Run the bot on your Mac and test it in your test server **before** deploying to Railway.
 
+**For the Blue Frontier Lab** (Alfred **tbflabon** / **tbflabpush** / **tbflaboff**): use **`blue_frontier/lab/.env.lab`** so the lab never uses production credentials. Copy `lab/.env.lab.example` to `lab/.env.lab` and fill in the lab bot’s token/IDs — see [lab/README.md](lab/README.md).
+
 ### Step 1: One-time setup
 
 1. **Terminal:** go to the bot folder and install dependencies.
@@ -30,11 +32,11 @@ Run the bot on your Mac and test it in your test server **before** deploying to 
    cd "/Users/kevbui/Desktop/Discord Bots/football-bots/blue_frontier"
    npm install
    ```
-2. **Copy env file** and add your credentials:
+2. **Copy env file** and add your credentials (for lab, use `.env.lab` as above):
    ```bash
    cp .env.example .env
    ```
-   Edit `.env` and set:
+   Edit `.env` (or `lab/.env.lab` for lab) and set:
    - `DISCORD_TOKEN` — from [Discord Developer Portal](https://discord.com/developers/applications) → your app → Bot → Reset Token / Copy.
    - `CLIENT_ID` — same app → OAuth2 → Application ID.
    - `GUILD_ID` — **your test server ID:** `609194510660009995`.
@@ -134,7 +136,7 @@ From the **football-bots** repo root, run `./deploy.sh` or `./deploy.sh "Your co
 | **Production** | Railway → The Blue Frontier server | **updatetbf** — commit + push main → Railway deploys |
 | **Blue Frontier Lab** | Local (your Mac); test in server **DATPANDA BOT TESTING** | **tbflabon** = start lab, **tbflabpush** = restart lab, **tbflaboff** = stop lab |
 
-**tbf** = The Blue Frontier (so you can reuse the pattern for other bots, e.g. wdlabon for WokeDyche). Lab uses a separate Discord app and `blue_frontier/.env`; production uses Railway variables only. Lab-only script and runtime files live in **blue_frontier/lab/** (see [lab/README.md](lab/README.md)). Run the regression checklist in the lab before **updatetbf** (see PROJECT_STATUS_SUMMARY or the plan in `.cursor/plans`).
+**tbf** = The Blue Frontier (so you can reuse the pattern for other bots, e.g. wdlabon for WokeDyche). Lab uses a separate Discord app and **`blue_frontier/lab/.env.lab`** (never `.env`); production uses Railway variables only. Lab-only script and runtime files live in **blue_frontier/lab/** (see [lab/README.md](lab/README.md)). Run the regression checklist in the lab before **updatetbf** (see PROJECT_STATUS_SUMMARY or the plan in `.cursor/plans`).
 
 ---
 
@@ -210,7 +212,7 @@ window — no manual updates needed until the end of the season.
 
 ## Notes
 
-- **Predictions are stored in SQLite** (`<DATA_DIR>/predictions.db`, default `./data/`). They persist across restarts. **If the bot runs on Railway (or another host):** use a persistent volume and set `DATA_DIR` to the mount path so the DB survives redeploys. See **[DEPLOY.md](DEPLOY.md)** for step-by-step instructions that keep your existing predictions when you add the volume.
+- **Predictions are stored in SQLite** (`<DATA_DIR>/predictions.db`, default `./data/`). They persist across restarts. **If the bot runs on Railway (or another host):** use a persistent volume and set `DATA_DIR` to the mount path so the DB survives redeploys. See **[DEPLOY.md](docs/DEPLOY.md)** for step-by-step instructions that keep your existing predictions when you add the volume.
 - Each member can have **one prediction per fixture**. Re-submitting overwrites.
 - Optional **ALLOWED_PREDICTION_CHANNEL_IDS** (see `.env.example`): when set, score-prediction commands only work in those channels (e.g. on the Blue Frontier server).
 - The bot is structured so additional feature modules can easily be added — this is the predictions module of The Blue Frontier Committee.

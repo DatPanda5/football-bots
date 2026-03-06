@@ -14,7 +14,8 @@ const {
   TextInputStyle,
   EmbedBuilder,
 } = require("discord.js");
-require("dotenv").config();
+// Lab uses .env.lab (see lab-frontier.sh); production uses Railway vars or .env
+require("dotenv").config({ path: process.env.DOTENV_CONFIG_PATH || ".env" });
 const Database = require("better-sqlite3");
 const path     = require("path");
 const fs       = require("fs");
@@ -1164,6 +1165,7 @@ client.on("disconnect", () => {
 client.on("clientReady", () => {
   if (wasDisconnected) { wasDisconnected = false; console.log(`[${BOT_NAME}] ✅ Reconnected!`); }
   else console.log(`[${BOT_NAME}] ✅ Online as ${client.user.tag}`);
+  console.log(`[${BOT_NAME}] Deploy pipeline check — OK (visible only in server logs)`);
 
   // On startup: re-schedule auto-checkers for any kicked-off, not-yet-finalised fixtures
   const resultsChannelId = getResultsChannelId();
@@ -1188,7 +1190,7 @@ client.on("clientReady", () => {
     }, 5000);
     console.log(`[${BOT_NAME}] Kickoff lock catch-up: ${kickoffCatchUpFixtures.length} fixture(s) (post in 5s).`);
   }
-  if (!resultsChannelId) {
+  if (!resultsChannelId && !process.env.DOTENV_CONFIG_PATH) {
     console.warn(`[${BOT_NAME}] ⚠️ No RESULTS_CHANNEL_ID / PREDICTIONS_CHANNEL_ID in .env — auto result checker disabled.`);
   }
 });
@@ -1628,6 +1630,13 @@ process.on("SIGTERM", () => shutdown("SIGTERM"));
 // ───────────────────────────────────────────────────────────────
 //  START
 // ───────────────────────────────────────────────────────────────
+function onStartupError(err) {
+  console.error(err);
+  if (err.code === 0 && err.status === 401) {
+    console.error("[Config] 401 Unauthorized: DISCORD_TOKEN is invalid or doesn't match this app's CLIENT_ID. Get a fresh token from Discord Developer Portal → your app → Bot → Reset Token, then update .env (or lab/.env.lab for lab).");
+  }
+  process.exit(1);
+}
 registerCommands()
   .then(() => client.login(process.env.DISCORD_TOKEN))
-  .catch(console.error);
+  .catch(onStartupError);

@@ -1,6 +1,6 @@
 {
   "name": "the-blue-frontier-committee",
-  "version": "3.0.0",
+  "version": "3.3.0",
   "description": "The Blue Frontier Committee — Everton Discord Bot",
   "engines": {
     "node": ">=18.0.0 <25.0.0"

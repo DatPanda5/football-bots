@@ -15,7 +15,7 @@ start_lab() {
     local pid
     pid=$(cat "$PID_FILE")
     if kill -0 "$pid" 2>/dev/null; then
-      echo "Blue Frontier Lab is already running (PID $pid). Use restart to apply changes."
+      echo "  ⚠️  Lab already running (PID $pid). Use restart to apply changes."
       return 0
     fi
     rm -f "$PID_FILE"
@@ -26,9 +26,19 @@ start_lab() {
   fi
   mkdir -p "$(dirname "$LOG_FILE")"
   cd "$BLUE_FRONTIER" || return 1
+  if ! [[ -f "$LAB_DIR/.env.lab" ]]; then
+    echo "Error: $LAB_DIR/.env.lab not found. Copy lab/.env.lab.example to lab/.env.lab and add lab bot credentials."
+    return 1
+  fi
+  export DOTENV_CONFIG_PATH="$LAB_DIR/.env.lab"
   nohup node index.js >> "$LOG_FILE" 2>&1 &
   echo $! > "$PID_FILE"
-  echo "Blue Frontier Lab started (PID $(cat "$PID_FILE")). Test in server DATPANDA BOT TESTING. Log: $LOG_FILE"
+  echo ""
+  echo "  ✅ Blue Frontier Lab is up — ready for testing in Discord."
+  echo "  → Server: DATPANDA BOT TESTING"
+  echo "  → Log:    $LOG_FILE"
+  echo "  → PID:    $(cat "$PID_FILE") (use tbflaboff or ./lab-frontier.sh stop to shut down)"
+  echo ""
 }
 
 stop_lab() {
@@ -37,17 +47,17 @@ stop_lab() {
     pid=$(cat "$PID_FILE")
     if kill -0 "$pid" 2>/dev/null; then
       kill "$pid" 2>/dev/null
-      echo "Blue Frontier Lab stopped (PID $pid)."
+      echo "  🛑 Blue Frontier Lab stopped (PID $pid)."
     else
-      echo "Blue Frontier Lab was not running (stale PID file)."
+      echo "  ⚠️  Lab was not running (stale PID file)."
     fi
     rm -f "$PID_FILE"
     return 0
   fi
   if pkill -f "blue_frontier.*index\.js" 2>/dev/null; then
-    echo "Blue Frontier Lab stopped (killed by process name)."
+    echo "  🛑 Blue Frontier Lab stopped (killed by process name)."
   else
-    echo "Blue Frontier Lab was not running."
+    echo "  ⚠️  Lab was not running."
   fi
 }
 
@@ -59,6 +69,7 @@ case "$cmd" in
     stop_lab
     ;;
   restart)
+    echo "  🔄 Restarting Blue Frontier Lab..."
     stop_lab
     sleep 1
     start_lab

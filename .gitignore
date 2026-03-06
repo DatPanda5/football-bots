@@ -11,8 +11,11 @@ blue_frontier/data/
 footy_bot/data/
 
 # Blue Frontier Lab (local)
+blue_frontier/lab/.env.lab
 blue_frontier/lab/.lab-pid
+blue_frontier/lab/.run-cmd.sh
 blue_frontier/lab/logs/
+blue_frontier/lab/production-backup.b64
 
 # One-time restore artifact (base64 DB backup; do not commit)
 backup_b64.txt
