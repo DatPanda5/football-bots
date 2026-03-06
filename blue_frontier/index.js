@@ -1129,8 +1129,8 @@ const PREDICTION_CHANNEL_MSG = "Score prediction commands are only allowed in th
 function logPredict(step, interaction, extra = {}) {
   const ctx = {
     step,
-    userId: interaction?.user?.id ?? "?",
     username: interaction?.user?.username ?? "?",
+    userId: interaction?.user?.id ?? "?",
     guildId: interaction?.guildId ?? "?",
     channelId: interaction?.channelId ?? "?",
     ...extra,
@@ -1142,6 +1142,7 @@ function logPredictError(step, interaction, err, extra = {}) {
     step,
     reason: "system_error",
     error: err?.message ?? String(err),
+    username: interaction?.user?.username ?? "?",
     userId: interaction?.user?.id ?? "?",
     guildId: interaction?.guildId ?? "?",
     channelId: interaction?.channelId ?? "?",
