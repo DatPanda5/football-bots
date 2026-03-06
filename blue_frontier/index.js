@@ -517,6 +517,13 @@ function buildScorerAliases() {
     "kdh": "kiernan dewsbury-hall",
     "job": "jake o'brien",
     "rohl": "merlin röhl",
+    "ndiaye": "iliman ndiaye",
+    "skiliman ndiaye": "iliman ndiaye",
+    "skilliman ndiaye": "iliman ndiaye",
+    "big mick": "michael keane",
+    "keggers": "michael keane",
+    "big mick keggers": "michael keane",
+    "keano": "michael keane",
   };
   const addFromName = (name) => {
     const lower = name.toLowerCase();
@@ -741,17 +748,30 @@ function normalizeScorers(str) {
     .sort();
 }
 
-function scorersMatch(actualStr, predictedStr) {
-  const a = normalizeScorers(actualStr), b = normalizeScorers(predictedStr);
-  return a.length === b.length && a.every((t, i) => t === b[i]);
+/** True if this predicted token matches an actual scorer: exact match, or predicted starts with "Actual " (extra words allowed), or actual starts with predicted (surname match). */
+function predictedTokenMatchesActual(predToken, actualSet) {
+  for (const actual of actualSet) {
+    if (predToken === actual) return true;
+    if (predToken.startsWith(actual + " ")) return true;  // "branthwaite at the death" vs "branthwaite"
+    if (actual.startsWith(predToken)) return true;         // "branthwaite" vs "jarrad branthwaite"
+  }
+  return false;
 }
 
-/** True if predicted string has at least one scorer in common with actual (after normalization). */
+function scorersMatch(actualStr, predictedStr) {
+  const actualSet = new Set(normalizeScorers(actualStr));
+  const predicted = normalizeScorers(predictedStr);
+  const resolved = predicted.map((pt) => [...actualSet].find((a) => pt === a || pt.startsWith(a + " ") || a.startsWith(pt))).filter(Boolean);
+  const uniqueResolved = [...new Set(resolved)];
+  return uniqueResolved.length === actualSet.size && [...actualSet].every((a) => uniqueResolved.includes(a));
+}
+
+/** True if predicted string has at least one scorer in common with actual (after normalization). Extra words after a name (e.g. "Branthwaite at the death") still match. */
 function scorersMatchAtLeastOne(actualStr, predictedStr) {
   if (!actualStr?.trim() || !predictedStr?.trim()) return false;
   const actualSet = new Set(normalizeScorers(actualStr));
   const predicted = normalizeScorers(predictedStr);
-  return predicted.some((name) => actualSet.has(name));
+  return predicted.some((predToken) => predictedTokenMatchesActual(predToken, actualSet));
 }
 
 function getStoredResult(fixtureId) {
@@ -828,11 +848,11 @@ function getLastCompletedFixtures(n) {
 // ───────────────────────────────────────────────────────────────
 //  POINTS EVALUATION (same as footy_bot: exact 5, result 2, each scorer 1)
 // ───────────────────────────────────────────────────────────────
-/** Returns list of predicted scorer names that match an actual scorer (same normalization as scorersMatchAtLeastOne). 1 pt per returned name. */
+/** Returns list of predicted scorer names that match an actual scorer (same normalization as scorersMatchAtLeastOne). 1 pt per returned name. Extra words after a name (e.g. "Branthwaite at the death") still match. */
 function _matchedScorers(predScorersStr, actualScorersStr) {
   const actualSet = new Set(normalizeScorers(actualScorersStr || ""));
   const pred = normalizeScorers(predScorersStr || "");
-  return pred.filter((name) => actualSet.has(name));
+  return pred.filter((predToken) => predictedTokenMatchesActual(predToken, actualSet));
 }
 
 function awardPointsForFixture(fixtureId, evertonGoals, opponentGoals, actualScorersStr) {
