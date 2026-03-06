@@ -23,7 +23,7 @@ const fs       = require("fs");
 // ───────────────────────────────────────────────────────────────
 //  ENV VALIDATION — fail fast with clear message if credentials missing
 // ───────────────────────────────────────────────────────────────
-const REQUIRED_ENV  = ["DISCORD_TOKEN", "CLIENT_ID", "GUILD_ID"];
+const REQUIRED_ENV  = ["DISCORD_TOKEN", "CLIENT_ID"];
 const PLACEHOLDERS  = /your_application_client_id_here|your_discord_server_id_here|your_bot_token_here/i;
 
 function validateEnv() {
@@ -33,12 +33,17 @@ function validateEnv() {
     console.error("Add them to .env (see .env.example). Then run: npm start");
     process.exit(1);
   }
+  const guildId  = process.env.GUILD_ID?.trim();
+  const blueFrontierId = process.env.BLUE_FRONTIER_GUILD_ID?.trim();
+  if (!guildId && !blueFrontierId) {
+    console.error("[Config] Need at least one of GUILD_ID or BLUE_FRONTIER_GUILD_ID for slash command registration.");
+    process.exit(1);
+  }
   const token    = process.env.DISCORD_TOKEN;
   const clientId = process.env.CLIENT_ID;
-  const guildId  = process.env.GUILD_ID;
-  if (PLACEHOLDERS.test(token + clientId + guildId)) {
+  if (PLACEHOLDERS.test(token + clientId + (guildId || "") + (blueFrontierId || ""))) {
     console.error("[Config] .env still contains placeholder values.");
-    console.error("Replace with your real Discord bot token, application (client) ID, and server (guild) ID.");
+    console.error("Replace with your real Discord bot token, application (client) ID, and server (guild) ID(s).");
     process.exit(1);
   }
 }
