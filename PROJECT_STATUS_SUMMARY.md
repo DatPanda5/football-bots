@@ -1,7 +1,7 @@
 # Football Bots — Project Status Summary
 
 **Project root:** `football-bots/`  
-**Last updated:** 06 Mar 2026 (v3.3.1)
+**Last updated:** 06 Mar 2026
 
 ---
 
@@ -19,7 +19,7 @@
 
 | Version | Date       | Changes |
 |---------|------------|--------|
-| **v3.3.1** | 06 Mar 2026 | **GUILD_ID** optional (require at least one of GUILD_ID or BLUE_FRONTIER_GUILD_ID); production can omit GUILD_ID to avoid 50001 on lab server. **[predict]** logs: username before userId for quicker scanning; logPredictError includes username. Deploy pipeline check log line (server logs only). |
+| **v3.3.1** | 06 Mar 2026 | **GUILD_ID** optional; **[predict]** logs username before userId; logPredictError includes username. **Scorer matching:** extra words after name allowed (e.g. "Branthwaite at the death" → Branthwaite); aliases: Ndiaye/Skiliman/Skilliman → Iliman Ndiaye; Keano/BIG MICK/Keggers → Michael Keane. Deploy pipeline check log line removed. |
 | **v3.3** | 03 Mar 2026 | One prediction per match; overwrite warning + confirm. Kickoff lock autopost in score-predictions channel + catch-up; **fixture_results** + MOD view stored result via **/final** (optional everton/opponent). **/listpredictions:** view "Last 2 completed matches" + optional fixture pick. SEED.md cleanup. |
 | **v3.2** | 03 Mar 2026 | **/final:** deferReply + editReply (fix "application did not respond"); "At least one correct goal scorer" field; removed full predicted-scorers list. **Scorer points:** _matchedScorers aligned with same normalization/set logic as display (leaderboard consistent). |
 | **v3.1** | 03 Mar 2026 | Persistent volume: `DATA_DIR` env (e.g. `/data` on Railway); seed from **seed-predictions.json** (empty table or `SEED_PREDICTIONS=1`); scorer aliases (JOB→Jake O'Brien, Rohl→Merlin Röhl) + diacritic normalization; `/listpredictions` shows next fixture, fallback to fixture with most predictions; mod channels (mod-chat, mod-bot-logs); DB row normalization; **SEED.md**, **DEPLOY.md**, backup-db.js. |
@@ -65,7 +65,7 @@ Known issues and fixes: see [DEBUG.md](../DEBUG.md) at Discord Bots root.
 
 1. **Deploy v3.3.1:** Run **updatetbf** to push version bump and any uncommitted changes; verify production deploy logs and **/predict** (username-first in [predict] logs).
 2. **Port production → lab:** If **tbflabport** shows "No DB at /data/predictions.db", get backup from the **running** Railway service (dashboard → service → shell/one-off → `node blue_frontier/backup-db.js`), save base64 to **blue_frontier/lab/production-backup.b64**, then run restore script and start lab (see **blue_frontier/lab/README.md**).
-3. **Optional:** Run regression checklist in lab before **updatetbf**. Remove `SEED_PREDICTIONS` from Railway Variables if still set. Remove "Deploy pipeline check — OK" log line from index.js when no longer needed.
+3. **Optional:** Run regression checklist in lab before **updatetbf**. Remove `SEED_PREDICTIONS` from Railway Variables if still set.
 4. **Test locally**
    - From **football-bots**: `cd blue_frontier && npm install && npm start` (Everton bot). Use `.env` with `DISCORD_TOKEN`, `CLIENT_ID`, `GUILD_ID`; optional `MOD_ROLE_ID`, `RESULTS_CHANNEL_ID`, `SPORTRADAR_KEY`.
    - From **football-bots**: `cd footy_bot && npm install && npm start` (Footy Bot). Use `.env` with `FOOTY_BOT_*` or `DISCORD_TOKEN`/`CLIENT_ID`/`GUILD_ID` and `PREDICTIONS_CHANNEL_ID`.

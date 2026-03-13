@@ -311,7 +311,7 @@ const ALL_FIXTURES = [
     evertonHome: true, srMatchId: null,
   }, // Next match: Everton vs Burnley, 2:30 PM ET today
   {
-    id: "fix04", kickoffUTC: "2026-03-15T14:00:00Z", label: "Sun 15 Mar 10:00 AM EDT",
+    id: "fix04", kickoffUTC: "2026-03-14T17:30:00Z", label: "Sat 14 Mar 1:30 PM EDT",
     home: "Arsenal", away: "Everton", opponent: "Arsenal",
     evertonHome: false, srMatchId: null,
   },
@@ -326,7 +326,7 @@ const ALL_FIXTURES = [
     evertonHome: false, srMatchId: null,
   },
   {
-    id: "fix07", kickoffUTC: "2026-04-19T13:00:00Z", label: "Sun 19 Apr 2:00 PM BST (9:00 AM EDT)",
+    id: "fix07", kickoffUTC: "2026-04-19T13:00:00Z", label: "Sun 19 Apr 9:00 AM EDT",
     home: "Everton", away: "Liverpool", opponent: "Liverpool",
     evertonHome: true, srMatchId: null,
   },
@@ -346,9 +346,9 @@ const ALL_FIXTURES = [
     evertonHome: false, srMatchId: null,
   },
   {
-    id: "fix11", kickoffUTC: "2026-05-16T14:00:00Z", label: "Sat 16 May 10:00 AM EDT",
-    home: "Sunderland", away: "Everton", opponent: "Sunderland",
-    evertonHome: false, srMatchId: null,
+    id: "fix11", kickoffUTC: "2026-05-17T14:00:00Z", label: "Sun 17 May 10:00 AM EDT",
+    home: "Everton", away: "Sunderland", opponent: "Sunderland",
+    evertonHome: true, srMatchId: null,
   },
   {
     id: "fix12", kickoffUTC: "2026-05-24T15:00:00Z", label: "Sun 24 May 11:00 AM EDT",
@@ -1191,7 +1191,6 @@ client.on("disconnect", () => {
 client.on("clientReady", () => {
   if (wasDisconnected) { wasDisconnected = false; console.log(`[${BOT_NAME}] ✅ Reconnected!`); }
   else console.log(`[${BOT_NAME}] ✅ Online as ${client.user.tag}`);
-  console.log(`[${BOT_NAME}] Deploy pipeline check — OK (visible only in server logs)`);
 
   // On startup: re-schedule auto-checkers for any kicked-off, not-yet-finalised fixtures
   const resultsChannelId = getResultsChannelId();
