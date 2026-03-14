@@ -512,6 +512,7 @@ const OPPONENT_SQUADS_2025_26 = {
 
 // Short-name / nickname aliases for scorer matching — keys and values lowercase.
 // Includes Everton + opponent players; ASCII spellings and shortenings map to canonical form.
+// "og" / "own goal" (case insensitive) map to "own goal" for when a team scores on themselves.
 function buildScorerAliases() {
   const aliases = {
     "kdh": "kiernan dewsbury-hall",
@@ -520,10 +521,19 @@ function buildScorerAliases() {
     "ndiaye": "iliman ndiaye",
     "skiliman ndiaye": "iliman ndiaye",
     "skilliman ndiaye": "iliman ndiaye",
+    "skilliman": "iliman ndiaye",
     "big mick": "michael keane",
     "keggers": "michael keane",
     "big mick keggers": "michael keane",
     "keano": "michael keane",
+    "jimmy g": "james garner",
+    "jg": "james garner",
+    "jb": "jarrad branthwaite",
+    "james branthwaite": "jarrad branthwaite",
+    "evil saka": "tyrique george",
+    "tark": "james tarkowski",
+    "og": "own goal",
+    "own goal": "own goal",
   };
   const addFromName = (name) => {
     const lower = name.toLowerCase();
