@@ -833,6 +833,20 @@ function isFixtureCompleted(fixture) {
 
 function getFixtureById(id) { return ALL_FIXTURES.find((f) => f.id === id); }
 
+function getLatestCompletedFixture() {
+  const completed = ALL_FIXTURES.filter((f) => isFixtureCompleted(f));
+  if (!completed.length) return null;
+  return completed.slice().sort((a, b) => new Date(b.kickoffUTC) - new Date(a.kickoffUTC))[0];
+}
+
+function getFixtureLabelForFinal(fixture) {
+  if (!fixture) return "";
+  const base = fixture.label || "";
+  if (!isFixtureCompleted(fixture)) return base;
+  if (/\bplayed\b/i.test(base)) return base;
+  return `${base} (played)`;
+}
+
 function getUpcomingFixtures() {
   const now = Date.now();
   return ALL_FIXTURES
@@ -926,8 +940,20 @@ const commands = [
       .addChoices(...ALL_FIXTURES.map((f) => ({ name: `${f.home} vs ${f.away} (${f.label})`, value: f.id })))),
   new SlashCommandBuilder().setName("final")
     .setDescription("MOD only: Enter final score or view result for a played fixture")
-    .addStringOption((o) => o.setName("fixture").setDescription("Which fixture (must have kicked off)").setRequired(true)
-      .addChoices(...ALL_FIXTURES.map((f) => ({ name: `${f.home} vs ${f.away} (${f.label})`, value: f.id }))))
+    .addStringOption((o) => {
+      const latestCompleted = getLatestCompletedFixture();
+      const choices = ALL_FIXTURES
+        .filter((f) => !isFixtureCompleted(f) || (latestCompleted && f.id === latestCompleted.id))
+        .map((f) => ({
+          name: `${f.home} vs ${f.away} (${getFixtureLabelForFinal(f)})`,
+          value: f.id,
+        }));
+      return o
+        .setName("fixture")
+        .setDescription("Which fixture (must have kicked off)")
+        .setRequired(true)
+        .addChoices(...choices);
+    })
     .addIntegerOption((o) => o.setName("everton").setDescription("Everton's goals (omit to just view stored result)").setRequired(false).setMinValue(0).setMaxValue(20))
     .addIntegerOption((o) => o.setName("opponent").setDescription("Opponent's goals (omit to just view stored result)").setRequired(false).setMinValue(0).setMaxValue(20))
     .addStringOption((o) => o.setName("scorers").setDescription("Actual goal scorers (optional)").setRequired(false)),
