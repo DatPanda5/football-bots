@@ -815,6 +815,22 @@ function getRandomScorersPlaceholder(opponentName) {
 // ───────────────────────────────────────────────────────────────
 //  FIXTURE HELPERS
 // ───────────────────────────────────────────────────────────────
+const FORTY_EIGHT_HOURS_MS = 48 * 60 * 60 * 1000;
+
+function isFixtureCompleted(fixture) {
+  if (!fixture) return false;
+  const kickoffMs = new Date(fixture.kickoffUTC).getTime();
+  if (Number.isNaN(kickoffMs)) return false;
+
+  // If /final (or auto result checker) has recorded a result, treat as completed immediately.
+  const isFinalised = !!db.prepare("SELECT 1 FROM finalised WHERE fixtureId = ?").get(fixture.id);
+  if (isFinalised) return true;
+
+  // Otherwise, treat as completed 48 hours after the listed kickoff time.
+  const now = Date.now();
+  return now - kickoffMs >= FORTY_EIGHT_HOURS_MS;
+}
+
 function getFixtureById(id) { return ALL_FIXTURES.find((f) => f.id === id); }
 
 function getUpcomingFixtures() {
@@ -846,11 +862,10 @@ function getListableFixture() {
   return next;
 }
 
-/** Last N fixtures that have already kicked off (most recent first). */
+/** Last N fixtures that count as completed (most recent first). */
 function getLastCompletedFixtures(n) {
-  const now = Date.now();
   return ALL_FIXTURES
-    .filter((f) => new Date(f.kickoffUTC).getTime() <= now)
+    .filter((f) => isFixtureCompleted(f))
     .sort((a, b) => new Date(b.kickoffUTC) - new Date(a.kickoffUTC))
     .slice(0, n);
 }
