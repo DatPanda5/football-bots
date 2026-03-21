@@ -517,6 +517,7 @@ function buildScorerAliases() {
   const aliases = {
     "kdh": "kiernan dewsbury-hall",
     "job": "jake o'brien",
+    "jake o brien": "jake o'brien",
     "rohl": "merlin röhl",
     "ndiaye": "iliman ndiaye",
     "skiliman ndiaye": "iliman ndiaye",

@@ -4,6 +4,11 @@ Reverse chronological (newest first). Entries may be prefixed with `[blue_fronti
 
 ---
 
+## 16 Mar 2026
+
+- **[blue_frontier] v3.3.1** — `/final` UX: fixture dropdown now shows only the most recent played match plus all future fixtures; "played" status comes from either a stored `/final` result or 48 hours having passed since kickoff. Labels keep consistent "played" wording. 
+- **[blue_frontier lab]** — Updated lab MOD role ID in `blue_frontier/lab/.env.lab` so lab permissions match production expectations for `/final` and other MOD-only commands.
+
 ## 06 Mar 2026
 
 - **[blue_frontier]** — **Scorer matching:** predicted scorers match by name/alias even with extra words (e.g. "Branthwaite at the death" counts as Branthwaite). **Aliases:** Ndiaye, Skiliman/Skilliman Ndiaye → Iliman Ndiaye; BIG MICK, Keggers, Keano → Michael Keane. Deploy pipeline check log line removed (gone on next deploy).
