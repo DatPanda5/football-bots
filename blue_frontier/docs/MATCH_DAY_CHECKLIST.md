@@ -8,7 +8,7 @@ Use this **after** a fixture's kickoff time has passed (e.g. Everton vs Burnley)
 
 - [ ] **Burnley is no longer in the list.**  
   The embed shows "Next 5 Everton Fixtures" — only fixtures **after** the current time.
-- [ ] **First fixture is the next match** (e.g. Arsenal vs Everton, Sun 15 Mar).  
+- [ ] **First fixture is the next match** (e.g. Brentford vs Everton, Sat 11 Apr).  
   You should see 5 upcoming matches; the one that just kicked off (Burnley) is gone.
 
 ---
@@ -19,7 +19,7 @@ Use this **after** a fixture's kickoff time has passed (e.g. Everton vs Burnley)
   The menu is built from the same "next 5 upcoming" list; Burnley should not be selectable.
 - [ ] **If someone still has the old menu and picks Burnley:** they get  
   _"That fixture has already kicked off. Run `/predict` again."_
-- [ ] **New predictions can only be made for the next match(es)** in the list (e.g. Arsenal, Chelsea, …).
+- [ ] **New predictions can only be made for the next match(es)** in the list (e.g. Brentford, Liverpool, …).
 
 ---
 
@@ -35,7 +35,7 @@ Use this **after** a fixture's kickoff time has passed (e.g. Everton vs Burnley)
 
 - [ ] **Burnley can be selected** in the fixture dropdown (all fixtures appear; server blocks ones that haven't kicked off).
 - [ ] **Submitting a result for Burnley works** (Everton score, opponent score, optional scorers).
-- [ ] **Choosing a fixture that hasn't kicked off** (e.g. Arsenal) returns  
+- [ ] **Choosing a fixture that hasn't kicked off** (e.g. Liverpool) returns  
   _"That fixture hasn't kicked off yet."_
 
 ---
@@ -44,7 +44,7 @@ Use this **after** a fixture's kickoff time has passed (e.g. Everton vs Burnley)
 
 - [ ] **Points are awarded** (exact score, correct result, scorers as configured).
 - [ ] **Leaderboard** (`/leaderboard`) shows updated points.
-- [ ] **`/listpredictions`** can then show the next fixture with predictions (e.g. Arsenal once people predict it), or the next upcoming match.
+- [ ] **`/listpredictions`** can then show the next fixture with predictions (e.g. Brentford once people predict it), or the next upcoming match.
 
 ---
 
@@ -52,7 +52,7 @@ Use this **after** a fixture's kickoff time has passed (e.g. Everton vs Burnley)
 
 | Command          | After Burnley kicks off |
 |------------------|-------------------------|
-| `/fixtures`      | Next 5 = Arsenal, Chelsea, Brentford, Liverpool, West Ham (no Burnley). |
+| `/fixtures`      | Next 5 = Brentford, Liverpool, West Ham, Manchester City, Crystal Palace (no Burnley). |
 | `/predict`       | Menu = same 5; no Burnley. Picking Burnley from an old menu → "already kicked off". |
 | `/listpredictions` | Shows **Everton vs Burnley** and all predictions for it. |
 | `/final`         | MOD: can enter result for Burnley; other fixtures rejected until their kickoff has passed. |

@@ -89,7 +89,7 @@ Get the new `seed-predictions.json` into the branch Railway deploys from (usuall
 
 ## Still seeing "No predictions yet"?
 
-1. **What match does `/listpredictions` show?** If it shows **Arsenal** (or any match other than Everton vs Burnley), the bot was showing the *next* fixture by date; your seeded predictions are for **Burnley (fix03)**. The code now falls back: if the next fixture has zero predictions, it shows the fixture that *has* predictions (e.g. Burnley). Deploy the latest code and try again.
+1. **What match does `/listpredictions` show?** If it shows **Brentford** (or any match other than Everton vs Burnley), the bot was showing the *next* fixture by date; your seeded predictions are for **Burnley (fix03)**. The code now falls back: if the next fixture has zero predictions, it shows the fixture that *has* predictions (e.g. Burnley). Deploy the latest code and try again.
 2. **Did the seed run?** In Railway → **Deployments** → latest → **Logs**, look for: `[DB] Seeded 14 prediction(s) from seed-predictions.json`. If it's missing, the seed didn't run (e.g. `SEED_PREDICTIONS` was not `1` when that deploy started, or `seed-predictions.json` wasn't in the container).
 3. **Is the DB on the volume?** In **Variables**, confirm **`DATA_DIR`** = **`/data`**. Without it, the app uses a non-persistent path and redeploys can start with an empty DB.
 4. **Re-run the seed:** Set **`SEED_PREDICTIONS`** = **`1`** in Variables **before** (or when) you trigger the deploy, so the variable is present when the new container starts. Save, wait for the deploy to finish, then check the logs (see below). After you see the seed message, remove the variable.

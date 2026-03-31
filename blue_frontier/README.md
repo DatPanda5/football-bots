@@ -199,14 +199,14 @@ window — no manual updates needed until the end of the season.
 |---|---|---|
 | 1 | ~~Mon 15 Feb~~ (played) | Everton vs Manchester United |
 | 2 | ~~Sat 18 Feb~~ (played) | Newcastle United vs Everton |
-| 3 | Tue 03 Mar 19:30 | **Everton vs Burnley** ← next |
-| 4 | Sun 15 Mar 14:00 | Arsenal vs Everton |
-| 5 | Sat 21 Mar 17:30 | Everton vs Chelsea |
-| 6 | Sat 11 Apr 14:00 | Brentford vs Everton |
-| 7 | Sat 18 Apr 14:00 | Everton vs Liverpool |
-| 8 | Sat 25 Apr 14:00 | West Ham United vs Everton |
-| 9 | Sat 02 May 14:00 | Everton vs Manchester City |
-| 10 | Sun 09 May 14:00 | Crystal Palace vs Everton |
+| 3 | ~~Tue 03 Mar 19:30~~ (played) | Everton vs Burnley |
+| 4 | ~~Sun 15 Mar 14:00~~ (played) | Arsenal vs Everton |
+| 5 | ~~Sat 21 Mar 17:30~~ (played) | Everton vs Chelsea |
+| 6 | Sat 11 Apr 10:00 AM EDT | **Brentford vs Everton** ← next |
+| 7 | Sun 19 Apr 9:00 AM EDT | Everton vs Liverpool |
+| 8 | Sat 25 Apr 10:00 AM EDT | West Ham United vs Everton |
+| 9 | Mon 04 May 3:00 PM EDT | Everton vs Manchester City |
+| 10 | Sat 09 May 10:00 AM EDT | Crystal Palace vs Everton |
 
 ---
 

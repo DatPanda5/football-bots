@@ -4,6 +4,11 @@ Reverse chronological (newest first). Entries may be prefixed with `[blue_fronti
 
 ---
 
+## 26 Mar 2026
+
+- **[blue_frontier lab]** — Preloaded 2026 World Cup group-stage test schedule in ET at `blue_frontier/lab/data/world-cup-2026-group-stage-et.csv` (72 fixtures, stable `match_id` keys, UEFA playoff placeholders retained for later winner updates).
+- **[blue_frontier lab]** — Added lab runbook note in `blue_frontier/lab/README.md` documenting the World Cup test dataset path and ET timestamp fields (`kickoff_et`, `kickoff_et_iso`).
+
 ## 16 Mar 2026
 
 - **[blue_frontier] v3.3.1** — `/final` UX: fixture dropdown now shows only the most recent played match plus all future fixtures; "played" status comes from either a stored `/final` result or 48 hours having passed since kickoff. Labels keep consistent "played" wording. 

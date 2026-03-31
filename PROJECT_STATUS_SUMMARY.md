@@ -1,7 +1,7 @@
 # Football Bots — Project Status Summary
 
 **Project root:** `football-bots/`  
-**Last updated:** 16 Mar 2026
+**Last updated:** 26 Mar 2026
 
 ---
 
@@ -56,6 +56,7 @@ Full history: **[CHANGELOG.md](CHANGELOG.md)** (this folder). Workspace-wide ent
 | **core**           | In use | Shared by both bots; no standalone run. |
 | **SportRadar**     | Stub | Blue Frontier: set `SPORTRADAR_KEY` and uncomment fetch in `_fetchFinalScore` to enable auto results. |
 | **Footy Bot API**  | Stub | Replace `fetchScores(league)` in `footy_bot/index.js` for live fixtures. |
+| **Model / LLM**    | GPT-5.3 Codex | Session model for latest status update. |
 
 Known issues and fixes: see [DEBUG.md](../DEBUG.md) at Discord Bots root.
 
@@ -63,9 +64,9 @@ Known issues and fixes: see [DEBUG.md](../DEBUG.md) at Discord Bots root.
 
 ## Next steps
 
-1. **Deploy v3.3.1:** Run **updatetbf** to push version bump and any uncommitted changes; verify production deploy logs and **/predict** (username-first in [predict] logs).
-2. **Port production → lab:** If **tbflabport** shows "No DB at /data/predictions.db", get backup from the **running** Railway service (dashboard → service → shell/one-off → `node blue_frontier/backup-db.js`), save base64 to **blue_frontier/lab/production-backup.b64**, then run restore script and start lab (see **blue_frontier/lab/README.md**).
-3. **Optional:** Run regression checklist in lab before **updatetbf**. Remove `SEED_PREDICTIONS` from Railway Variables if still set.
+1. **World Cup build prep (lab):** Wire ET schedule loader for TBF lab using `blue_frontier/lab/data/world-cup-2026-group-stage-et.csv` and `match_id` keys (`wc26_gs_###`).
+2. **Update placeholders when ready:** Replace UEFA playoff placeholder teams in the lab World Cup dataset when winners are confirmed (keep schema unchanged).
+3. **Keep production isolated:** Continue using only `blue_frontier/lab/` paths for World Cup testing until implementation is validated end-to-end.
 4. **Test locally**
    - From **football-bots**: `cd blue_frontier && npm install && npm start` (Everton bot). Use `.env` with `DISCORD_TOKEN`, `CLIENT_ID`, `GUILD_ID`; optional `MOD_ROLE_ID`, `RESULTS_CHANNEL_ID`, `SPORTRADAR_KEY`.
    - From **football-bots**: `cd footy_bot && npm install && npm start` (Footy Bot). Use `.env` with `FOOTY_BOT_*` or `DISCORD_TOKEN`/`CLIENT_ID`/`GUILD_ID` and `PREDICTIONS_CHANNEL_ID`.

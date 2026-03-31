@@ -336,7 +336,7 @@ const ALL_FIXTURES = [
     evertonHome: false, srMatchId: null,
   },
   {
-    id: "fix09", kickoffUTC: "2026-05-02T14:00:00Z", label: "Sat 02 May 10:00 AM EDT",
+    id: "fix09", kickoffUTC: "2026-05-04T19:00:00Z", label: "Mon 04 May 3:00 PM EDT",
     home: "Everton", away: "Manchester City", opponent: "Manchester City",
     evertonHome: true, srMatchId: null,
   },
@@ -759,12 +759,47 @@ function normalizeScorers(str) {
     .sort();
 }
 
+/** One segment after split (preserves order & duplicates for /final + points). */
+function normalizeSingleScorerToken(segment) {
+  const s0 = String(segment).trim().toLowerCase();
+  if (!s0) return "";
+  const aliased = SCORER_ALIASES[s0] || s0;
+  return normalizeDiacritics(aliased);
+}
+
+function parseScorerSegmentsRaw(str) {
+  if (!str?.trim()) return [];
+  return String(str)
+    .split(/[,/\n]+/)
+    .map((s) => s.replace(/^\s*[^:,]+:\s*/, "").trim())
+    .filter(Boolean);
+}
+
+/** Ordered goal slots from MOD /final string (e.g. two "Beto" entries = two goals). */
+function parseScorerSlotsOrdered(str) {
+  return parseScorerSegmentsRaw(str)
+    .map((display) => ({ display, norm: normalizeSingleScorerToken(display) }))
+    .filter((s) => s.norm);
+}
+
+/** Ordered predicted tokens (no sort) for multiset matching. */
+function parsePredictedTokensOrdered(str) {
+  return parseScorerSegmentsRaw(str).map(normalizeSingleScorerToken).filter(Boolean);
+}
+
+/** Match one predicted normalized token to one actual slot (same rules as set-based match). */
+function predictedTokenMatchesSingleActual(predToken, actualNorm) {
+  if (!predToken || !actualNorm) return false;
+  if (predToken === actualNorm) return true;
+  if (predToken.startsWith(actualNorm + " ")) return true; // "branthwaite at the death" vs "branthwaite"
+  if (actualNorm.startsWith(predToken)) return true;       // "branthwaite" vs "jarrad branthwaite"
+  return false;
+}
+
 /** True if this predicted token matches an actual scorer: exact match, or predicted starts with "Actual " (extra words allowed), or actual starts with predicted (surname match). */
 function predictedTokenMatchesActual(predToken, actualSet) {
   for (const actual of actualSet) {
-    if (predToken === actual) return true;
-    if (predToken.startsWith(actual + " ")) return true;  // "branthwaite at the death" vs "branthwaite"
-    if (actual.startsWith(predToken)) return true;         // "branthwaite" vs "jarrad branthwaite"
+    if (predictedTokenMatchesSingleActual(predToken, actual)) return true;
   }
   return false;
 }
@@ -780,9 +815,10 @@ function scorersMatch(actualStr, predictedStr) {
 /** True if predicted string has at least one scorer in common with actual (after normalization). Extra words after a name (e.g. "Branthwaite at the death") still match. */
 function scorersMatchAtLeastOne(actualStr, predictedStr) {
   if (!actualStr?.trim() || !predictedStr?.trim()) return false;
-  const actualSet = new Set(normalizeScorers(actualStr));
-  const predicted = normalizeScorers(predictedStr);
-  return predicted.some((predToken) => predictedTokenMatchesActual(predToken, actualSet));
+  const slots = parseScorerSlotsOrdered(actualStr);
+  if (!slots.length) return false;
+  const predicted = parsePredictedTokensOrdered(predictedStr);
+  return predicted.some((pt) => slots.some((slot) => predictedTokenMatchesSingleActual(pt, slot.norm)));
 }
 
 function getStoredResult(fixtureId) {
@@ -888,11 +924,23 @@ function getLastCompletedFixtures(n) {
 // ───────────────────────────────────────────────────────────────
 //  POINTS EVALUATION (same as footy_bot: exact 5, result 2, each scorer 1)
 // ───────────────────────────────────────────────────────────────
-/** Returns list of predicted scorer names that match an actual scorer (same normalization as scorersMatchAtLeastOne). 1 pt per returned name. Extra words after a name (e.g. "Branthwaite at the death") still match. */
-function _matchedScorers(predScorersStr, actualScorersStr) {
-  const actualSet = new Set(normalizeScorers(actualScorersStr || ""));
-  const pred = normalizeScorers(predScorersStr || "");
-  return pred.filter((predToken) => predictedTokenMatchesActual(predToken, actualSet));
+/**
+ * How many goal-scorer points (1 pt each): walk actual goals in order; each slot consumes one matching
+ * predicted token. Same player twice requires two predictions to earn two points.
+ */
+function countScorerSlotMatches(predScorersStr, actualScorersStr) {
+  const slots = parseScorerSlotsOrdered(actualScorersStr || "");
+  if (!slots.length) return 0;
+  const remaining = [...parsePredictedTokensOrdered(predScorersStr || "")];
+  let n = 0;
+  for (const slot of slots) {
+    const idx = remaining.findIndex((t) => predictedTokenMatchesSingleActual(t, slot.norm));
+    if (idx >= 0) {
+      n++;
+      remaining.splice(idx, 1);
+    }
+  }
+  return n;
 }
 
 function awardPointsForFixture(fixtureId, evertonGoals, opponentGoals, actualScorersStr) {
@@ -906,9 +954,9 @@ function awardPointsForFixture(fixtureId, evertonGoals, opponentGoals, actualSco
     } else if (correctResult) {
       awardPoints(pred.userId, pred.displayName, fixtureId, POINTS_CORRECT_RESULT, "correct_result");
     }
-    const matched = _matchedScorers(pred.scorers, actualScorersStr);
-    for (const scorer of matched) {
-      awardPoints(pred.userId, pred.displayName, fixtureId, POINTS_CORRECT_SCORER, `scorer:${scorer}`);
+    const scorerPts = countScorerSlotMatches(pred.scorers, actualScorersStr);
+    for (let s = 0; s < scorerPts; s++) {
+      awardPoints(pred.userId, pred.displayName, fixtureId, POINTS_CORRECT_SCORER, `scorer:slot_${s + 1}`);
     }
   }
 }
@@ -1068,6 +1116,63 @@ async function buildListEmbed(fixture, guild) {
   return embed;
 }
 
+/**
+ * One line per actual goal (order preserved; duplicate names = separate goals).
+ * Users listed under each scorer they matched; same user on multiple lines if they predicted multiple correctly.
+ * Greedy consumption matches scorer points (countScorerSlotMatches).
+ */
+async function buildAtLeastOneScorerBreakdownLines(actualScorersStr, entries, guild) {
+  const slots = parseScorerSlotsOrdered(actualScorersStr);
+  if (!slots.length) return null;
+  const eligible = entries.filter((p) => p.scorers?.trim() && scorersMatchAtLeastOne(actualScorersStr, p.scorers));
+  if (!eligible.length) return null;
+  const sorted = [...eligible].sort((a, b) =>
+    (a.displayName || "").localeCompare(b.displayName || "", undefined, { sensitivity: "base" })
+  );
+  const bags = new Map(sorted.map((p) => [p.userId, [...parsePredictedTokensOrdered(p.scorers)]]));
+  const lines = [];
+  for (const slot of slots) {
+    const names = [];
+    for (const p of sorted) {
+      const rem = bags.get(p.userId);
+      if (!rem?.length) continue;
+      const idx = rem.findIndex((t) => predictedTokenMatchesSingleActual(t, slot.norm));
+      if (idx >= 0) {
+        rem.splice(idx, 1);
+        names.push(await getDisplayName(guild, p.userId, p.displayName));
+      }
+    }
+    lines.push(`**${slot.display}** - ${names.length ? names.join(", ") : "*none*"}`);
+  }
+  return lines;
+}
+
+const FINAL_SCORER_FIELD_MAX = 1000;
+
+function appendScorerBreakdownEmbedFields(embed, lines) {
+  if (!lines?.length) return;
+  let chunk = "";
+  let part = 0;
+  const title = (i) => (i === 0 ? "✅ At least one correct goal scorer" : "✅ At least one correct goal scorer (cont.)");
+  const flush = () => {
+    if (!chunk) return;
+    const v = chunk.length > FINAL_SCORER_FIELD_MAX ? `${chunk.slice(0, FINAL_SCORER_FIELD_MAX - 1)}…` : chunk;
+    embed.addFields({ name: title(part), value: v, inline: false });
+    part++;
+    chunk = "";
+  };
+  for (const line of lines) {
+    const next = chunk ? `${chunk}\n${line}` : line;
+    if (next.length > FINAL_SCORER_FIELD_MAX) {
+      flush();
+      chunk = line.length > FINAL_SCORER_FIELD_MAX ? `${line.slice(0, FINAL_SCORER_FIELD_MAX - 1)}…` : line;
+    } else {
+      chunk = next;
+    }
+  }
+  flush();
+}
+
 /** Build the final-score embed for a fixture (used when entering result or viewing stored result). */
 async function buildFinalResultEmbed(fixture, everton, opponent, actualScorers, guild) {
   const fixtureId   = fixture.id;
@@ -1076,9 +1181,6 @@ async function buildFinalResultEmbed(fixture, everton, opponent, actualScorers, 
   const correctAll = entries.filter((p) => p.evertonScore === eStr && p.opponentScore === oStr);
   const withScorers= actualScorers ? correctAll.filter((p) => p.scorers?.trim() && scorersMatch(actualScorers, p.scorers)) : [];
   const scoreOnly  = correctAll.filter((p) => !withScorers.includes(p));
-  const atLeastOneScorer = actualScorers
-    ? entries.filter((p) => p.scorers?.trim() && scorersMatchAtLeastOne(actualScorers, p.scorers))
-    : [];
   const scoreLine = fixture.evertonHome
     ? `Everton **${everton}** – **${opponent}** ${fixture.opponent}`
     : `${fixture.opponent} **${opponent}** – **${everton}** Everton`;
@@ -1088,14 +1190,14 @@ async function buildFinalResultEmbed(fixture, everton, opponent, actualScorers, 
     .setFooter({ text: `${BOT_FOOTER} • Entered by MOD` }).setTimestamp();
   const nWith = await Promise.all(withScorers.map((p) => getDisplayName(guild, p.userId, p.displayName)));
   const nOnly = await Promise.all(scoreOnly.map((p) => getDisplayName(guild, p.userId, p.displayName)));
-  const atLeastOnePreds = atLeastOneScorer.filter((p, i, arr) => arr.findIndex((q) => q.userId === p.userId) === i);
-  const nAtLeastOne = await Promise.all(atLeastOnePreds.map((p) => getDisplayName(guild, p.userId, p.displayName)));
   embed.addFields(
     { name: "✅ Correct score + goal scorers", value: nWith.length ? nWith.join(", ") : "_None_", inline: false },
     { name: "✅ Correct score only", value: nOnly.length ? nOnly.join(", ") : "_None_", inline: false }
   );
   if (actualScorers) {
-    embed.addFields({ name: "✅ At least one correct goal scorer", value: nAtLeastOne.length ? nAtLeastOne.join(", ") : "_None_", inline: false });
+    const breakdown = await buildAtLeastOneScorerBreakdownLines(actualScorers, entries, guild);
+    if (breakdown?.length) appendScorerBreakdownEmbedFields(embed, breakdown);
+    else embed.addFields({ name: "✅ At least one correct goal scorer", value: "_None_", inline: false });
   }
   return embed;
 }
