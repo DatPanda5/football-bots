@@ -530,6 +530,7 @@ function buildScorerAliases() {
     "jimmy g": "james garner",
     "jg": "james garner",
     "jb": "jarrad branthwaite",
+    "jb32": "jarrad branthwaite",
     "james branthwaite": "jarrad branthwaite",
     "evil saka": "tyrique george",
     "tark": "james tarkowski",
