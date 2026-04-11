@@ -750,13 +750,13 @@ function _buildScoreEmbed(game) {
 // ───────────────────────────────────────────────────────────────
 function normalizeScorers(str) {
   if (!str?.trim()) return [];
-  return String(str)
-    .split(/[,/\n]+/)
-    .map((s) => s.replace(/^\s*[^:,]+:\s*/, "").trim().toLowerCase()) // strip "Everton: " / "Burnley: " etc.
-    .filter(Boolean)
-    .map((name) => SCORER_ALIASES[name] || name)
-    .map(normalizeDiacritics)
-    .sort();
+  const tokens = [];
+  for (const seg of parseScorerSegmentsRaw(str)) {
+    for (const { norm } of expandScorerSegment(seg)) {
+      if (norm) tokens.push(norm);
+    }
+  }
+  return tokens.sort();
 }
 
 /** One segment after split (preserves order & duplicates for /final + points). */
@@ -767,6 +767,35 @@ function normalizeSingleScorerToken(segment) {
   return normalizeDiacritics(aliased);
 }
 
+/**
+ * "Igor Thiago Brace" / "beto brace" → two identical { display, norm } slots.
+ * "Name hat trick" / "hattrick" / "hat-trick" / "hatty" → three slots. Suffix is stripped before aliases/diacritics.
+ */
+function expandScorerSegment(segment) {
+  const raw = String(segment).trim();
+  if (!raw) return [];
+  const hatRe = /^(.+?)\s+(hat[\s-]*trick|hattrick|hatty)$/i;
+  const braceRe = /^(.+?)\s+brace$/i;
+  let base = raw;
+  let count = 1;
+  const hatM = raw.match(hatRe);
+  if (hatM) {
+    base = hatM[1].trim();
+    count = 3;
+  } else {
+    const braceM = raw.match(braceRe);
+    if (braceM) {
+      base = braceM[1].trim();
+      count = 2;
+    }
+  }
+  const norm = normalizeSingleScorerToken(base);
+  if (!norm) return [];
+  const displayCore = base.trim();
+  if (count === 1) return [{ display: raw, norm }];
+  return Array.from({ length: count }, () => ({ display: displayCore, norm }));
+}
+
 function parseScorerSegmentsRaw(str) {
   if (!str?.trim()) return [];
   return String(str)
@@ -775,16 +804,24 @@ function parseScorerSegmentsRaw(str) {
     .filter(Boolean);
 }
 
-/** Ordered goal slots from MOD /final string (e.g. two "Beto" entries = two goals). */
+/** Ordered goal slots from MOD /final string (e.g. two "Beto" entries = two goals, or one "Beto brace"). */
 function parseScorerSlotsOrdered(str) {
-  return parseScorerSegmentsRaw(str)
-    .map((display) => ({ display, norm: normalizeSingleScorerToken(display) }))
-    .filter((s) => s.norm);
+  const out = [];
+  for (const seg of parseScorerSegmentsRaw(str)) {
+    out.push(...expandScorerSegment(seg));
+  }
+  return out.filter((s) => s.norm);
 }
 
 /** Ordered predicted tokens (no sort) for multiset matching. */
 function parsePredictedTokensOrdered(str) {
-  return parseScorerSegmentsRaw(str).map(normalizeSingleScorerToken).filter(Boolean);
+  const out = [];
+  for (const seg of parseScorerSegmentsRaw(str)) {
+    for (const { norm } of expandScorerSegment(seg)) {
+      if (norm) out.push(norm);
+    }
+  }
+  return out;
 }
 
 /** Match one predicted normalized token to one actual slot (same rules as set-based match). */

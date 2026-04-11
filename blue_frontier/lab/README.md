@@ -36,4 +36,4 @@ Local-only environment for testing the bot in the **DATPANDA BOT TESTING** Disco
 - Time fields:
   - `kickoff_et` (display value from source)
   - `kickoff_et_iso` (ISO timestamp with `America/New_York` offset)
-- UEFA playoff placeholders are intentionally retained so you can update winners later without changing file shape.
+- Team list updated to the final 2026 group stage after playoffs (e.g. Czechia, Bosnia, Türkiye, Sweden, Iraq, DR Congo); `source_note` column in CSV marks the refresh batch.
