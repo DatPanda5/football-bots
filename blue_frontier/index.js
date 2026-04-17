@@ -139,6 +139,14 @@ db.exec(`
   );
 `);
 
+// Migrate: add bonus card columns (silently no-ops if already present).
+for (const sql of [
+  "ALTER TABLE predictions ADD COLUMN bonusYellowCards TEXT",
+  "ALTER TABLE predictions ADD COLUMN bonusRedCards TEXT",
+  "ALTER TABLE fixture_results ADD COLUMN yellowCards INTEGER",
+  "ALTER TABLE fixture_results ADD COLUMN redCards INTEGER",
+]) { try { db.exec(sql); } catch {} }
+
 // Seed from seed-predictions.json: when table is empty, or when SEED_PREDICTIONS=1 (merge/update from file).
 const SEED_PATH = path.join(__dirname, "seed-predictions.json");
 const forceSeed = /^1|true|yes$/i.test(process.env.SEED_PREDICTIONS || "");
@@ -195,6 +203,8 @@ function normalizePredRow(row) {
     evertonScore: row.evertonScore ?? row.evertonscore ?? row.EVERTONSCORE,
     opponentScore: row.opponentScore ?? row.opponentscore ?? row.OPPONENTSCORE,
     scorers: row.scorers ?? row.SCORERS,
+    bonusYellowCards: row.bonusYellowCards ?? row.bonusyellowcards ?? null,
+    bonusRedCards: row.bonusRedCards ?? row.bonusredcards ?? null,
     submittedAt: row.submittedAt ?? row.submittedat ?? row.SUBMITTEDAT,
   };
   if (r.fixture != null) r.fixture = String(r.fixture).trim();
@@ -211,10 +221,10 @@ const predStore = {
   set(key, pred) {
     db.prepare(`
       INSERT OR REPLACE INTO predictions
-        (key, userId, displayName, fixture, evertonScore, opponentScore, scorers, submittedAt)
+        (key, userId, displayName, fixture, evertonScore, opponentScore, scorers, bonusYellowCards, bonusRedCards, submittedAt)
       VALUES
-        (@key, @userId, @displayName, @fixture, @evertonScore, @opponentScore, @scorers, @submittedAt)
-    `).run({ ...pred, key, scorers: pred.scorers ?? null });
+        (@key, @userId, @displayName, @fixture, @evertonScore, @opponentScore, @scorers, @bonusYellowCards, @bonusRedCards, @submittedAt)
+    `).run({ ...pred, key, scorers: pred.scorers ?? null, bonusYellowCards: pred.bonusYellowCards ?? null, bonusRedCards: pred.bonusRedCards ?? null });
   },
   get(key) {
     const row = db.prepare("SELECT * FROM predictions WHERE key = ?").get(key);
@@ -234,9 +244,12 @@ const predStore = {
 // ───────────────────────────────────────────────────────────────
 //  POINTS (same as footy_bot: 5pt exact, 2pt result, 1pt per scorer)
 // ───────────────────────────────────────────────────────────────
-const POINTS_EXACT_SCORE   = 5;
+const POINTS_EXACT_SCORE    = 5;
 const POINTS_CORRECT_RESULT = 2;
 const POINTS_CORRECT_SCORER = 1;
+const POINTS_CORRECT_BONUS  = 1;
+
+const DERBY_FIXTURE_ID = "fix07";
 
 function _seasonYear() {
   const now = new Date();
@@ -760,9 +773,19 @@ function normalizeScorers(str) {
   return tokens.sort();
 }
 
+/** Remove common middle interjections so "seamus fucking coleman" matches Séamus Coleman. */
+function stripScorerInterjections(s) {
+  return String(s)
+    .replace(/\b(fucking|fuckin|bloody|damn|dammit|frickin|fricking)\b/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 /** One segment after split (preserves order & duplicates for /final + points). */
 function normalizeSingleScorerToken(segment) {
-  const s0 = String(segment).trim().toLowerCase();
+  let s0 = String(segment).trim().toLowerCase();
+  if (!s0) return "";
+  s0 = stripScorerInterjections(s0);
   if (!s0) return "";
   const aliased = SCORER_ALIASES[s0] || s0;
   return normalizeDiacritics(aliased);
@@ -860,19 +883,21 @@ function scorersMatchAtLeastOne(actualStr, predictedStr) {
 }
 
 function getStoredResult(fixtureId) {
-  const row = db.prepare("SELECT evertonGoals, opponentGoals, scorers, finalisedAt FROM fixture_results WHERE fixtureId = ?").get(fixtureId);
+  const row = db.prepare("SELECT evertonGoals, opponentGoals, scorers, yellowCards, redCards, finalisedAt FROM fixture_results WHERE fixtureId = ?").get(fixtureId);
   if (!row) return null;
   return {
     evertonGoals: row.evertonGoals ?? row.evertongoals,
     opponentGoals: row.opponentGoals ?? row.opponentgoals,
     scorers: row.scorers ?? row.SCORERS ?? null,
+    yellowCards: row.yellowCards ?? row.yellowcards ?? null,
+    redCards: row.redCards ?? row.redcards ?? null,
     finalisedAt: row.finalisedAt ?? row.finalisedat,
   };
 }
-function storeFixtureResult(fixtureId, evertonGoals, opponentGoals, scorers) {
+function storeFixtureResult(fixtureId, evertonGoals, opponentGoals, scorers, yellowCards = null, redCards = null) {
   db.prepare(
-    "INSERT OR REPLACE INTO fixture_results (fixtureId, evertonGoals, opponentGoals, scorers, finalisedAt) VALUES (?, ?, ?, ?, ?)"
-  ).run(fixtureId, evertonGoals, opponentGoals, scorers ?? null, new Date().toISOString());
+    "INSERT OR REPLACE INTO fixture_results (fixtureId, evertonGoals, opponentGoals, scorers, yellowCards, redCards, finalisedAt) VALUES (?, ?, ?, ?, ?, ?, ?)"
+  ).run(fixtureId, evertonGoals, opponentGoals, scorers ?? null, yellowCards ?? null, redCards ?? null, new Date().toISOString());
 }
 
 function getRandomScorersPlaceholder(opponentName) {
@@ -981,7 +1006,7 @@ function countScorerSlotMatches(predScorersStr, actualScorersStr) {
   return n;
 }
 
-function awardPointsForFixture(fixtureId, evertonGoals, opponentGoals, actualScorersStr) {
+function awardPointsForFixture(fixtureId, evertonGoals, opponentGoals, actualScorersStr, actualYellowCards = null, actualRedCards = null) {
   const entries = predStore.values().filter((p) => sameFixture(p.fixture, fixtureId));
   const eStr = String(evertonGoals), oStr = String(opponentGoals);
   for (const pred of entries) {
@@ -995,6 +1020,14 @@ function awardPointsForFixture(fixtureId, evertonGoals, opponentGoals, actualSco
     const scorerPts = countScorerSlotMatches(pred.scorers, actualScorersStr);
     for (let s = 0; s < scorerPts; s++) {
       awardPoints(pred.userId, pred.displayName, fixtureId, POINTS_CORRECT_SCORER, `scorer:slot_${s + 1}`);
+    }
+    if (fixtureId === DERBY_FIXTURE_ID) {
+      if (actualYellowCards != null && pred.bonusYellowCards != null && String(pred.bonusYellowCards).trim() === String(actualYellowCards)) {
+        awardPoints(pred.userId, pred.displayName, fixtureId, POINTS_CORRECT_BONUS, "bonus:yellow_cards");
+      }
+      if (actualRedCards != null && pred.bonusRedCards != null && String(pred.bonusRedCards).trim() === String(actualRedCards)) {
+        awardPoints(pred.userId, pred.displayName, fixtureId, POINTS_CORRECT_BONUS, "bonus:red_cards");
+      }
     }
   }
 }
@@ -1043,7 +1076,9 @@ const commands = [
     })
     .addIntegerOption((o) => o.setName("everton").setDescription("Everton's goals (omit to just view stored result)").setRequired(false).setMinValue(0).setMaxValue(20))
     .addIntegerOption((o) => o.setName("opponent").setDescription("Opponent's goals (omit to just view stored result)").setRequired(false).setMinValue(0).setMaxValue(20))
-    .addStringOption((o) => o.setName("scorers").setDescription("Actual goal scorers (optional)").setRequired(false)),
+    .addStringOption((o) => o.setName("scorers").setDescription("Actual goal scorers (optional)").setRequired(false))
+    .addIntegerOption((o) => o.setName("yellow_cards").setDescription("🟨 Total yellow cards — Merseyside Derby only, awards bonus pts").setRequired(false).setMinValue(0).setMaxValue(20))
+    .addIntegerOption((o) => o.setName("red_cards").setDescription("🟥 Total red cards — Merseyside Derby only, awards bonus pts").setRequired(false).setMinValue(0).setMaxValue(10)),
   new SlashCommandBuilder().setName("leaderboard")
     .setDescription("View prediction leaderboard (season or all-time)")
     .addStringOption((o) => o.setName("scope").setDescription("Season or all-time").setRequired(false)
@@ -1102,14 +1137,19 @@ function buildPredictionEmbed(pred, displayName) {
   const scoreStr = f.evertonHome
     ? `Everton **${pred.evertonScore}** – **${pred.opponentScore}** ${f.opponent}`
     : `${f.opponent} **${pred.opponentScore}** – **${pred.evertonScore}** Everton`;
-  return new EmbedBuilder().setColor(BOT_COLOUR).setTitle("🔵 Match Prediction")
+  const embed = new EmbedBuilder().setColor(BOT_COLOUR).setTitle("🔵 Match Prediction")
     .setDescription(`**${f.home} vs ${f.away}**\n📅 ${f.label}`)
     .addFields(
       { name: "👤 Member",          value: displayName || pred.displayName, inline: true },
       { name: "📊 Predicted Score", value: scoreStr,                         inline: true },
       { name: "⚽ Goal Scorers",    value: pred.scorers || "_None entered_", inline: false }
-    )
-    .setFooter({ text: BOT_FOOTER }).setTimestamp(new Date(pred.submittedAt));
+    );
+  if (pred.fixture === DERBY_FIXTURE_ID) {
+    const yellowVal = pred.bonusYellowCards != null ? pred.bonusYellowCards : "_Not entered_";
+    const redVal    = pred.bonusRedCards    != null ? pred.bonusRedCards    : "_Not entered_";
+    embed.addFields({ name: "🟨 Yellow cards  🟥 Red cards", value: `Yellow: **${yellowVal}**　Red: **${redVal}**`, inline: false });
+  }
+  return embed.setFooter({ text: BOT_FOOTER }).setTimestamp(new Date(pred.submittedAt));
 }
 
 function buildFixturesEmbed(fixtures) {
@@ -1134,12 +1174,19 @@ async function buildListEmbed(fixture, guild) {
     return embed;
   }
 
+  const isDerby = fixture.id === DERBY_FIXTURE_ID;
   const rows = await Promise.all(entries.map(async (pred) => {
     const name  = await getDisplayName(guild, pred.userId, pred.displayName);
     const score = fixture.evertonHome
       ? `Everton ${pred.evertonScore}–${pred.opponentScore} ${fixture.opponent}`
       : `${fixture.opponent} ${pred.opponentScore}–${pred.evertonScore} Everton`;
-    return `**${name}** — ${score}${pred.scorers ? `\n　⚽ _${pred.scorers}_` : ""}`;
+    let line = `**${name}** — ${score}${pred.scorers ? `\n　⚽ _${pred.scorers}_` : ""}`;
+    if (isDerby) {
+      const y = pred.bonusYellowCards != null ? pred.bonusYellowCards : "—";
+      const r = pred.bonusRedCards    != null ? pred.bonusRedCards    : "—";
+      line += `\n　🟨 ${y} yellows  🟥 ${r} reds`;
+    }
+    return line;
   }));
 
   let buffer = "", isFirst = true;
@@ -1212,7 +1259,7 @@ function appendScorerBreakdownEmbedFields(embed, lines) {
 }
 
 /** Build the final-score embed for a fixture (used when entering result or viewing stored result). */
-async function buildFinalResultEmbed(fixture, everton, opponent, actualScorers, guild) {
+async function buildFinalResultEmbed(fixture, everton, opponent, actualScorers, guild, yellowCards = null, redCards = null) {
   const fixtureId   = fixture.id;
   const entries    = predStore.values().filter((p) => sameFixture(p.fixture, fixtureId));
   const eStr       = String(everton), oStr = String(opponent);
@@ -1222,9 +1269,17 @@ async function buildFinalResultEmbed(fixture, everton, opponent, actualScorers, 
   const scoreLine = fixture.evertonHome
     ? `Everton **${everton}** – **${opponent}** ${fixture.opponent}`
     : `${fixture.opponent} **${opponent}** – **${everton}** Everton`;
+
+  let descExtra = "";
+  if (fixtureId === DERBY_FIXTURE_ID) {
+    const yDisplay = yellowCards != null ? `**${yellowCards}**` : "_not entered_";
+    const rDisplay = redCards    != null ? `**${redCards}**`    : "_not entered_";
+    descExtra = `\n\n🟨 Yellow cards: ${yDisplay}　🟥 Red cards: ${rDisplay}`;
+  }
+
   const embed = new EmbedBuilder().setColor(BOT_COLOUR)
     .setTitle(`🏁 Final Score — ${fixture.home} vs ${fixture.away}`)
-    .setDescription(`📅 ${fixture.label}\n\n**${scoreLine}**${actualScorers ? `\n\n⚽ _Actual scorers:_ ${actualScorers}` : ""}`)
+    .setDescription(`📅 ${fixture.label}\n\n**${scoreLine}**${actualScorers ? `\n\n⚽ _Actual scorers:_ ${actualScorers}` : ""}${descExtra}`)
     .setFooter({ text: `${BOT_FOOTER} • Entered by MOD` }).setTimestamp();
   const nWith = await Promise.all(withScorers.map((p) => getDisplayName(guild, p.userId, p.displayName)));
   const nOnly = await Promise.all(scoreOnly.map((p) => getDisplayName(guild, p.userId, p.displayName)));
@@ -1236,6 +1291,18 @@ async function buildFinalResultEmbed(fixture, everton, opponent, actualScorers, 
     const breakdown = await buildAtLeastOneScorerBreakdownLines(actualScorers, entries, guild);
     if (breakdown?.length) appendScorerBreakdownEmbedFields(embed, breakdown);
     else embed.addFields({ name: "✅ At least one correct goal scorer", value: "_None_", inline: false });
+  }
+  if (fixtureId === DERBY_FIXTURE_ID) {
+    if (yellowCards != null) {
+      const yCorrect = entries.filter((p) => p.bonusYellowCards != null && String(p.bonusYellowCards).trim() === String(yellowCards));
+      const yNames   = await Promise.all(yCorrect.map((p) => getDisplayName(guild, p.userId, p.displayName)));
+      embed.addFields({ name: "🟨 Correct yellow card count (bonus 1pt)", value: yNames.length ? yNames.join(", ") : "_None_", inline: false });
+    }
+    if (redCards != null) {
+      const rCorrect = entries.filter((p) => p.bonusRedCards != null && String(p.bonusRedCards).trim() === String(redCards));
+      const rNames   = await Promise.all(rCorrect.map((p) => getDisplayName(guild, p.userId, p.displayName)));
+      embed.addFields({ name: "🟥 Correct red card count (bonus 1pt)", value: rNames.length ? rNames.join(", ") : "_None_", inline: false });
+    }
   }
   return embed;
 }
@@ -1520,6 +1587,22 @@ client.on("interactionCreate", async (interaction) => {
           .setStyle(TextInputStyle.Paragraph).setPlaceholder(`e.g. ${getRandomScorersPlaceholder(f.opponent)}`).setRequired(false)
       )
     );
+    if (fixtureId === DERBY_FIXTURE_ID) {
+      modal.addComponents(
+        new ActionRowBuilder().addComponents(
+          new TextInputBuilder().setCustomId("bonus_yellow_cards")
+            .setLabel("🟨 Bonus: How many yellow cards? (1pt)")
+            .setStyle(TextInputStyle.Short).setPlaceholder("e.g. 4")
+            .setRequired(false).setMinLength(1).setMaxLength(2)
+        ),
+        new ActionRowBuilder().addComponents(
+          new TextInputBuilder().setCustomId("bonus_red_cards")
+            .setLabel("🟥 Bonus: How many red cards? (1pt)")
+            .setStyle(TextInputStyle.Short).setPlaceholder("e.g. 0")
+            .setRequired(false).setMinLength(1).setMaxLength(2)
+        )
+      );
+    }
     return modal;
   }
 
@@ -1619,6 +1702,21 @@ client.on("interactionCreate", async (interaction) => {
       const opponentScore = interaction.fields.getTextInputValue("opponent_score").trim();
       const scorers       = interaction.fields.getTextInputValue("scorers").trim();
 
+      let bonusYellowCards = null;
+      let bonusRedCards    = null;
+      if (fixtureId === DERBY_FIXTURE_ID) {
+        const rawYellow = interaction.fields.getTextInputValue("bonus_yellow_cards").trim();
+        const rawRed    = interaction.fields.getTextInputValue("bonus_red_cards").trim();
+        if (rawYellow && !/^\d+$/.test(rawYellow)) {
+          return interaction.reply({ content: "❌ Yellow card count must be a whole number. Run `/predict` again.", flags: MessageFlags.Ephemeral });
+        }
+        if (rawRed && !/^\d+$/.test(rawRed)) {
+          return interaction.reply({ content: "❌ Red card count must be a whole number. Run `/predict` again.", flags: MessageFlags.Ephemeral });
+        }
+        bonusYellowCards = rawYellow || null;
+        bonusRedCards    = rawRed    || null;
+      }
+
       if (!/^\d+$/.test(evertonScore) || !/^\d+$/.test(opponentScore)) {
         logPredict("predict_modal_invalid_scores", interaction, { fixtureId, evertonScore, opponentScore, reason: "user_error", detail: "invalid_scores" });
         return interaction.reply({ content: "❌ Scores must be whole numbers. Run `/predict` again.", flags: MessageFlags.Ephemeral });
@@ -1628,7 +1726,7 @@ client.on("interactionCreate", async (interaction) => {
       try { displayName = (await interaction.guild.members.fetch(interaction.user.id)).displayName; } catch {}
 
       const key  = `${interaction.user.id}_${fixtureId}`;
-      const pred = { userId: interaction.user.id, displayName, fixture: fixtureId, evertonScore, opponentScore, scorers: scorers || null, submittedAt: new Date().toISOString() };
+      const pred = { userId: interaction.user.id, displayName, fixture: fixtureId, evertonScore, opponentScore, scorers: scorers || null, bonusYellowCards, bonusRedCards, submittedAt: new Date().toISOString() };
       predStore.set(key, pred);
 
       // Schedule result check on first prediction for this fixture
@@ -1722,6 +1820,8 @@ client.on("interactionCreate", async (interaction) => {
     const everton       = interaction.options.getInteger("everton");
     const opponent      = interaction.options.getInteger("opponent");
     const actualScorers = interaction.options.getString("scorers")?.trim() || null;
+    const yellowCards   = interaction.options.getInteger("yellow_cards") ?? null;
+    const redCards      = interaction.options.getInteger("red_cards") ?? null;
     const fixture       = getFixtureById(fixtureId);
 
     if (!fixture) return interaction.reply({ content: "❌ Unknown fixture.", flags: MessageFlags.Ephemeral });
@@ -1736,7 +1836,7 @@ client.on("interactionCreate", async (interaction) => {
       if (stored) {
         await interaction.deferReply();
         const embed = await buildFinalResultEmbed(
-          fixture, stored.evertonGoals, stored.opponentGoals, stored.scorers, interaction.guild
+          fixture, stored.evertonGoals, stored.opponentGoals, stored.scorers, interaction.guild, stored.yellowCards, stored.redCards
         );
         return interaction.editReply({ content: "Result for this fixture (already finalised):", embeds: [embed] });
       }
@@ -1757,9 +1857,9 @@ client.on("interactionCreate", async (interaction) => {
     db.prepare("INSERT OR IGNORE INTO finalised (fixtureId, finalisedAt) VALUES (?,?)")
       .run(fixtureId, new Date().toISOString());
     const actualScorersStr = actualScorers || "";
-    awardPointsForFixture(fixtureId, everton, opponent, actualScorersStr);
-    storeFixtureResult(fixtureId, everton, opponent, actualScorersStr || null);
-    const embed = await buildFinalResultEmbed(fixture, everton, opponent, actualScorers, interaction.guild);
+    awardPointsForFixture(fixtureId, everton, opponent, actualScorersStr, yellowCards, redCards);
+    storeFixtureResult(fixtureId, everton, opponent, actualScorersStr || null, yellowCards, redCards);
+    const embed = await buildFinalResultEmbed(fixture, everton, opponent, actualScorers, interaction.guild, yellowCards, redCards);
     return interaction.editReply({ embeds: [embed] });
   }
 
