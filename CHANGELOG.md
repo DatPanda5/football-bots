@@ -4,6 +4,10 @@ Reverse chronological (newest first). Entries may be prefixed with `[blue_fronti
 
 ---
 
+## 17 Apr 2026
+
+- **[blue_frontier] v3.4.0** — **Merseyside Derby bonus predictors:** Two 1pt bonus questions added to the `/predict` modal for `fix07` (Everton vs Liverpool) only — 🟨 yellow cards and 🟥 red cards. New columns `bonusYellowCards`/`bonusRedCards` on `predictions` and `yellowCards`/`redCards` on `fixture_results` (auto-migrated on startup). `/final` gains optional `yellow_cards` and `red_cards` integer options; scoring awards 1pt each for an exact match. All display embeds updated: prediction confirmation, `/listpredictions`, and the final result embed show bonus predictions and who got each right.
+
 ## 26 Mar 2026
 
 - **[blue_frontier lab]** — Preloaded 2026 World Cup group-stage test schedule in ET at `blue_frontier/lab/data/world-cup-2026-group-stage-et.csv` (72 fixtures, stable `match_id` keys, UEFA playoff placeholders retained for later winner updates).
