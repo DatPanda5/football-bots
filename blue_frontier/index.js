@@ -834,7 +834,7 @@ function expandScorerSegment(segment) {
 function parseScorerSegmentsRaw(str) {
   if (!str?.trim()) return [];
   return String(str)
-    .split(/[,./\n]+/)                                        // period is a valid separator (e.g. "KDH. Igor Thiago Brace")
+    .split(/[,./;\n]+/)                                       // period/semicolon are valid separators (e.g. "KDH. Igor Thiago Brace", "beto;")
     .map((s) => s.replace(/^\s*[^:,]+:\s*/, "").trim())      // strip "Everton: " / "Burnley: " prefixes
     .filter(Boolean);
 }
