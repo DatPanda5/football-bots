@@ -577,6 +577,13 @@ function buildScorerAliases() {
 }
 const SCORER_ALIASES = buildScorerAliases();
 
+// All canonical player name forms (normalized) — used to detect multi-name space-separated segments.
+const KNOWN_SCORER_NORMS = new Set([
+  ...EVERTON_SQUAD_2025_26.map((p) => normalizeDiacritics(p.name.toLowerCase())),
+  ...Object.values(OPPONENT_SQUADS_2025_26).flat().map((n) => normalizeDiacritics(n.toLowerCase())),
+  ...Object.values(SCORER_ALIASES),
+]);
+
 // ───────────────────────────────────────────────────────────────
 //  TEAM ALIASES — for !score command
 //  All keys lowercase. Values are substrings matched against API team names.
@@ -838,10 +845,24 @@ function expandScorerSegment(segment) {
 
 function parseScorerSegmentsRaw(str) {
   if (!str?.trim()) return [];
-  return String(str)
+  const parts = String(str)
     .split(/[,./;\n]+/)                                       // period/semicolon are valid separators (e.g. "KDH. Igor Thiago Brace", "beto;")
     .map((s) => s.replace(/^\s*[^:,]+:\s*/, "").trim())      // strip "Everton: " / "Burnley: " prefixes
     .filter(Boolean);
+
+  // Space-split fallback: if a segment has spaces but isn't a known multi-word player name
+  // (e.g. MOD enters "Soucek Wilson KDH" without commas), split it into individual tokens.
+  const result = [];
+  for (const part of parts) {
+    if (!part.includes(" ")) { result.push(part); continue; }
+    const norm = normalizeSingleScorerToken(part);
+    if (KNOWN_SCORER_NORMS.has(norm)) {
+      result.push(part);  // recognised multi-word name like "Kiernan Dewsbury-Hall"
+    } else {
+      result.push(...part.split(/\s+/).filter(Boolean));
+    }
+  }
+  return result;
 }
 
 /** Ordered goal slots from MOD /final string (e.g. two "Beto" entries = two goals, or one "Beto brace"). */
