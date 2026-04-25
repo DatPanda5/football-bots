@@ -249,7 +249,11 @@ const POINTS_CORRECT_RESULT = 2;
 const POINTS_CORRECT_SCORER = 1;
 const POINTS_CORRECT_BONUS  = 1;
 
-const DERBY_FIXTURE_ID = "fix07";
+// Identifies any Everton vs Liverpool fixture — applies bonus predictors to every Merseyside Derby.
+function isMerseysideDerby(fixtureId) {
+  const f = getFixtureById(fixtureId);
+  return !!f && f.opponent === "Liverpool";
+}
 
 function _seasonYear() {
   const now = new Date();
@@ -540,6 +544,7 @@ function buildScorerAliases() {
     "keggers": "michael keane",
     "big mick keggers": "michael keane",
     "keano": "michael keane",
+    "michael keen": "michael keane",
     "jimmy g": "james garner",
     "jg": "james garner",
     "jb": "jarrad branthwaite",
@@ -1032,7 +1037,7 @@ function awardPointsForFixture(fixtureId, evertonGoals, opponentGoals, actualSco
     for (let s = 0; s < scorerPts; s++) {
       awardPoints(pred.userId, pred.displayName, fixtureId, POINTS_CORRECT_SCORER, `scorer:slot_${s + 1}`);
     }
-    if (fixtureId === DERBY_FIXTURE_ID) {
+    if (isMerseysideDerby(fixtureId)) {
       if (actualYellowCards != null && pred.bonusYellowCards != null && String(pred.bonusYellowCards).trim() === String(actualYellowCards)) {
         awardPoints(pred.userId, pred.displayName, fixtureId, POINTS_CORRECT_BONUS, "bonus:yellow_cards");
       }
@@ -1155,7 +1160,7 @@ function buildPredictionEmbed(pred, displayName) {
       { name: "📊 Predicted Score", value: scoreStr,                         inline: true },
       { name: "⚽ Goal Scorers",    value: pred.scorers || "_None entered_", inline: false }
     );
-  if (pred.fixture === DERBY_FIXTURE_ID) {
+  if (isMerseysideDerby(pred.fixture)) {
     const yellowVal = pred.bonusYellowCards != null ? pred.bonusYellowCards : "_Not entered_";
     const redVal    = pred.bonusRedCards    != null ? pred.bonusRedCards    : "_Not entered_";
     embed.addFields({ name: "🟨 Yellow cards  🟥 Red cards", value: `Yellow: **${yellowVal}**　Red: **${redVal}**`, inline: false });
@@ -1185,7 +1190,7 @@ async function buildListEmbed(fixture, guild) {
     return embed;
   }
 
-  const isDerby = fixture.id === DERBY_FIXTURE_ID;
+  const isDerby = isMerseysideDerby(fixture.id);
   const rows = await Promise.all(entries.map(async (pred) => {
     const name  = await getDisplayName(guild, pred.userId, pred.displayName);
     const score = fixture.evertonHome
@@ -1282,7 +1287,7 @@ async function buildFinalResultEmbed(fixture, everton, opponent, actualScorers, 
     : `${fixture.opponent} **${opponent}** – **${everton}** Everton`;
 
   let descExtra = "";
-  if (fixtureId === DERBY_FIXTURE_ID) {
+  if (isMerseysideDerby(fixtureId)) {
     const yDisplay = yellowCards != null ? `**${yellowCards}**` : "_not entered_";
     const rDisplay = redCards    != null ? `**${redCards}**`    : "_not entered_";
     descExtra = `\n\n🟨 Yellow cards: ${yDisplay}　🟥 Red cards: ${rDisplay}`;
@@ -1303,7 +1308,7 @@ async function buildFinalResultEmbed(fixture, everton, opponent, actualScorers, 
     if (breakdown?.length) appendScorerBreakdownEmbedFields(embed, breakdown);
     else embed.addFields({ name: "✅ At least one correct goal scorer", value: "_None_", inline: false });
   }
-  if (fixtureId === DERBY_FIXTURE_ID) {
+  if (isMerseysideDerby(fixtureId)) {
     if (yellowCards != null) {
       const yCorrect = entries.filter((p) => p.bonusYellowCards != null && String(p.bonusYellowCards).trim() === String(yellowCards));
       const yNames   = await Promise.all(yCorrect.map((p) => getDisplayName(guild, p.userId, p.displayName)));
@@ -1598,7 +1603,7 @@ client.on("interactionCreate", async (interaction) => {
           .setStyle(TextInputStyle.Paragraph).setPlaceholder(`e.g. ${getRandomScorersPlaceholder(f.opponent)}`).setRequired(false)
       )
     );
-    if (fixtureId === DERBY_FIXTURE_ID) {
+    if (isMerseysideDerby(fixtureId)) {
       modal.addComponents(
         new ActionRowBuilder().addComponents(
           new TextInputBuilder().setCustomId("bonus_yellow_cards")
@@ -1715,7 +1720,7 @@ client.on("interactionCreate", async (interaction) => {
 
       let bonusYellowCards = null;
       let bonusRedCards    = null;
-      if (fixtureId === DERBY_FIXTURE_ID) {
+      if (isMerseysideDerby(fixtureId)) {
         const rawYellow = interaction.fields.getTextInputValue("bonus_yellow_cards").trim();
         const rawRed    = interaction.fields.getTextInputValue("bonus_red_cards").trim();
         if (rawYellow && !/^\d+$/.test(rawYellow)) {
