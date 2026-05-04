@@ -815,14 +815,17 @@ function normalizeSingleScorerToken(segment) {
 }
 
 /**
- * "Igor Thiago Brace" / "beto brace" → two identical { display, norm } slots.
- * "Name hat trick" / "hattrick" / "hat-trick" / "hatty" → three slots. Suffix is stripped before aliases/diacritics.
+ * "Igor Thiago Brace" / "beto brace" / "Haaland x2" → two identical { display, norm } slots.
+ * "Name hat trick" / "hattrick" / "hat-trick" / "hatty" / "Name x3" → three slots.
+ * "Name x1" / "Name x 1" → one slot (treated as normal).
+ * Suffix is stripped before aliases/diacritics.
  */
 function expandScorerSegment(segment) {
   const raw = String(segment).trim();
   if (!raw) return [];
   const hatRe = /^(.+?)\s+(hat[\s-]*trick|hattrick|hatty)$/i;
   const braceRe = /^(.+?)\s+brace$/i;
+  const xnRe   = /^(.+?)\s+x\s*(\d+)$/i;
   let base = raw;
   let count = 1;
   const hatM = raw.match(hatRe);
@@ -834,6 +837,12 @@ function expandScorerSegment(segment) {
     if (braceM) {
       base = braceM[1].trim();
       count = 2;
+    } else {
+      const xnM = raw.match(xnRe);
+      if (xnM) {
+        base = xnM[1].trim();
+        count = Math.max(1, parseInt(xnM[2], 10));
+      }
     }
   }
   const norm = normalizeSingleScorerToken(base);
