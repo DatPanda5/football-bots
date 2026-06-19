@@ -1455,7 +1455,7 @@ function buildPredictionEmbed(pred, displayName) {
 function buildFixturesEmbed(fixtures) {
   const rows = fixtures.map((f, i) => {
     const matchup = f.evertonHome ? `Everton vs ${f.opponent}` : `${f.opponent} vs Everton`;
-    return `**${i + 1}.** ${matchup}\n　📅 ${f.label}`;
+    return `**${f.id}.** ${matchup}\n　📅 ${f.label}`;
   });
   return new EmbedBuilder().setColor(BOT_COLOUR).setTitle("📅 Next 5 Everton Fixtures")
     .setDescription(rows.join("\n\n") || "_No upcoming fixtures found._")
