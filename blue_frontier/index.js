@@ -1348,13 +1348,15 @@ const commands = [
         { name: "Last 2 completed matches", value: "last2" }
       ))
     .addStringOption((o) => o.setName("fixture").setDescription("Which fixture (when view = one)").setRequired(false)
-      .addChoices(...ALL_FIXTURES.map((f) => ({ name: `${f.home} vs ${f.away} (${f.label})`, value: f.id })))),
+      // Discord caps addChoices at 25 — show only the next 25 upcoming fixtures (or all if fewer).
+      .addChoices(...ALL_FIXTURES.filter((f) => new Date(f.kickoffUTC).getTime() > Date.now()).slice(0, 25).map((f) => ({ name: `${f.home} vs ${f.away} (${f.label})`, value: f.id })))),
   new SlashCommandBuilder().setName("fixtures").setDescription("Show the next 5 upcoming Everton fixtures"),
   new SlashCommandBuilder().setName("help")
     .setDescription("Show Blue Frontier Committee commands (only visible to you)"),
   new SlashCommandBuilder().setName("clearprediction").setDescription("Delete one of your predictions")
     .addStringOption((o) => o.setName("fixture").setDescription("Which fixture to clear").setRequired(true)
-      .addChoices(...ALL_FIXTURES.map((f) => ({ name: `${f.home} vs ${f.away} (${f.label})`, value: f.id })))),
+      // Discord caps addChoices at 25 — show only the next 25 upcoming fixtures.
+      .addChoices(...ALL_FIXTURES.filter((f) => new Date(f.kickoffUTC).getTime() > Date.now()).slice(0, 25).map((f) => ({ name: `${f.home} vs ${f.away} (${f.label})`, value: f.id })))),
   new SlashCommandBuilder().setName("final")
     .setDescription("MOD only: Enter final score or view result for a played fixture")
     .addStringOption((o) => {
@@ -1365,11 +1367,12 @@ const commands = [
           name: `${f.home} vs ${f.away} (${getFixtureLabelForFinal(f)})`,
           value: f.id,
         }));
+      // Discord caps addChoices at 25 — slice to most recent completed + nearest upcoming.
       return o
         .setName("fixture")
         .setDescription("Which fixture (must have kicked off)")
         .setRequired(true)
-        .addChoices(...choices);
+        .addChoices(...choices.slice(0, 25));
     })
     .addIntegerOption((o) => o.setName("everton").setDescription("Everton's goals (omit to just view stored result)").setRequired(false).setMinValue(0).setMaxValue(20))
     .addIntegerOption((o) => o.setName("opponent").setDescription("Opponent's goals (omit to just view stored result)").setRequired(false).setMinValue(0).setMaxValue(20))
