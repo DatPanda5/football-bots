@@ -1252,6 +1252,30 @@ function getUpcomingFixtures() {
     .slice(0, 5);
 }
 
+function getAllUpcomingFixtures() {
+  const now = Date.now();
+  return ALL_FIXTURES
+    .filter((f) => new Date(f.kickoffUTC).getTime() > now)
+    .sort((a, b) => new Date(a.kickoffUTC) - new Date(b.kickoffUTC));
+}
+
+const FIXTURES_PAGE_SIZE = 5;
+
+function buildFixturesButtons(page, totalPages) {
+  return new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setCustomId(`tbfc_fixtures_prev:${page}`)
+      .setLabel("← Prev")
+      .setStyle(ButtonStyle.Secondary)
+      .setDisabled(page === 0),
+    new ButtonBuilder()
+      .setCustomId(`tbfc_fixtures_next:${page}`)
+      .setLabel("Next →")
+      .setStyle(ButtonStyle.Secondary)
+      .setDisabled(page === totalPages - 1),
+  );
+}
+
 function getListableFixture() {
   const now = Date.now();
   const upcoming = ALL_FIXTURES
@@ -1452,12 +1476,13 @@ function buildPredictionEmbed(pred, displayName) {
   return embed.setFooter({ text: BOT_FOOTER }).setTimestamp(new Date(pred.submittedAt));
 }
 
-function buildFixturesEmbed(fixtures) {
-  const rows = fixtures.map((f, i) => {
+function buildFixturesEmbed(fixtures, rangeLabel) {
+  const title = rangeLabel ? `📅 Upcoming Fixtures (${rangeLabel})` : "📅 Next 5 Everton Fixtures";
+  const rows = fixtures.map((f) => {
     const matchup = f.evertonHome ? `Everton vs ${f.opponent}` : `${f.opponent} vs Everton`;
     return `**${f.id}.** ${matchup}\n　📅 ${f.label}`;
   });
-  return new EmbedBuilder().setColor(BOT_COLOUR).setTitle("📅 Next 5 Everton Fixtures")
+  return new EmbedBuilder().setColor(BOT_COLOUR).setTitle(title)
     .setDescription(rows.join("\n\n") || "_No upcoming fixtures found._")
     .setFooter({ text: BOT_FOOTER }).setTimestamp();
 }
@@ -1791,11 +1816,37 @@ client.on("messageCreate", async (message) => {
 client.on("interactionCreate", async (interaction) => {
 
   if (interaction.isChatInputCommand() && interaction.commandName === "fixtures") {
-    const upcoming = getUpcomingFixtures();
-    if (!upcoming.length) {
+    const all = getAllUpcomingFixtures();
+    if (!all.length) {
       return interaction.reply({ content: "😔 No upcoming Everton fixtures found!", flags: MessageFlags.Ephemeral });
     }
-    return interaction.reply({ embeds: [buildFixturesEmbed(upcoming)] });
+    const totalPages = Math.ceil(all.length / FIXTURES_PAGE_SIZE);
+    const slice = all.slice(0, FIXTURES_PAGE_SIZE);
+    const rangeLabel = `1–${slice.length} of ${all.length}`;
+    return interaction.reply({
+      embeds: [buildFixturesEmbed(slice, rangeLabel)],
+      components: totalPages > 1 ? [buildFixturesButtons(0, totalPages)] : [],
+    });
+  }
+
+  if (interaction.isButton() && (
+    interaction.customId.startsWith("tbfc_fixtures_prev:") ||
+    interaction.customId.startsWith("tbfc_fixtures_next:")
+  )) {
+    const [action, pageStr] = interaction.customId.split(":");
+    const currentPage = parseInt(pageStr, 10);
+    const all = getAllUpcomingFixtures();
+    const totalPages = Math.ceil(all.length / FIXTURES_PAGE_SIZE);
+    const newPage = action === "tbfc_fixtures_prev" ? currentPage - 1 : currentPage + 1;
+    const clamped = Math.max(0, Math.min(newPage, totalPages - 1));
+    const slice = all.slice(clamped * FIXTURES_PAGE_SIZE, (clamped + 1) * FIXTURES_PAGE_SIZE);
+    const start = clamped * FIXTURES_PAGE_SIZE + 1;
+    const end = start + slice.length - 1;
+    const rangeLabel = `${start}–${end} of ${all.length}`;
+    return interaction.update({
+      embeds: [buildFixturesEmbed(slice, rangeLabel)],
+      components: [buildFixturesButtons(clamped, totalPages)],
+    });
   }
 
   if (interaction.isChatInputCommand() && interaction.commandName === "help") {
