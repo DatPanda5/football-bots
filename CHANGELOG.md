@@ -4,6 +4,14 @@ Reverse chronological (newest first). Entries may be prefixed with `[blue_fronti
 
 ---
 
+## 19 Jun 2026
+
+- **[blue_frontier] v3.5.0** — **2026–27 fixture schedule:** `ALL_FIXTURES` replaced with 5 pre-season friendlies (`pre01`–`pre05`) plus 38 Premier League matches (`fix01`–`fix38`) from evertonfc.com. Opponent squads added for Dundee, Bolton, Stoke, VfB Stuttgart, Ipswich, Hull, and Coventry. Reference docs **26-27fixtures.md** and **squad.md**; `npm run sync-docs` regenerates them from `index.js`. `seed-predictions.json` cleared for new season.
+
+## 28 May 2026
+
+- **[blue_frontier]** — Removed World Cup 2026 lab predictor (`/wc-fixtures`, `/wc-final`), WC schedule CSV, and `TBF_WC_PREDICTOR` wiring from `index.js`. World Cup features remain in WokeDyche only.
+
 ## 17 Apr 2026
 
 - **[blue_frontier] v3.4.0** — **Merseyside Derby bonus predictors:** Two 1pt bonus questions added to the `/predict` modal for `fix07` (Everton vs Liverpool) only — 🟨 yellow cards and 🟥 red cards. New columns `bonusYellowCards`/`bonusRedCards` on `predictions` and `yellowCards`/`redCards` on `fixture_results` (auto-migrated on startup). `/final` gains optional `yellow_cards` and `red_cards` integer options; scoring awards 1pt each for an exact match. All display embeds updated: prediction confirmation, `/listpredictions`, and the final result embed show bonus predictions and who got each right.

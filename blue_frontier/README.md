@@ -178,7 +178,7 @@ Points are awarded when a MOD uses `/final` or when the auto result checker post
 
 ## How the rolling fixture window works
 
-All 10 remaining Premier League fixtures are stored in `ALL_FIXTURES` with a
+All **43** fixtures (5 pre-season + 38 Premier League, 2026-27) are stored in `ALL_FIXTURES` with a
 `kickoffUTC` timestamp. Every time `/predict` or `/fixtures` is called,
 `getUpcomingFixtures()` runs live:
 
@@ -193,20 +193,24 @@ window — no manual updates needed until the end of the season.
 
 ---
 
-## All remaining fixtures (2025-26)
+## 2026-27 Premier League fixtures
+
+Source: [evertonfc.com](https://www.evertonfc.com/matches/men/fixtures) (Jun 2026). **43 matches** total: 5 pre-season + 38 Premier League. See **[26-27fixtures.md](26-27fixtures.md)** for the full list; keep in sync with `ALL_FIXTURES` in `index.js`.
 
 | # | Date | Match |
 |---|---|---|
-| 1 | ~~Mon 15 Feb~~ (played) | Everton vs Manchester United |
-| 2 | ~~Sat 18 Feb~~ (played) | Newcastle United vs Everton |
-| 3 | ~~Tue 03 Mar 19:30~~ (played) | Everton vs Burnley |
-| 4 | ~~Sun 15 Mar 14:00~~ (played) | Arsenal vs Everton |
-| 5 | ~~Sat 21 Mar 17:30~~ (played) | Everton vs Chelsea |
-| 6 | Sat 11 Apr 10:00 AM EDT | **Brentford vs Everton** ← next |
-| 7 | Sun 19 Apr 9:00 AM EDT | Everton vs Liverpool |
-| 8 | Sat 25 Apr 10:00 AM EDT | West Ham United vs Everton |
-| 9 | Mon 04 May 3:00 PM EDT | Everton vs Manchester City |
-| 10 | Sat 09 May 10:00 AM EDT | Crystal Palace vs Everton |
+| pre01 | Sat 18 Jul 9:00 AM EDT | Dundee vs Everton |
+| pre02 | Sat 25 Jul 10:00 AM EDT | Bolton Wanderers vs Everton |
+| pre03 | Tue 28 Jul 2:45 PM EDT | Stoke City vs Everton |
+| pre04 | Sat 08 Aug 11:00 AM EDT | VfB Stuttgart vs Everton |
+| pre05 | Wed 12 Aug 12:15 PM EDT | Everton vs Newcastle United (Murrayfield) |
+| fix01 | Sat 22 Aug 10:00 AM EDT | **Everton vs Crystal Palace** ← PL opener |
+| fix02 | Sat 29 Aug 10:00 AM EDT | AFC Bournemouth vs Everton |
+| fix03 | Sat 05 Sep 10:00 AM EDT | Everton vs Manchester United |
+| … | … | fix04–fix37 (see **26-27fixtures.md**) |
+| fix38 | Sun 30 May 11:00 AM EDT | Ipswich Town vs Everton |
+
+Squads and scorer/team aliases: **[squad.md](squad.md)** (sync with `index.js`).
 
 ---
 

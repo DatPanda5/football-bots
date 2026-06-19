@@ -304,78 +304,274 @@ function adminResetAllTimePoints() {
 }
 
 // ───────────────────────────────────────────────────────────────
-//  ALL REMAINING EVERTON FIXTURES (2025-26 Premier League)
-//  This bot only shows Everton fixtures: /fixtures and /predict use this list only.
+//  ALL EVERTON FIXTURES (2026-27)
+//  Source: evertonfc.com fixtures (Jun 2026).
+//  Keep in sync with 26-27fixtures.md (human-readable list).
 //  kickoffUTC drives ALL time logic — always keep in UTC ISO 8601.
 //  srMatchId: SportRadar event ID — used by the auto result checker.
 //             Fill these in as fixtures get closer (IDs appear in the
-//             API ~2 weeks before kick-off). fix01 is already confirmed.
+//             API ~2 weeks before kick-off).
 // ───────────────────────────────────────────────────────────────
 const ALL_FIXTURES = [
+  // ── Pre-season friendlies ──
   {
-    id: "fix01", kickoffUTC: "2026-02-15T20:00:00Z", label: "Mon 15 Feb (played)",
-    home: "Everton", away: "Manchester United", opponent: "Manchester United",
-    evertonHome: true, srMatchId: "sr:sport_event:66905890",
-  },
-  {
-    id: "fix02", kickoffUTC: "2026-02-18T15:00:00Z", label: "Sat 18 Feb (played)",
-    home: "Newcastle United", away: "Everton", opponent: "Newcastle United",
+    id: "pre01", kickoffUTC: "2026-07-18T13:00:00Z", label: "Sat 18 Jul 9:00 AM EDT",
+    home: "Dundee", away: "Everton", opponent: "Dundee", competition: "preseason",
     evertonHome: false, srMatchId: null,
   },
   {
-    id: "fix03", kickoffUTC: "2026-03-03T19:30:00Z", label: "Tue 03 Mar 2:30 PM ET",
-    home: "Everton", away: "Burnley", opponent: "Burnley",
+    id: "pre02", kickoffUTC: "2026-07-25T14:00:00Z", label: "Sat 25 Jul 10:00 AM EDT",
+    home: "Bolton Wanderers", away: "Everton", opponent: "Bolton Wanderers", competition: "preseason",
+    evertonHome: false, srMatchId: null,
+  },
+  {
+    id: "pre03", kickoffUTC: "2026-07-28T18:45:00Z", label: "Tue 28 Jul 2:45 PM EDT",
+    home: "Stoke City", away: "Everton", opponent: "Stoke City", competition: "preseason",
+    evertonHome: false, srMatchId: null,
+  },
+  {
+    id: "pre04", kickoffUTC: "2026-08-08T15:00:00Z", label: "Sat 08 Aug 11:00 AM EDT",
+    home: "VfB Stuttgart", away: "Everton", opponent: "VfB Stuttgart", competition: "preseason",
+    evertonHome: false, srMatchId: null,
+  },
+  {
+    id: "pre05", kickoffUTC: "2026-08-12T16:15:00Z", label: "Wed 12 Aug 12:15 PM EDT",
+    home: "Everton", away: "Newcastle United", opponent: "Newcastle United", competition: "preseason",
     evertonHome: true, srMatchId: null,
-  }, // Next match: Everton vs Burnley, 2:30 PM ET today
+  },
+  // ── Premier League ──
   {
-    id: "fix04", kickoffUTC: "2026-03-14T17:30:00Z", label: "Sat 14 Mar 1:30 PM EDT",
-    home: "Arsenal", away: "Everton", opponent: "Arsenal",
+    id: "fix01", kickoffUTC: "2026-08-22T14:00:00Z", label: "Sat 22 Aug 10:00 AM EDT",
+    competition: "premier_league",
+    home: "Everton", away: "Crystal Palace", opponent: "Crystal Palace",
+    evertonHome: true, srMatchId: null,
+  },
+  {
+    id: "fix02", kickoffUTC: "2026-08-29T14:00:00Z", label: "Sat 29 Aug 10:00 AM EDT",
+    competition: "premier_league",
+    home: "AFC Bournemouth", away: "Everton", opponent: "AFC Bournemouth",
     evertonHome: false, srMatchId: null,
   },
   {
-    id: "fix05", kickoffUTC: "2026-03-21T17:30:00Z", label: "Sat 21 Mar 1:30 PM EDT",
+    id: "fix03", kickoffUTC: "2026-09-05T14:00:00Z", label: "Sat 05 Sep 10:00 AM EDT",
+    competition: "premier_league",
+    home: "Everton", away: "Manchester United", opponent: "Manchester United",
+    evertonHome: true, srMatchId: null,
+  },
+  {
+    id: "fix04", kickoffUTC: "2026-09-12T14:00:00Z", label: "Sat 12 Sep 10:00 AM EDT",
+    competition: "premier_league",
+    home: "Tottenham Hotspur", away: "Everton", opponent: "Tottenham Hotspur",
+    evertonHome: false, srMatchId: null,
+  },
+  {
+    id: "fix05", kickoffUTC: "2026-09-19T14:00:00Z", label: "Sat 19 Sep 10:00 AM EDT",
+    competition: "premier_league",
+    home: "Everton", away: "Ipswich Town", opponent: "Ipswich Town",
+    evertonHome: true, srMatchId: null,
+  },
+  {
+    id: "fix06", kickoffUTC: "2026-10-10T14:00:00Z", label: "Sat 10 Oct 10:00 AM EDT",
+    competition: "premier_league",
+    home: "Hull City", away: "Everton", opponent: "Hull City",
+    evertonHome: false, srMatchId: null,
+  },
+  {
+    id: "fix07", kickoffUTC: "2026-10-17T14:00:00Z", label: "Sat 17 Oct 10:00 AM EDT",
+    competition: "premier_league",
     home: "Everton", away: "Chelsea", opponent: "Chelsea",
     evertonHome: true, srMatchId: null,
   },
   {
-    id: "fix06", kickoffUTC: "2026-04-11T14:00:00Z", label: "Sat 11 Apr 10:00 AM EDT",
+    id: "fix08", kickoffUTC: "2026-10-24T14:00:00Z", label: "Sat 24 Oct 10:00 AM EDT",
+    competition: "premier_league",
+    home: "Arsenal", away: "Everton", opponent: "Arsenal",
+    evertonHome: false, srMatchId: null,
+  },
+  {
+    id: "fix09", kickoffUTC: "2026-10-31T15:00:00Z", label: "Sat 31 Oct 11:00 AM EDT",
+    competition: "premier_league",
+    home: "Newcastle United", away: "Everton", opponent: "Newcastle United",
+    evertonHome: false, srMatchId: null,
+  },
+  {
+    id: "fix10", kickoffUTC: "2026-11-07T15:00:00Z", label: "Sat 07 Nov 10:00 AM EST",
+    competition: "premier_league",
+    home: "Everton", away: "Coventry City", opponent: "Coventry City",
+    evertonHome: true, srMatchId: null,
+  },
+  {
+    id: "fix11", kickoffUTC: "2026-11-21T15:00:00Z", label: "Sat 21 Nov 10:00 AM EST",
+    competition: "premier_league",
     home: "Brentford", away: "Everton", opponent: "Brentford",
     evertonHome: false, srMatchId: null,
   },
   {
-    id: "fix07", kickoffUTC: "2026-04-19T13:00:00Z", label: "Sun 19 Apr 9:00 AM EDT",
+    id: "fix12", kickoffUTC: "2026-11-28T15:00:00Z", label: "Sat 28 Nov 10:00 AM EST",
+    competition: "premier_league",
     home: "Everton", away: "Liverpool", opponent: "Liverpool",
     evertonHome: true, srMatchId: null,
   },
   {
-    id: "fix08", kickoffUTC: "2026-04-25T14:00:00Z", label: "Sat 25 Apr 10:00 AM EDT",
-    home: "West Ham United", away: "Everton", opponent: "West Ham United",
+    id: "fix13", kickoffUTC: "2026-12-02T20:00:00Z", label: "Wed 02 Dec 3:00 PM EST",
+    competition: "premier_league",
+    home: "Aston Villa", away: "Everton", opponent: "Aston Villa",
     evertonHome: false, srMatchId: null,
   },
   {
-    id: "fix09", kickoffUTC: "2026-05-04T19:00:00Z", label: "Mon 04 May 3:00 PM EDT",
-    home: "Everton", away: "Manchester City", opponent: "Manchester City",
+    id: "fix14", kickoffUTC: "2026-12-05T15:00:00Z", label: "Sat 05 Dec 10:00 AM EST",
+    competition: "premier_league",
+    home: "Everton", away: "Fulham", opponent: "Fulham",
     evertonHome: true, srMatchId: null,
   },
   {
-    id: "fix10", kickoffUTC: "2026-05-09T14:00:00Z", label: "Sat 09 May 10:00 AM EDT",
-    home: "Crystal Palace", away: "Everton", opponent: "Crystal Palace",
+    id: "fix15", kickoffUTC: "2026-12-12T15:00:00Z", label: "Sat 12 Dec 10:00 AM EST",
+    competition: "premier_league",
+    home: "Brighton & Hove Albion", away: "Everton", opponent: "Brighton & Hove Albion",
     evertonHome: false, srMatchId: null,
   },
   {
-    id: "fix11", kickoffUTC: "2026-05-17T14:00:00Z", label: "Sun 17 May 10:00 AM EDT",
+    id: "fix16", kickoffUTC: "2026-12-19T15:00:00Z", label: "Sat 19 Dec 10:00 AM EST",
+    competition: "premier_league",
+    home: "Nottingham Forest", away: "Everton", opponent: "Nottingham Forest",
+    evertonHome: false, srMatchId: null,
+  },
+  {
+    id: "fix17", kickoffUTC: "2026-12-26T15:00:00Z", label: "Sat 26 Dec 10:00 AM EST",
+    competition: "premier_league",
     home: "Everton", away: "Sunderland", opponent: "Sunderland",
     evertonHome: true, srMatchId: null,
   },
   {
-    id: "fix12", kickoffUTC: "2026-05-24T15:00:00Z", label: "Sun 24 May 11:00 AM EDT",
-    home: "Tottenham Hotspur", away: "Everton", opponent: "Tottenham Hotspur",
+    id: "fix18", kickoffUTC: "2026-12-30T20:00:00Z", label: "Wed 30 Dec 3:00 PM EST",
+    competition: "premier_league",
+    home: "Everton", away: "Manchester City", opponent: "Manchester City",
+    evertonHome: true, srMatchId: null,
+  },
+  {
+    id: "fix19", kickoffUTC: "2027-01-02T15:00:00Z", label: "Sat 02 Jan 10:00 AM EST",
+    competition: "premier_league",
+    home: "Leeds United", away: "Everton", opponent: "Leeds United",
+    evertonHome: false, srMatchId: null,
+  },
+  {
+    id: "fix20", kickoffUTC: "2027-01-06T20:00:00Z", label: "Wed 06 Jan 3:00 PM EST",
+    competition: "premier_league",
+    home: "Everton", away: "Aston Villa", opponent: "Aston Villa",
+    evertonHome: true, srMatchId: null,
+  },
+  {
+    id: "fix21", kickoffUTC: "2027-01-16T15:00:00Z", label: "Sat 16 Jan 10:00 AM EST",
+    competition: "premier_league",
+    home: "Coventry City", away: "Everton", opponent: "Coventry City",
+    evertonHome: false, srMatchId: null,
+  },
+  {
+    id: "fix22", kickoffUTC: "2027-01-23T15:00:00Z", label: "Sat 23 Jan 10:00 AM EST",
+    competition: "premier_league",
+    home: "Everton", away: "Brentford", opponent: "Brentford",
+    evertonHome: true, srMatchId: null,
+  },
+  {
+    id: "fix23", kickoffUTC: "2027-01-30T15:00:00Z", label: "Sat 30 Jan 10:00 AM EST",
+    competition: "premier_league",
+    home: "Liverpool", away: "Everton", opponent: "Liverpool",
+    evertonHome: false, srMatchId: null,
+  },
+  {
+    id: "fix24", kickoffUTC: "2027-02-06T15:00:00Z", label: "Sat 06 Feb 10:00 AM EST",
+    competition: "premier_league",
+    home: "Everton", away: "Newcastle United", opponent: "Newcastle United",
+    evertonHome: true, srMatchId: null,
+  },
+  {
+    id: "fix25", kickoffUTC: "2027-02-10T20:00:00Z", label: "Wed 10 Feb 3:00 PM EST",
+    competition: "premier_league",
+    home: "Everton", away: "Leeds United", opponent: "Leeds United",
+    evertonHome: true, srMatchId: null,
+  },
+  {
+    id: "fix26", kickoffUTC: "2027-02-20T15:00:00Z", label: "Sat 20 Feb 10:00 AM EST",
+    competition: "premier_league",
+    home: "Sunderland", away: "Everton", opponent: "Sunderland",
+    evertonHome: false, srMatchId: null,
+  },
+  {
+    id: "fix27", kickoffUTC: "2027-02-27T15:00:00Z", label: "Sat 27 Feb 10:00 AM EST",
+    competition: "premier_league",
+    home: "Everton", away: "Nottingham Forest", opponent: "Nottingham Forest",
+    evertonHome: true, srMatchId: null,
+  },
+  {
+    id: "fix28", kickoffUTC: "2027-03-03T20:00:00Z", label: "Wed 03 Mar 3:00 PM EST",
+    competition: "premier_league",
+    home: "Manchester City", away: "Everton", opponent: "Manchester City",
+    evertonHome: false, srMatchId: null,
+  },
+  {
+    id: "fix29", kickoffUTC: "2027-03-13T15:00:00Z", label: "Sat 13 Mar 10:00 AM EST",
+    competition: "premier_league",
+    home: "Manchester United", away: "Everton", opponent: "Manchester United",
+    evertonHome: false, srMatchId: null,
+  },
+  {
+    id: "fix30", kickoffUTC: "2027-03-20T15:00:00Z", label: "Sat 20 Mar 11:00 AM EDT",
+    competition: "premier_league",
+    home: "Everton", away: "Tottenham Hotspur", opponent: "Tottenham Hotspur",
+    evertonHome: true, srMatchId: null,
+  },
+  {
+    id: "fix31", kickoffUTC: "2027-04-10T14:00:00Z", label: "Sat 10 Apr 10:00 AM EDT",
+    competition: "premier_league",
+    home: "Crystal Palace", away: "Everton", opponent: "Crystal Palace",
+    evertonHome: false, srMatchId: null,
+  },
+  {
+    id: "fix32", kickoffUTC: "2027-04-17T14:00:00Z", label: "Sat 17 Apr 10:00 AM EDT",
+    competition: "premier_league",
+    home: "Everton", away: "AFC Bournemouth", opponent: "AFC Bournemouth",
+    evertonHome: true, srMatchId: null,
+  },
+  {
+    id: "fix33", kickoffUTC: "2027-04-24T14:00:00Z", label: "Sat 24 Apr 10:00 AM EDT",
+    competition: "premier_league",
+    home: "Everton", away: "Brighton & Hove Albion", opponent: "Brighton & Hove Albion",
+    evertonHome: true, srMatchId: null,
+  },
+  {
+    id: "fix34", kickoffUTC: "2027-05-01T14:00:00Z", label: "Sat 01 May 10:00 AM EDT",
+    competition: "premier_league",
+    home: "Fulham", away: "Everton", opponent: "Fulham",
+    evertonHome: false, srMatchId: null,
+  },
+  {
+    id: "fix35", kickoffUTC: "2027-05-08T14:00:00Z", label: "Sat 08 May 10:00 AM EDT",
+    competition: "premier_league",
+    home: "Everton", away: "Hull City", opponent: "Hull City",
+    evertonHome: true, srMatchId: null,
+  },
+  {
+    id: "fix36", kickoffUTC: "2027-05-15T14:00:00Z", label: "Sat 15 May 10:00 AM EDT",
+    competition: "premier_league",
+    home: "Chelsea", away: "Everton", opponent: "Chelsea",
+    evertonHome: false, srMatchId: null,
+  },
+  {
+    id: "fix37", kickoffUTC: "2027-05-23T14:00:00Z", label: "Sun 23 May 10:00 AM EDT",
+    competition: "premier_league",
+    home: "Everton", away: "Arsenal", opponent: "Arsenal",
+    evertonHome: true, srMatchId: null,
+  },
+  {
+    id: "fix38", kickoffUTC: "2027-05-30T15:00:00Z", label: "Sun 30 May 11:00 AM EDT",
+    competition: "premier_league",
+    home: "Ipswich Town", away: "Everton", opponent: "Ipswich Town",
     evertonHome: false, srMatchId: null,
   },
 ];
 
 // ───────────────────────────────────────────────────────────────
-//  EVERTON SQUAD 2025-26
+//  EVERTON SQUAD 2026-27 — keep in sync with squad.md
 // ───────────────────────────────────────────────────────────────
 const EVERTON_SQUAD_2025_26 = [
   { number: 1,  name: "Jordan Pickford",       positions: "GK" },
@@ -419,10 +615,31 @@ function normalizeDiacritics(str) {
 }
 
 // ───────────────────────────────────────────────────────────────
-//  OPPONENT SQUADS 2025-26 — remaining fixtures (verified Feb 2026)
+//  OPPONENT SQUADS 2026-27
+//  Keep in sync with squad.md (human-readable list).
 //  Key = opponent name as in ALL_FIXTURES. Value = array of player names for placeholders.
 // ───────────────────────────────────────────────────────────────
 const OPPONENT_SQUADS_2025_26 = {
+  "Dundee": [
+    "Jon McLaughlin", "Harrison Devenny", "Jordan McGhee", "Dara O'Shea", "Josh Mulligan", "Liam Fontana", "Jordan Allan",
+    "Lyall Cameron", "Mark O'Hara", "Finlay Robertson", "Oluwaseun Adewumi", "Ben Doak", "Scott Tiffoney",
+    "Simon Murray", "Kieran Tierney", "Antonio Portales", "Olivier Ntcham", "Kieran Murray",
+  ],
+  "Bolton Wanderers": [
+    "Nathan Baxter", "Joel Coleman", "Gethin Jones", "Eoin Toher", "Ricardo Santos", "Josh Wilson", "Jordi Osei-Tutu",
+    "George Johnston", "George Thomason", "Aaron Morley", "Kieran Sadlier", "Ibrahim Osaze-Uhigue", "Paris Maghoma",
+    "Dean Charles", "Nelson Khumbeni", "Chris Otero", "Amadou Mbengue", "Luca Thomas",
+  ],
+  "Stoke City": [
+    "Jack Bonham", "Tommy Stockdale", "Gethin Jones", "Ben Gibson", "Phil Jagielka", "Junior Tchamadeu", "Ki-Jana Hoever",
+    "Wouter Burger", "Josh Laurent", "Tom Davies", "Steven Fletcher", "Ryan Mmaee", "Jun-Ho Bae", "Andre Vidigal",
+    "Million Manhoef", "Sam Gallagher", "Emre Tezgel", "Tom Cannon",
+  ],
+  "VfB Stuttgart": [
+    "Alexander Nübel", "Fabian Bredlow", "Pascal Stenzel", "Josha Vagnoman", "Waldemar Anton", "Chris Richards", "Maximilian Mittelstädt",
+    "Angelo Stiller", "Atakan Karazor", "Enzo Millot", "Nick Woltemade", "Deniz Undav", "Laurin Ulrich",
+    "Silas", "Jamie Leweling", "Justin Diehl", "Chris Führich", "Lorenz Assignon",
+  ],
   "Manchester United": [
     "Noussair Mazraoui", "Matthijs de Ligt", "Harry Maguire", "Lisandro Martinez", "Tyrell Malacia", "Leny Yoro", "Luke Shaw", "Ayden Heaven", "Tyler Fredricson", "Diego Leon",
     "Diogo Dalot", "Mason Mount", "Bruno Fernandes", "Patrick Dorgu", "Amad", "Casemiro", "Manuel Ugarte", "Kobbie Mainoo",
@@ -525,6 +742,23 @@ const OPPONENT_SQUADS_2025_26 = {
     "Julián Araujo", "Adrien Truffert", "Marcos Senesi", "Julio Soler", "Adam Smith", "Bafodé Diakité", "Álex Jiménez", "James Hill",
     "Lewis Cook", "David Brooks", "Alex Scott", "Ryan Christie", "Tyler Adams", "Marcus Tavernier", "Romain Faivre",
     "Evanilson", "Ben Doak", "Justin Kluivert", "Amine Adli", "Junior Kroupi", "Enes Ünal", "Rayan",
+  ],
+  "Ipswich Town": [
+    "Václav Hladký", "Alex Palmer", "Christian Walton",
+    "Dara O'Shea", "Jacob Greaves", "Leif Davis", "Axel Tuanzebe", "Luke Woolfenden", "Harry Clarke", "Cameron Humphreys", "Wes Burns",
+    "Sam Morsy", "Massimo Luongo", "Jaden Philogene", "Conor Chaplin", "Marcus Harness", "David Brooks",
+    "Liam Delap", "Conor Chaplin", "Omari Hutchinson", "Jeremy Sarmiento", "George Hirst", "Freddie Ladapo",
+  ],
+  "Hull City": [
+    "Matt Oxley", "Anthony Gardner", "Jacob Greaves", "Alfie Jones", "Sean McLoughlin", "Cody Drameh", "Jacob Carling", "Lys Mousset",
+    "Tyler Morton", "Regan Slater", "Jean Michael Seri", "Ivan Sunjic", "Xavier Simons", "Marko Stamenić",
+    "Mason Greenwood", "Lukas Jutkiewicz", "Abdallah Sima", "Kieran Sadlier", "Tyler Smith", "Cameron Ashia",
+  ],
+  "Coventry City": [
+    "Ben Wilson", "Oliver Moore", "Brad Collins",
+    "Bobby Thomas", "Jay Dasilva", "Milan Ilori", "Kyle McFadzean", "Callum Doyle", "Jake Bidwell", "Luis Binks",
+    "Callum O'Hare", "Ben Sheaf", "Josh Eccles", "Kasey Palmer", "Haji Wright", "Ellis Simms",
+    "Victor Torp", "Matt Godden", "Tatsuhiro Sakamoto", "Jack Burrows", "Milan Jevtović",
   ],
 };
 
@@ -629,6 +863,9 @@ const TEAM_ALIASES = {
   "cottagers":      "fulham",            "saints":         "southampton",
   "clarets":        "burnley",           "black cats":     "sunderland",
   "leeds":          "leeds",             "lufc":           "leeds",
+  "dundee":         "dundee",            "bolton":         "bolton wanderers",
+  "stoke":          "stoke",             "stuttgart":      "vfb stuttgart",
+  "vfb":            "vfb stuttgart",
   // La Liga
   "real":           "real madrid",       "madrid":         "real madrid",
   "barca":          "barcelona",         "barça":          "barcelona",

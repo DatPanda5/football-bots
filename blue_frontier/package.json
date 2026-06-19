@@ -1,6 +1,6 @@
 {
   "name": "the-blue-frontier-committee",
-  "version": "3.4.0",
+  "version": "3.5.0",
   "description": "The Blue Frontier Committee — Everton Discord Bot",
   "engines": {
     "node": ">=18.0.0 <25.0.0"
@@ -9,7 +9,8 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "stop": "lsof -t ./index.js 2>/dev/null | xargs kill 2>/dev/null; true"
+    "stop": "lsof -t ./index.js 2>/dev/null | xargs kill 2>/dev/null; true",
+    "sync-docs": "node scripts/regenerate-reference-md.js"
   },
   "dependencies": {
     "discord.js": "^14.16.1",
