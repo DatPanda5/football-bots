@@ -317,27 +317,27 @@ const ALL_FIXTURES = [
   {
     id: "Pre1", kickoffUTC: "2026-07-18T13:00:00Z", label: "Sat 18 Jul 9:00 AM EDT",
     home: "Dundee", away: "Everton", opponent: "Dundee", competition: "preseason",
-    evertonHome: false, srMatchId: null,
+    evertonHome: false, venue: "Dens Park", srMatchId: null,
   },
   {
     id: "Pre2", kickoffUTC: "2026-07-25T14:00:00Z", label: "Sat 25 Jul 10:00 AM EDT",
     home: "Bolton Wanderers", away: "Everton", opponent: "Bolton Wanderers", competition: "preseason",
-    evertonHome: false, srMatchId: null,
+    evertonHome: false, venue: "Toughsheet Community Stadium", srMatchId: null,
   },
   {
     id: "Pre3", kickoffUTC: "2026-07-28T18:45:00Z", label: "Tue 28 Jul 2:45 PM EDT",
     home: "Stoke City", away: "Everton", opponent: "Stoke City", competition: "preseason",
-    evertonHome: false, srMatchId: null,
+    evertonHome: false, venue: "Bet365 Stadium", srMatchId: null,
   },
   {
     id: "Pre4", kickoffUTC: "2026-08-08T15:00:00Z", label: "Sat 08 Aug 11:00 AM EDT",
     home: "VfB Stuttgart", away: "Everton", opponent: "VfB Stuttgart", competition: "preseason",
-    evertonHome: false, srMatchId: null,
+    evertonHome: false, venue: "MHP Arena", srMatchId: null,
   },
   {
     id: "Pre5", kickoffUTC: "2026-08-12T16:15:00Z", label: "Wed 12 Aug 12:15 PM EDT",
     home: "Everton", away: "Newcastle United", opponent: "Newcastle United", competition: "preseason",
-    evertonHome: true, srMatchId: null,
+    evertonHome: true, venue: "Scottish Gas Murrayfield Stadium", srMatchId: null,
   },
   // ── Premier League ──
   {
@@ -1480,7 +1480,9 @@ function buildFixturesEmbed(fixtures, rangeLabel) {
   const title = rangeLabel ? `📅 Upcoming Fixtures (${rangeLabel})` : "📅 Next 5 Everton Fixtures";
   const rows = fixtures.map((f) => {
     const matchup = f.evertonHome ? `Everton vs ${f.opponent}` : `${f.opponent} vs Everton`;
-    return `**${f.id}.** ${matchup}\n　📅 ${f.label}`;
+    const venueEmoji = f.evertonHome ? "🏟️" : "🛫";
+    const venueLine = f.venue ? `\n　${venueEmoji} ${f.venue}` : "";
+    return `**${f.id}.** ${matchup}\n　📅 ${f.label}${venueLine}`;
   });
   return new EmbedBuilder().setColor(BOT_COLOUR).setTitle(title)
     .setDescription(rows.join("\n\n") || "_No upcoming fixtures found._")
