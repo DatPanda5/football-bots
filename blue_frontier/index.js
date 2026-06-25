@@ -339,6 +339,11 @@ const ALL_FIXTURES = [
     home: "Everton", away: "Newcastle United", opponent: "Newcastle United", competition: "preseason",
     evertonHome: true, venue: "Scottish Gas Murrayfield Stadium", srMatchId: null,
   },
+  {
+    id: "Pre6", kickoffUTC: "2026-08-15T14:00:00Z", label: "Sat 15 Aug 10:00 AM EDT",
+    home: "Everton", away: "LOSC Lille", opponent: "LOSC Lille", competition: "preseason",
+    evertonHome: true, venue: "Hill Dickinson Stadium", srMatchId: null,
+  },
   // ── Premier League ──
   {
     id: "MW1", kickoffUTC: "2026-08-22T14:00:00Z", label: "Sat 22 Aug 10:00 AM EDT",
@@ -640,6 +645,11 @@ const OPPONENT_SQUADS_2025_26 = {
     "Angelo Stiller", "Atakan Karazor", "Enzo Millot", "Nick Woltemade", "Deniz Undav", "Laurin Ulrich",
     "Silas", "Jamie Leweling", "Justin Diehl", "Chris Führich", "Lorenz Assignon",
   ],
+  "LOSC Lille": [
+    "Lucas Chevalier", "Vito Mannone", "Alexsandro", "Tiago Santos", "Mads Bjørbye", "Leny Yoro", "Gabriel Gudmundsson",
+    "Benjamin André", "Ayyoub Bouaddi", "Angel Gomes", "Jonathan David", "Edon Zhegrova", "Rémy Cabella",
+    "Hakon Haraldsson", "Mohamed Camara", "Osame Sahraoui",
+  ],
   "Manchester United": [
     "Noussair Mazraoui", "Matthijs de Ligt", "Harry Maguire", "Lisandro Martinez", "Tyrell Malacia", "Leny Yoro", "Luke Shaw", "Ayden Heaven", "Tyler Fredricson", "Diego Leon",
     "Diogo Dalot", "Mason Mount", "Bruno Fernandes", "Patrick Dorgu", "Amad", "Casemiro", "Manuel Ugarte", "Kobbie Mainoo",
@@ -866,6 +876,7 @@ const TEAM_ALIASES = {
   "dundee":         "dundee",            "bolton":         "bolton wanderers",
   "stoke":          "stoke",             "stuttgart":      "vfb stuttgart",
   "vfb":            "vfb stuttgart",
+  "lille":          "losc lille",        "losc":           "losc lille",
   // La Liga
   "real":           "real madrid",       "madrid":         "real madrid",
   "barca":          "barcelona",         "barça":          "barcelona",
