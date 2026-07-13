@@ -1,6 +1,6 @@
 # Everton Bot — Squads & Aliases (2026–27)
 
-**Last updated:** 2026-06-19  
+**Last updated:** 2026-07-13  
 **Source of truth:** `index.js` — run `node scripts/regenerate-reference-md.js` after squad or alias changes.
 
 ---
@@ -28,6 +28,7 @@
 | 22 | Kiernan Dewsbury-Hall | CM |
 | 24 | Charly Alcaraz | AM |
 | 27 | Idrissa Gana Gueye | DM |
+| 30 | Hayden Hackney | DM/CM |
 | 34 | Merlin Röhl | CM |
 | 37 | James Garner | CM/DM |
 | 42 | Tim Iroegbunam | CM/DM |
@@ -107,6 +108,10 @@ Lucas Perri, Illan Meslier, Alex Cairns, Karl Darlow, Jayden Bogle, Gabriel Gudm
 ### Liverpool
 
 Joe Gomez, Virgil van Dijk, Ibrahima Konaté, Milos Kerkez, Conor Bradley, Giovanni Leoni, Andrew Robertson, Jeremie Frimpong, Rhys Williams, Calvin Ramsay, Wataru Endo, Florian Wirtz, Dominik Szoboszlai, Alexis Mac Allister, Curtis Jones, Ryan Gravenberch, Trey Nyoni, Stefan Bajcetic, Alexander Isak, Mohamed Salah, Federico Chiesa, Cody Gakpo, Hugo Ekitike, Rio Ngumoha
+
+### LOSC Lille
+
+Lucas Chevalier, Vito Mannone, Alexsandro, Tiago Santos, Mads Bjørbye, Leny Yoro, Gabriel Gudmundsson, Benjamin André, Ayyoub Bouaddi, Angel Gomes, Jonathan David, Edon Zhegrova, Rémy Cabella, Hakon Haraldsson, Mohamed Camara, Osame Sahraoui
 
 ### Manchester City
 
@@ -258,6 +263,8 @@ For every squad player, the **ASCII form** (diacritics stripped) also matches �
 | `lens` | racing club de lens |
 | `leverkusen` | bayer leverkusen |
 | `lfc` | liverpool |
+| `lille` | losc lille |
+| `losc` | losc lille |
 | `lufc` | leeds |
 | `lyon` | olympique lyon |
 | `madrid` | real madrid |
