@@ -1,6 +1,6 @@
 # Everton 2026–27 Fixtures
 
-**Last updated:** 2026-06-25  
+**Last updated:** 2026-07-13  
 **Source of truth:** `index.js` → `ALL_FIXTURES` — run `node scripts/regenerate-reference-md.js` after fixture changes.
 
 [evertonfc.com fixtures](https://www.evertonfc.com/matches/men/fixtures)
@@ -16,7 +16,7 @@
 | Pre3 | Tue 28 Jul 2:45 PM EDT | Stoke City vs Everton | Bet365 Stadium | A |
 | Pre4 | Sat 08 Aug 11:00 AM EDT | VfB Stuttgart vs Everton | MHP Arena | A |
 | Pre5 | Wed 12 Aug 12:15 PM EDT | Everton vs Newcastle United | Scottish Gas Murrayfield Stadium (neutral) | H |
-| Pre6 | Sat 15 Aug 10:00 AM EDT | Everton vs LOSC Lille | Hill Dickinson Stadium | H |
+| Pre6 | Sat 15 Aug 10:00 AM EDT | Everton vs LOSC Lille | — | H |
 
 ---
 

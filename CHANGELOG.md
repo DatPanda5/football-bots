@@ -4,6 +4,10 @@ Reverse chronological (newest first). Entries may be prefixed with `[blue_fronti
 
 ---
 
+## 13 Jul 2026
+
+- **[blue_frontier]** — Added Hayden Hackney (#30, DM/CM) to the 2026–27 Everton squad.
+
 ## 19 Jun 2026
 
 - **[blue_frontier] v3.5.0** — **2026–27 fixture schedule:** `ALL_FIXTURES` replaced with 5 pre-season friendlies (`pre01`–`pre05`) plus 38 Premier League matches (`fix01`–`fix38`) from evertonfc.com. Opponent squads added for Dundee, Bolton, Stoke, VfB Stuttgart, Ipswich, Hull, and Coventry. Reference docs **26-27fixtures.md** and **squad.md**; `npm run sync-docs` regenerates them from `index.js`. `seed-predictions.json` cleared for new season.

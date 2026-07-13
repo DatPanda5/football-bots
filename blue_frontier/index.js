@@ -598,6 +598,7 @@ const EVERTON_SQUAD_2025_26 = [
   { number: 22, name: "Kiernan Dewsbury-Hall",  positions: "CM" },
   { number: 24, name: "Charly Alcaraz",         positions: "AM" },
   { number: 27, name: "Idrissa Gana Gueye",    positions: "DM" },
+  { number: 30, name: "Hayden Hackney",         positions: "DM/CM" },
   { number: 34, name: "Merlin Röhl",            positions: "CM" },
   { number: 37, name: "James Garner",           positions: "CM/DM" },
   { number: 42, name: "Tim Iroegbunam",         positions: "CM/DM" },
