@@ -16,7 +16,7 @@
 | Pre3 | Tue 28 Jul 2:45 PM EDT | Stoke City vs Everton | Bet365 Stadium | A |
 | Pre4 | Sat 08 Aug 11:00 AM EDT | VfB Stuttgart vs Everton | MHP Arena | A |
 | Pre5 | Wed 12 Aug 12:15 PM EDT | Everton vs Newcastle United | Scottish Gas Murrayfield Stadium (neutral) | H |
-| Pre6 | Sat 15 Aug 10:00 AM EDT | Everton vs LOSC Lille | — | H |
+| Pre6 | Sat 15 Aug 10:00 AM EDT | Everton vs LOSC Lille | Hillfoss Stadium | H |
 
 ---
 

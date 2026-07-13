@@ -17,6 +17,7 @@ const VENUES = {
   Pre3: "Bet365 Stadium",
   Pre4: "MHP Arena",
   Pre5: "Scottish Gas Murrayfield Stadium (neutral)",
+  Pre6: "Hillfoss Stadium",
   MW1: "Hill Dickinson Stadium",
   MW2: "Vitality Stadium",
   MW3: "Hill Dickinson Stadium",
