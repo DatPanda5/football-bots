@@ -6,7 +6,11 @@ Reverse chronological (newest first). Entries may be prefixed with `[blue_fronti
 
 ## 18 Jul 2026
 
+<<<<<<< HEAD
 - **[blue_frontier]** — Updated Dundee opponent squad for 2026–27 (pre-season friendly).
+=======
+- **[blue_frontier]** — `/predict` goal scorers placeholder no longer includes minute examples (e.g. `71'`).
+>>>>>>> origin/main
 
 ## 13 Jul 2026
 
