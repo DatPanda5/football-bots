@@ -1,6 +1,6 @@
 # Everton Bot — Squads & Aliases (2026–27)
 
-**Last updated:** 2026-07-13  
+**Last updated:** 2026-07-18  
 **Source of truth:** `index.js` — run `node scripts/regenerate-reference-md.js` after squad or alias changes.
 
 ---
@@ -87,7 +87,7 @@ Daniel Munoz, Tyrick Mitchell, Maxence Lacroix, Nathaniel Clyne, Borna Sosa, Chr
 
 ### Dundee
 
-Jon McLaughlin, Harrison Devenny, Jordan McGhee, Dara O'Shea, Josh Mulligan, Liam Fontana, Jordan Allan, Lyall Cameron, Mark O'Hara, Finlay Robertson, Oluwaseun Adewumi, Ben Doak, Scott Tiffoney, Simon Murray, Kieran Tierney, Antonio Portales, Olivier Ntcham, Kieran Murray
+Kieran O'Hara, Harrison Sharp, Idris Odutayo, Owen Bevan, Ryan Astley, Aaron Donnelly, Drey Wright, Imari Samuels, Lewis Montsma, Charley Oosenbrugh, Alan Forrest, Ryan Finnigan, Zan Besir, Finlay Robertson, Bradley Halliday, Joel Cotterill, Callum Jones, Ethan Hamilton, Ethan Crombie, Ashley Hay, Simon Murray, Charlie Reilly, Joe Westley, Cameron Congreve, Joe Bevan, Finlay Allan
 
 ### Fulham
 

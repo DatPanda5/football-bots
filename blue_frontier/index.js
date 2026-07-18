@@ -627,9 +627,10 @@ function normalizeDiacritics(str) {
 // ───────────────────────────────────────────────────────────────
 const OPPONENT_SQUADS_2025_26 = {
   "Dundee": [
-    "Jon McLaughlin", "Harrison Devenny", "Jordan McGhee", "Dara O'Shea", "Josh Mulligan", "Liam Fontana", "Jordan Allan",
-    "Lyall Cameron", "Mark O'Hara", "Finlay Robertson", "Oluwaseun Adewumi", "Ben Doak", "Scott Tiffoney",
-    "Simon Murray", "Kieran Tierney", "Antonio Portales", "Olivier Ntcham", "Kieran Murray",
+    "Kieran O'Hara", "Harrison Sharp",
+    "Idris Odutayo", "Owen Bevan", "Ryan Astley", "Aaron Donnelly", "Drey Wright", "Imari Samuels", "Lewis Montsma", "Charley Oosenbrugh",
+    "Alan Forrest", "Ryan Finnigan", "Zan Besir", "Finlay Robertson", "Bradley Halliday", "Joel Cotterill", "Callum Jones", "Ethan Hamilton", "Ethan Crombie",
+    "Ashley Hay", "Simon Murray", "Charlie Reilly", "Joe Westley", "Cameron Congreve", "Joe Bevan", "Finlay Allan",
   ],
   "Bolton Wanderers": [
     "Nathan Baxter", "Joel Coleman", "Gethin Jones", "Eoin Toher", "Ricardo Santos", "Josh Wilson", "Jordi Osei-Tutu",
