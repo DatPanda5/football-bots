@@ -4,6 +4,10 @@ Reverse chronological (newest first). Entries may be prefixed with `[blue_fronti
 
 ---
 
+## 18 Jul 2026
+
+- **[blue_frontier]** — `/predict` goal scorers placeholder no longer includes minute examples (e.g. `71'`).
+
 ## 13 Jul 2026
 
 - **[blue_frontier]** — Added Hayden Hackney (#30, DM/CM) to the 2026–27 Everton squad.

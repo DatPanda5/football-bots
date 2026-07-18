@@ -1212,11 +1212,10 @@ function storeFixtureResult(fixtureId, evertonGoals, opponentGoals, scorers, yel
 function getRandomScorersPlaceholder(opponentName) {
   const shuffle = (arr) => arr.sort(() => Math.random() - 0.5);
   const pick    = (arr, n) => shuffle([...arr]).slice(0, n);
-  const mins    = () => Math.floor(Math.random() * 90) + 1;
   const evPicks = pick(EVERTON_SQUAD_2025_26, Math.random() > 0.5 ? 1 : 2);
-  const evPart  = evPicks.map((p) => `${p.name} ${mins()}'`).join(", ");
+  const evPart  = evPicks.map((p) => p.name).join(", ");
   const oppSq   = OPPONENT_SQUADS_2025_26[opponentName];
-  const oppPart = oppSq?.length ? `${pick(oppSq, 1)[0]} ${mins()}'` : `${opponentName} ${mins()}'`;
+  const oppPart = oppSq?.length ? pick(oppSq, 1)[0] : opponentName;
   const out     = `${evPart} / ${oppPart}`;
   return out.length > 100 ? out.slice(0, 97) + "…" : out;
 }
