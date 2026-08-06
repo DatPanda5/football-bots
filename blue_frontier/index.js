@@ -588,16 +588,14 @@ const EVERTON_SQUAD_2025_26 = [
   { number: 6,  name: "James Tarkowski",        positions: "CB" },
   { number: 15, name: "Jake O'Brien",           positions: "CB" },
   { number: 16, name: "Vitalii Mykolenko",      positions: "LB" },
-  { number: 23, name: "Séamus Coleman",         positions: "RB (Captain)" },
   { number: 32, name: "Jarrad Branthwaite",     positions: "CB" },
   { number: 39, name: "Adam Aznou",             positions: "LB" },
   { number: 64, name: "Reece Welch",            positions: "CB" },
   { number: 7,  name: "Dwight McNeil",          positions: "LW/AM" },
-  { number: 18, name: "Jack Grealish",          positions: "LW/AM" },
   { number: 20, name: "Tyler Dibling",          positions: "RW/AM" },
   { number: 22, name: "Kiernan Dewsbury-Hall",  positions: "CM" },
+  { number: 23, name: "Christian Nørgaard",     positions: "DM" },
   { number: 24, name: "Charly Alcaraz",         positions: "AM" },
-  { number: 27, name: "Idrissa Gana Gueye",    positions: "DM" },
   { number: 30, name: "Hayden Hackney",         positions: "DM/CM" },
   { number: 34, name: "Merlin Röhl",            positions: "CM" },
   { number: 37, name: "James Garner",           positions: "CM/DM" },
@@ -669,7 +667,7 @@ const OPPONENT_SQUADS_2025_26 = {
   ],
   "Arsenal": [
     "William Saliba", "Cristhian Mosquera", "Ben White", "Piero Hincapié", "Gabriel", "Jurriën Timber", "Riccardo Calafiori", "Myles Lewis-Skelly",
-    "Martin Ødegaard", "Eberechi Eze", "Christian Nørgaard", "Mikel Merino", "Martín Zubimendi", "Declan Rice", "Max Dowman",
+    "Martin Ødegaard", "Eberechi Eze", "Mikel Merino", "Martín Zubimendi", "Declan Rice", "Max Dowman",
     "Bukayo Saka", "Gabriel Jesus", "Gabriel Martinelli", "Viktor Gyökeres", "Leandro Trossard", "Noni Madueke", "Kai Havertz",
   ],
   "Chelsea": [
@@ -695,7 +693,7 @@ const OPPONENT_SQUADS_2025_26 = {
   "Manchester City": [
     "Ruben Dias", "John Stones", "Nathan Aké", "Josko Gvardiol", "Rayan Ait Nouri", "Marc Guehi", "Abdukodir Khusanov", "Rico Lewis",
     "Rodri", "Kevin De Bruyne", "Bernardo Silva", "Phil Foden", "Tijjani Reijnders", "Nico González", "Rayan Cherki", "Matheus Nunes",
-    "Erling Haaland", "Jeremy Doku", "Savinho", "Oscar Bobb", "Antoine Semenyo", "Omar Marmoush",
+    "Erling Haaland", "Jeremy Doku", "Savinho", "Oscar Bobb", "Antoine Semenyo", "Omar Marmoush", "Jack Grealish",
   ],
   "Crystal Palace": [
     "Daniel Munoz", "Tyrick Mitchell", "Maxence Lacroix", "Nathaniel Clyne", "Borna Sosa", "Chris Richards", "Chadi Riad",

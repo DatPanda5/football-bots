@@ -1,6 +1,6 @@
 # Everton Bot — Squads & Aliases (2026–27)
 
-**Last updated:** 2026-07-18  
+**Last updated:** 2026-08-06  
 **Source of truth:** `index.js` — run `node scripts/regenerate-reference-md.js` after squad or alias changes.
 
 ---
@@ -18,16 +18,14 @@
 | 6 | James Tarkowski | CB |
 | 15 | Jake O'Brien | CB |
 | 16 | Vitalii Mykolenko | LB |
-| 23 | Séamus Coleman | RB (Captain) |
 | 32 | Jarrad Branthwaite | CB |
 | 39 | Adam Aznou | LB |
 | 64 | Reece Welch | CB |
 | 7 | Dwight McNeil | LW/AM |
-| 18 | Jack Grealish | LW/AM |
 | 20 | Tyler Dibling | RW/AM |
 | 22 | Kiernan Dewsbury-Hall | CM |
+| 23 | Christian Nørgaard | DM |
 | 24 | Charly Alcaraz | AM |
-| 27 | Idrissa Gana Gueye | DM |
 | 30 | Hayden Hackney | DM/CM |
 | 34 | Merlin Röhl | CM |
 | 37 | James Garner | CM/DM |
@@ -51,7 +49,7 @@ Djordje Petrovic, Alex Paulsen, Fraser Forster, Christos Mandas, Will Dennis, Ju
 
 ### Arsenal
 
-William Saliba, Cristhian Mosquera, Ben White, Piero Hincapié, Gabriel, Jurriën Timber, Riccardo Calafiori, Myles Lewis-Skelly, Martin Ødegaard, Eberechi Eze, Christian Nørgaard, Mikel Merino, Martín Zubimendi, Declan Rice, Max Dowman, Bukayo Saka, Gabriel Jesus, Gabriel Martinelli, Viktor Gyökeres, Leandro Trossard, Noni Madueke, Kai Havertz
+William Saliba, Cristhian Mosquera, Ben White, Piero Hincapié, Gabriel, Jurriën Timber, Riccardo Calafiori, Myles Lewis-Skelly, Martin Ødegaard, Eberechi Eze, Mikel Merino, Martín Zubimendi, Declan Rice, Max Dowman, Bukayo Saka, Gabriel Jesus, Gabriel Martinelli, Viktor Gyökeres, Leandro Trossard, Noni Madueke, Kai Havertz
 
 ### Aston Villa
 
@@ -115,7 +113,7 @@ Lucas Chevalier, Vito Mannone, Alexsandro, Tiago Santos, Mads Bjørbye, Leny Yor
 
 ### Manchester City
 
-Ruben Dias, John Stones, Nathan Aké, Josko Gvardiol, Rayan Ait Nouri, Marc Guehi, Abdukodir Khusanov, Rico Lewis, Rodri, Kevin De Bruyne, Bernardo Silva, Phil Foden, Tijjani Reijnders, Nico González, Rayan Cherki, Matheus Nunes, Erling Haaland, Jeremy Doku, Savinho, Oscar Bobb, Antoine Semenyo, Omar Marmoush
+Ruben Dias, John Stones, Nathan Aké, Josko Gvardiol, Rayan Ait Nouri, Marc Guehi, Abdukodir Khusanov, Rico Lewis, Rodri, Kevin De Bruyne, Bernardo Silva, Phil Foden, Tijjani Reijnders, Nico González, Rayan Cherki, Matheus Nunes, Erling Haaland, Jeremy Doku, Savinho, Oscar Bobb, Antoine Semenyo, Omar Marmoush, Jack Grealish
 
 ### Manchester United
 
