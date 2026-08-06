@@ -821,6 +821,8 @@ function buildScorerAliases() {
     "kovacic": "mateo kovacic",
     "reindeers": "tijjani reijnders",
     "reijnders": "tijjani reijnders",
+    "norgaard": "christian nørgaard",
+    "nørgaard": "christian nørgaard",
     "og": "own goal",
     "own goal": "own goal",
   };
