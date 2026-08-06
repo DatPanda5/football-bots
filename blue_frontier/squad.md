@@ -182,6 +182,8 @@ José Sá, Dan Bentley, Sam Johnstone, Matt Doherty, Hugo Bueno, Santiago Bueno,
 | `madison` | james maddison |
 | `michael keen` | michael keane |
 | `ndiaye` | iliman ndiaye |
+| `norgaard` | christian nørgaard |
+| `nørgaard` | christian nørgaard |
 | `og` | own goal |
 | `own goal` | own goal |
 | `pape matar sarr` | pape sarr |
