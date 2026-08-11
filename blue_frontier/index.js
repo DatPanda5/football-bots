@@ -591,9 +591,9 @@ const EVERTON_SQUAD_2025_26 = [
   { number: 32, name: "Jarrad Branthwaite",     positions: "CB" },
   { number: 39, name: "Adam Aznou",             positions: "LB" },
   { number: 64, name: "Reece Welch",            positions: "CB" },
-  { number: 7,  name: "Dwight McNeil",          positions: "LW/AM" },
+  { number: 8,  name: "Kiernan Dewsbury-Hall",  positions: "CM" },
   { number: 20, name: "Tyler Dibling",          positions: "RW/AM" },
-  { number: 22, name: "Kiernan Dewsbury-Hall",  positions: "CM" },
+  { number: 22, name: "Brennan Johnson",        positions: "RW/AM" },
   { number: 23, name: "Christian Nørgaard",     positions: "DM" },
   { number: 24, name: "Charly Alcaraz",         positions: "AM" },
   { number: 30, name: "Hayden Hackney",         positions: "DM/CM" },
@@ -698,7 +698,7 @@ const OPPONENT_SQUADS_2025_26 = {
   "Crystal Palace": [
     "Daniel Munoz", "Tyrick Mitchell", "Maxence Lacroix", "Nathaniel Clyne", "Borna Sosa", "Chris Richards", "Chadi Riad",
     "Jefferson Lerma", "Daichi Kamada", "Will Hughes", "Adam Wharton", "Cheick Doucouré",
-    "Ismaila Sarr", "Edward Nketiah", "Yéremi Pino", "Brennan Johnson", "Christantus Uche", "Jean-Philippe Mateta", "Jørgen Strand Larsen", "Evann Guessand",
+    "Ismaila Sarr", "Edward Nketiah", "Yéremi Pino", "Dwight McNeil", "Christantus Uche", "Jean-Philippe Mateta", "Jørgen Strand Larsen", "Evann Guessand",
   ],
   "Sunderland": [
     "Dennis Cirkin", "Daniel Ballard", "Lutsharel Geertruida", "Reinildo", "Luke O'Nien", "Omar Alderete", "Nordi Mukiele", "Trai Hume", "Arthur Masuaku",
@@ -815,6 +815,7 @@ function buildScorerAliases() {
     "sarr": "pape sarr",
     "pape matar sarr": "pape sarr",
     "awb": "aaron wan-bissaka",
+    "bj": "brennan johnson",
     "taty": "valentin castellanos",
     "tatty": "valentin castellanos",
     "kov": "mateo kovacic",
@@ -1494,7 +1495,8 @@ function buildFixturesEmbed(fixtures, rangeLabel) {
     const matchup = f.evertonHome ? `Everton vs ${f.opponent}` : `${f.opponent} vs Everton`;
     const venueEmoji = f.evertonHome ? "🏟️" : "🛫";
     const venueLine = f.venue ? `\n　${venueEmoji} ${f.venue}` : "";
-    return `**${f.id}.** ${matchup}\n　📅 ${f.label}${venueLine}`;
+    const broadcastLine = f.broadcast ? `\n　📺 ${f.broadcast}` : "";
+    return `**${f.id}.** ${matchup}\n　📅 ${f.label}${venueLine}${broadcastLine}`;
   });
   return new EmbedBuilder().setColor(BOT_COLOUR).setTitle(title)
     .setDescription(rows.join("\n\n") || "_No upcoming fixtures found._")

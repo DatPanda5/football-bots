@@ -1,6 +1,6 @@
 # Everton Bot — Squads & Aliases (2026–27)
 
-**Last updated:** 2026-08-06  
+**Last updated:** 2026-08-11  
 **Source of truth:** `index.js` — run `node scripts/regenerate-reference-md.js` after squad or alias changes.
 
 ---
@@ -21,9 +21,9 @@
 | 32 | Jarrad Branthwaite | CB |
 | 39 | Adam Aznou | LB |
 | 64 | Reece Welch | CB |
-| 7 | Dwight McNeil | LW/AM |
+| 8 | Kiernan Dewsbury-Hall | CM |
 | 20 | Tyler Dibling | RW/AM |
-| 22 | Kiernan Dewsbury-Hall | CM |
+| 22 | Brennan Johnson | RW/AM |
 | 23 | Christian Nørgaard | DM |
 | 24 | Charly Alcaraz | AM |
 | 30 | Hayden Hackney | DM/CM |
@@ -81,7 +81,7 @@ Ben Wilson, Oliver Moore, Brad Collins, Bobby Thomas, Jay Dasilva, Milan Ilori, 
 
 ### Crystal Palace
 
-Daniel Munoz, Tyrick Mitchell, Maxence Lacroix, Nathaniel Clyne, Borna Sosa, Chris Richards, Chadi Riad, Jefferson Lerma, Daichi Kamada, Will Hughes, Adam Wharton, Cheick Doucouré, Ismaila Sarr, Edward Nketiah, Yéremi Pino, Brennan Johnson, Christantus Uche, Jean-Philippe Mateta, Jørgen Strand Larsen, Evann Guessand
+Daniel Munoz, Tyrick Mitchell, Maxence Lacroix, Nathaniel Clyne, Borna Sosa, Chris Richards, Chadi Riad, Jefferson Lerma, Daichi Kamada, Will Hughes, Adam Wharton, Cheick Doucouré, Ismaila Sarr, Edward Nketiah, Yéremi Pino, Dwight McNeil, Christantus Uche, Jean-Philippe Mateta, Jørgen Strand Larsen, Evann Guessand
 
 ### Dundee
 
@@ -160,6 +160,7 @@ José Sá, Dan Bentley, Sam Johnstone, Matt Doherty, Hugo Bueno, Santiago Bueno,
 | `awb` | aaron wan-bissaka |
 | `big mick` | michael keane |
 | `big mick keggers` | michael keane |
+| `bj` | brennan johnson |
 | `evil saka` | tyrique george |
 | `isidor` | wilson isidor |
 | `jake o brien` | jake o'brien |
