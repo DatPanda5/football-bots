@@ -65,6 +65,14 @@
 
 ---
 
+## EFL Cup (Carabao Cup)
+
+| ID | Date (ET) | Match | Venue | H/A |
+|----|-----------|-------|-------|-----|
+| EFLR2 | Wed 26 Aug 3:00 PM EDT | Preston North End vs Everton | — | A |
+
+---
+
 ## Broadcast defaults
 
 - **EFL Cup:** US streams on **Paramount+** (applied automatically when `competition: "efl_cup"`).
@@ -78,6 +86,7 @@
 - **Pre4** — `2026-08-08T15:00:00Z`
 - **Pre5** — `2026-08-12T16:15:00Z`
 - **Pre6** — `2026-08-15T14:00:00Z`
+- **EFLR2** — `2026-08-26T19:00:00Z`
 - **MW1** — `2026-08-22T14:00:00Z`
 - **MW2** — `2026-08-29T14:00:00Z`
 - **MW3** — `2026-09-05T14:00:00Z`

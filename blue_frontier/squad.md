@@ -1,6 +1,6 @@
 # Everton Bot — Squads & Aliases (2026–27)
 
-**Last updated:** 2026-08-14  
+**Last updated:** 2026-08-15  
 **Source of truth:** `index.js` — run `node scripts/regenerate-reference-md.js` after squad or alias changes.
 
 ---
@@ -10,30 +10,29 @@
 | # | Player | Positions |
 |---|--------|-----------|
 | 1 | Jordan Pickford | GK |
-| 12 | Mark Travers | GK |
-| 31 | Tom King | GK |
 | 2 | Nathan Patterson | RB |
+| 4 | Jarrad Branthwaite | CB |
 | 5 | Michael Keane | CB |
 | 6 | James Tarkowski | CB |
+| 8 | Kiernan Dewsbury-Hall | CM |
+| 9 | Beto | ST |
+| 10 | Iliman Ndiaye | SS/RW |
+| 11 | Thierno Barry | ST |
+| 12 | Mark Travers | GK |
 | 15 | Jake O'Brien | CB |
 | 16 | Vitalii Mykolenko | LB |
-| 32 | Jarrad Branthwaite | CB |
-| 39 | Adam Aznou | LB |
-| 73 | Elijah Campbell | CB/LB |
-| 8 | Kiernan Dewsbury-Hall | CM |
+| 19 | Tyrique George | Winger |
 | 20 | Tyler Dibling | RW/AM |
 | 22 | Brennan Johnson | RW/AM |
 | 23 | Christian Nørgaard | DM |
 | 24 | Charly Alcaraz | AM |
 | 30 | Hayden Hackney | DM/CM |
+| 31 | Tom King | GK |
 | 34 | Merlin Röhl | CM |
 | 37 | James Garner | CM/DM |
+| 39 | Adam Aznou | LB |
 | 42 | Tim Iroegbunam | CM/DM |
 | 45 | Harrison Armstrong | CM |
-| 9 | Beto | ST |
-| 10 | Iliman Ndiaye | SS/RW |
-| 11 | Thierno Barry | ST |
-| 19 | Tyrique George | Winger |
 
 ---
 
@@ -168,6 +167,7 @@ José Sá, Dan Bentley, Sam Johnstone, Matt Doherty, Hugo Bueno, Santiago Bueno,
 | `james branthwaite` | jarrad branthwaite |
 | `jb` | jarrad branthwaite |
 | `jb32` | jarrad branthwaite |
+| `jb4` | jarrad branthwaite |
 | `jg` | james garner |
 | `jimmy g` | james garner |
 | `job` | jake o'brien |

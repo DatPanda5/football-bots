@@ -313,6 +313,7 @@ function adminResetAllTimePoints() {
 //             API ~2 weeks before kick-off).
 //  competition: preseason | premier_league | efl_cup
 //  broadcast: optional US TV override; efl_cup defaults to Paramount+ when omitted.
+//  unlisted: optional — omit from /fixtures, /predict, and other fixture menus (e.g. future cup ties).
 // ───────────────────────────────────────────────────────────────
 const DEFAULT_BROADCAST_BY_COMPETITION = {
   efl_cup: "Paramount+",
@@ -356,12 +357,13 @@ const ALL_FIXTURES = [
     evertonHome: true, venue: "Hill Dickinson Stadium", srMatchId: null,
   },
   // ── EFL Cup (Carabao Cup) — competition: "efl_cup" → 📺 Paramount+ (US) by default ──
-  // {
-  //   id: "EFL1", kickoffUTC: "2026-09-23T19:00:00Z", label: "Wed 23 Sep 3:00 PM EDT",
-  //   competition: "efl_cup",
-  //   home: "Opponent", away: "Everton", opponent: "Opponent",
-  //   evertonHome: false, venue: "Stadium Name", srMatchId: null,
-  // },
+  {
+    id: "EFLR2", kickoffUTC: "2026-08-26T19:00:00Z", label: "Wed 26 Aug 3:00 PM EDT",
+    competition: "efl_cup",
+    home: "Preston North End", away: "Everton", opponent: "Preston North End",
+    evertonHome: false, venue: "Deepdale", srMatchId: null,
+  },
+  // Add EFLR3 here after R2 win + R3 draw (id: "EFLR3", competition: "efl_cup", …).
   // ── Premier League ──
   {
     id: "MW1", kickoffUTC: "2026-08-22T14:00:00Z", label: "Sat 22 Aug 10:00 AM EDT",
@@ -1277,6 +1279,12 @@ function isFixtureCompleted(fixture) {
   return now - kickoffMs >= FORTY_EIGHT_HOURS_MS;
 }
 
+function isUpcomingFixture(fixture) {
+  if (!fixture || fixture.unlisted) return false;
+  const kickoffMs = new Date(fixture.kickoffUTC).getTime();
+  return !Number.isNaN(kickoffMs) && kickoffMs > Date.now();
+}
+
 function getFixtureById(id) { return ALL_FIXTURES.find((f) => f.id === id); }
 
 function getLatestCompletedFixture() {
@@ -1294,17 +1302,15 @@ function getFixtureLabelForFinal(fixture) {
 }
 
 function getUpcomingFixtures() {
-  const now = Date.now();
   return ALL_FIXTURES
-    .filter((f) => new Date(f.kickoffUTC).getTime() > now)
+    .filter(isUpcomingFixture)
     .sort((a, b) => new Date(a.kickoffUTC) - new Date(b.kickoffUTC))
     .slice(0, 5);
 }
 
 function getAllUpcomingFixtures() {
-  const now = Date.now();
   return ALL_FIXTURES
-    .filter((f) => new Date(f.kickoffUTC).getTime() > now)
+    .filter(isUpcomingFixture)
     .sort((a, b) => new Date(a.kickoffUTC) - new Date(b.kickoffUTC));
 }
 
@@ -1326,9 +1332,8 @@ function buildFixturesButtons(page, totalPages) {
 }
 
 function getListableFixture() {
-  const now = Date.now();
   const upcoming = ALL_FIXTURES
-    .filter((f) => new Date(f.kickoffUTC).getTime() > now)
+    .filter(isUpcomingFixture)
     .sort((a, b) => new Date(a.kickoffUTC) - new Date(b.kickoffUTC));
   const next = upcoming[0] ?? null;
   if (next) {
@@ -1422,14 +1427,14 @@ const commands = [
       ))
     .addStringOption((o) => o.setName("fixture").setDescription("Which fixture (when view = one)").setRequired(false)
       // Discord caps addChoices at 25 — show only the next 25 upcoming fixtures (or all if fewer).
-      .addChoices(...ALL_FIXTURES.filter((f) => new Date(f.kickoffUTC).getTime() > Date.now()).slice(0, 25).map((f) => ({ name: `${f.home} vs ${f.away} (${f.label})`, value: f.id })))),
+      .addChoices(...ALL_FIXTURES.filter(isUpcomingFixture).slice(0, 25).map((f) => ({ name: `${f.home} vs ${f.away} (${f.label})`, value: f.id })))),
   new SlashCommandBuilder().setName("fixtures").setDescription("Show the next 5 upcoming Everton fixtures"),
   new SlashCommandBuilder().setName("help")
     .setDescription("Show Blue Frontier Committee commands (only visible to you)"),
   new SlashCommandBuilder().setName("clearprediction").setDescription("Delete one of your predictions")
     .addStringOption((o) => o.setName("fixture").setDescription("Which fixture to clear").setRequired(true)
       // Discord caps addChoices at 25 — show only the next 25 upcoming fixtures.
-      .addChoices(...ALL_FIXTURES.filter((f) => new Date(f.kickoffUTC).getTime() > Date.now()).slice(0, 25).map((f) => ({ name: `${f.home} vs ${f.away} (${f.label})`, value: f.id })))),
+      .addChoices(...ALL_FIXTURES.filter(isUpcomingFixture).slice(0, 25).map((f) => ({ name: `${f.home} vs ${f.away} (${f.label})`, value: f.id })))),
   new SlashCommandBuilder().setName("final")
     .setDescription("MOD only: Enter final score or view result for a played fixture")
     .addStringOption((o) => {
