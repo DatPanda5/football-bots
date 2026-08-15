@@ -311,7 +311,18 @@ function adminResetAllTimePoints() {
 //  srMatchId: SportRadar event ID — used by the auto result checker.
 //             Fill these in as fixtures get closer (IDs appear in the
 //             API ~2 weeks before kick-off).
+//  competition: preseason | premier_league | efl_cup
+//  broadcast: optional US TV override; efl_cup defaults to Paramount+ when omitted.
 // ───────────────────────────────────────────────────────────────
+const DEFAULT_BROADCAST_BY_COMPETITION = {
+  efl_cup: "Paramount+",
+};
+
+function getFixtureBroadcast(fixture) {
+  if (fixture.broadcast) return fixture.broadcast;
+  return DEFAULT_BROADCAST_BY_COMPETITION[fixture.competition] || null;
+}
+
 const ALL_FIXTURES = [
   // ── Pre-season friendlies ──
   {
@@ -344,6 +355,13 @@ const ALL_FIXTURES = [
     home: "Everton", away: "LOSC Lille", opponent: "LOSC Lille", competition: "preseason",
     evertonHome: true, venue: "Hill Dickinson Stadium", srMatchId: null,
   },
+  // ── EFL Cup (Carabao Cup) — competition: "efl_cup" → 📺 Paramount+ (US) by default ──
+  // {
+  //   id: "EFL1", kickoffUTC: "2026-09-23T19:00:00Z", label: "Wed 23 Sep 3:00 PM EDT",
+  //   competition: "efl_cup",
+  //   home: "Opponent", away: "Everton", opponent: "Opponent",
+  //   evertonHome: false, venue: "Stadium Name", srMatchId: null,
+  // },
   // ── Premier League ──
   {
     id: "MW1", kickoffUTC: "2026-08-22T14:00:00Z", label: "Sat 22 Aug 10:00 AM EDT",
@@ -1513,7 +1531,8 @@ function buildFixturesEmbed(fixtures, rangeLabel) {
     const matchup = f.evertonHome ? `Everton vs ${f.opponent}` : `${f.opponent} vs Everton`;
     const venueEmoji = f.evertonHome ? "🏟️" : "🛫";
     const venueLine = f.venue ? `\n　${venueEmoji} ${f.venue}` : "";
-    const broadcastLine = f.broadcast ? `\n　📺 ${f.broadcast}` : "";
+    const broadcast = getFixtureBroadcast(f);
+    const broadcastLine = broadcast ? `\n　📺 ${broadcast}` : "";
     return `**${f.id}.** ${matchup}\n　📅 ${f.label}${venueLine}${broadcastLine}`;
   });
   return new EmbedBuilder().setColor(BOT_COLOUR).setTitle(title)

@@ -90,7 +90,15 @@ function writeFixturesMd(fixtures) {
   md += fixtureTable(fixtures.filter((f) => f.competition === "preseason"), "Pre-season friendlies");
   md += "\n---\n\n";
   md += fixtureTable(fixtures.filter((f) => f.competition === "premier_league"), "Premier League (38)");
-  md += "\n---\n\n## Kickoff UTC reference\n\n";
+  const efl = fixtures.filter((f) => f.competition === "efl_cup");
+  if (efl.length) {
+    md += "\n---\n\n";
+    md += fixtureTable(efl, "EFL Cup (Carabao Cup)");
+  }
+  md += "\n---\n\n## Broadcast defaults\n\n";
+  md += "- **EFL Cup:** US streams on **Paramount+** (applied automatically when `competition: \"efl_cup\"`).\n";
+  md += "- **Premier League:** set per-fixture `broadcast` from FotMob (e.g. USA Network, Peacock).\n\n";
+  md += "## Kickoff UTC reference\n\n";
   for (const f of fixtures) md += `- **${f.id}** — \`${f.kickoffUTC}\`\n`;
   fs.writeFileSync(path.join(ROOT, "26-27fixtures.md"), md);
 }

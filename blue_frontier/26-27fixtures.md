@@ -65,6 +65,11 @@
 
 ---
 
+## Broadcast defaults
+
+- **EFL Cup:** US streams on **Paramount+** (applied automatically when `competition: "efl_cup"`).
+- **Premier League:** set per-fixture `broadcast` from FotMob (e.g. USA Network, Peacock).
+
 ## Kickoff UTC reference
 
 - **Pre1** — `2026-07-18T13:00:00Z`

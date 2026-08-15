@@ -6,7 +6,7 @@
 /** @type {Array<{ test: RegExp, label: string }>} */
 const CANONICAL = [
   { test: /peacock/i, label: "Peacock" },
-  { test: /paramount\+?\s*\(us\)|^paramount\+?$/i, label: "Peacock" },
+  { test: /paramount\+?\s*\(us\)|^paramount\+?$/i, label: "Paramount+" },
   { test: /usa\s*network/i, label: "USA" },
   { test: /^usa$/i, label: "USA" },
   { test: /espn/i, label: "ESPN" },
@@ -25,6 +25,7 @@ const CANONICAL = [
 const DISPLAY_PRIORITY = [
   "USA",
   "Peacock",
+  "Paramount+",
   "ESPN",
   "NBC",
   "FOX",

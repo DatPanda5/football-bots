@@ -212,6 +212,8 @@ Source: [evertonfc.com](https://www.evertonfc.com/matches/men/fixtures) (Jun 202
 
 Squads and scorer/team aliases: **[squad.md](squad.md)** (sync with `index.js`).
 
+**EFL Cup:** when added to `ALL_FIXTURES`, use `competition: "efl_cup"` — `/fixtures` shows **Paramount+** as the US stream automatically (no per-match `broadcast` needed unless overriding).
+
 ---
 
 ## Notes
