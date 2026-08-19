@@ -137,6 +137,14 @@ db.exec(`
     reason        TEXT NOT NULL,
     awardedAt     TEXT NOT NULL
   );
+
+  -- Runtime scorer nicknames added by MODs via /addscoreralias (no redeploy needed).
+  CREATE TABLE IF NOT EXISTS scorer_aliases (
+    alias      TEXT PRIMARY KEY,
+    canonical  TEXT NOT NULL,
+    added_by   TEXT NOT NULL,
+    added_at   TEXT NOT NULL
+  );
 `);
 
 // Migrate: add bonus card columns (silently no-ops if already present).
@@ -278,6 +286,14 @@ function awardPoints(userId, displayName, fixtureId, points, reason) {
     INSERT INTO points_log (fixtureId, userId, displayName, points_awarded, reason, awardedAt)
     VALUES (?, ?, ?, ?, ?, ?)
   `).run(fixtureId, String(userId), displayName, points, reason, now);
+}
+
+/** Current-season points for a user (0 if none). */
+function getUserSeasonPoints(userId) {
+  const row = db.prepare(
+    "SELECT season_points FROM points WHERE userId = ? AND season_year = ?"
+  ).get(String(userId), _seasonYear());
+  return row?.season_points ?? 0;
 }
 
 function getLeaderboard(seasonType = "season", limit = 15) {
@@ -876,11 +892,55 @@ function buildScorerAliases() {
 }
 const SCORER_ALIASES = buildScorerAliases();
 
+/** MOD-added aliases (DB); checked before code SCORER_ALIASES. */
+const runtimeScorerAliases = Object.create(null);
+
+function loadScorerAliasesFromDb() {
+  for (const key of Object.keys(runtimeScorerAliases)) delete runtimeScorerAliases[key];
+  const rows = db.prepare("SELECT alias, canonical FROM scorer_aliases").all();
+  for (const row of rows) {
+    runtimeScorerAliases[row.alias] = row.canonical;
+  }
+}
+
+/** Resolve nickname → canonical form. Runtime/DB aliases win over code aliases. */
+function resolveScorerAlias(s0) {
+  return runtimeScorerAliases[s0] || SCORER_ALIASES[s0] || s0;
+}
+
+/**
+ * Upsert a MOD scorer alias into DB + memory. Returns { alias, canonical } or throws on bad input.
+ */
+function upsertScorerAlias(aliasRaw, canonicalRaw, addedBy) {
+  const alias = String(aliasRaw || "").trim().toLowerCase();
+  let canonical = String(canonicalRaw || "").trim().toLowerCase();
+  if (!alias) throw new Error("Alias cannot be empty.");
+  if (!canonical) throw new Error("Canonical name cannot be empty.");
+  // If they typed another known alias as the target, resolve to the real canonical.
+  canonical = resolveScorerAlias(canonical);
+  if (alias === canonical) throw new Error("Alias and canonical name are the same — nothing to add.");
+  const now = new Date().toISOString();
+  db.prepare(`
+    INSERT INTO scorer_aliases (alias, canonical, added_by, added_at)
+    VALUES (?, ?, ?, ?)
+    ON CONFLICT(alias) DO UPDATE SET
+      canonical = excluded.canonical,
+      added_by  = excluded.added_by,
+      added_at  = excluded.added_at
+  `).run(alias, canonical, String(addedBy), now);
+  runtimeScorerAliases[alias] = canonical;
+  KNOWN_SCORER_NORMS.add(normalizeDiacritics(canonical));
+  return { alias, canonical };
+}
+
+loadScorerAliasesFromDb();
+
 // All canonical player name forms (normalized) — used to detect multi-name space-separated segments.
 const KNOWN_SCORER_NORMS = new Set([
   ...EVERTON_SQUAD_2025_26.map((p) => normalizeDiacritics(p.name.toLowerCase())),
   ...Object.values(OPPONENT_SQUADS_2025_26).flat().map((n) => normalizeDiacritics(n.toLowerCase())),
   ...Object.values(SCORER_ALIASES),
+  ...Object.values(runtimeScorerAliases).map((c) => normalizeDiacritics(c)),
 ]);
 
 // ───────────────────────────────────────────────────────────────
@@ -1113,7 +1173,7 @@ function normalizeSingleScorerToken(segment) {
   if (!s0) return "";
   s0 = stripScorerInterjections(s0);
   if (!s0) return "";
-  const aliased = SCORER_ALIASES[s0] || s0;
+  const aliased = resolveScorerAlias(s0);
   return normalizeDiacritics(aliased);
 }
 
@@ -1461,6 +1521,25 @@ const commands = [
     .setDescription("View prediction leaderboard (season or all-time)")
     .addStringOption((o) => o.setName("scope").setDescription("Season or all-time").setRequired(false)
       .addChoices({ name: "Current season", value: "season" }, { name: "All time", value: "alltime" })),
+  new SlashCommandBuilder().setName("adjustpoints")
+    .setDescription("MOD only: Add or subtract prediction points for a user")
+    .addUserOption((o) => o.setName("user").setDescription("User to adjust").setRequired(true))
+    .addIntegerOption((o) => o.setName("amount").setDescription("Points to add (positive) or subtract (negative)").setRequired(true))
+    .addStringOption((o) => o.setName("reason").setDescription("Why (logged in points history)").setRequired(true).setMaxLength(100))
+    .addStringOption((o) => {
+      const kickedOff = ALL_FIXTURES
+        .filter((f) => new Date(f.kickoffUTC).getTime() <= Date.now())
+        .slice(-25)
+        .reverse()
+        .map((f) => ({ name: `${f.home} vs ${f.away} (${f.label})`, value: f.id }));
+      const opt = o.setName("fixture").setDescription("Optional fixture for the audit log").setRequired(false);
+      if (kickedOff.length) opt.addChoices(...kickedOff);
+      return opt;
+    }),
+  new SlashCommandBuilder().setName("addscoreralias")
+    .setDescription("MOD only: Add a scorer nickname so it matches immediately (no redeploy)")
+    .addStringOption((o) => o.setName("alias").setDescription("Nickname users type (e.g. big beto)").setRequired(true).setMaxLength(80))
+    .addStringOption((o) => o.setName("canonical").setDescription("Canonical player name (e.g. beto)").setRequired(true).setMaxLength(80)),
   new SlashCommandBuilder().setName("resetleaderboard")
     .setDescription("[ADMIN] Reset season or all-time points")
     .addStringOption((o) => o.setName("scope").setDescription("What to reset").setRequired(true)
@@ -1919,6 +1998,8 @@ client.on("interactionCreate", async (interaction) => {
       "**/listpredictions** — list predictions (one fixture, or last 2 completed matches).",
       "**/clearprediction** — delete one of your predictions.",
       "**/final** — MOD only; enter final score + scorers to award points.",
+      "**/adjustpoints** — MOD only; add or subtract points for a user (with a logged reason).",
+      "**/addscoreralias** — MOD only; add a scorer nickname so it matches without redeploying.",
       "**/leaderboard [scope]** — view current-season or all-time points.",
       "**/resetleaderboard [scope]** — MOD only; reset season or all-time (all-time asks for confirm).",
       "",
@@ -2297,6 +2378,66 @@ client.on("interactionCreate", async (interaction) => {
       .setDescription(body)
       .setFooter({ text: `${BOT_FOOTER} • 5pt exact score, 2pt result, 1pt per correct scorer` }).setTimestamp();
     return interaction.reply({ embeds: [embed] });
+  }
+
+  if (interaction.isChatInputCommand() && interaction.commandName === "adjustpoints") {
+    const modRoleId = getModRoleIdForGuild(interaction.guildId);
+    let hasModRole = false;
+    if (modRoleId) {
+      try { hasModRole = (await interaction.guild.members.fetch(interaction.user.id)).roles.cache.has(modRoleId); }
+      catch { hasModRole = interaction.member?.roles?.cache?.has(modRoleId) ?? false; }
+    }
+    if (!hasModRole) return interaction.reply({ content: "❌ This command is only for MODs.", flags: MessageFlags.Ephemeral });
+
+    const target = interaction.options.getUser("user", true);
+    const amount = interaction.options.getInteger("amount", true);
+    const reasonRaw = interaction.options.getString("reason", true).trim();
+    const fixtureId = interaction.options.getString("fixture") || "mod_adjust";
+
+    if (amount === 0) {
+      return interaction.reply({ content: "❌ Amount cannot be 0.", flags: MessageFlags.Ephemeral });
+    }
+    if (!reasonRaw) {
+      return interaction.reply({ content: "❌ Reason cannot be empty.", flags: MessageFlags.Ephemeral });
+    }
+
+    let displayName = target.username;
+    try {
+      const member = await interaction.guild.members.fetch(target.id);
+      displayName = member.displayName || target.username;
+    } catch { /* use username */ }
+
+    const before = getUserSeasonPoints(target.id);
+    awardPoints(target.id, displayName, fixtureId, amount, `mod_adjust:${reasonRaw}`);
+    const after = getUserSeasonPoints(target.id);
+    const signed = amount > 0 ? `+${amount}` : String(amount);
+    const fixtureNote = fixtureId === "mod_adjust" ? "" : ` (fixture: \`${fixtureId}\`)`;
+    return interaction.reply({
+      content: `✅ Adjusted **${displayName}** by **${signed}** pts${fixtureNote}.\nSeason total: **${before}** → **${after}**.\nReason: ${reasonRaw}`,
+      flags: MessageFlags.Ephemeral,
+    });
+  }
+
+  if (interaction.isChatInputCommand() && interaction.commandName === "addscoreralias") {
+    const modRoleId = getModRoleIdForGuild(interaction.guildId);
+    let hasModRole = false;
+    if (modRoleId) {
+      try { hasModRole = (await interaction.guild.members.fetch(interaction.user.id)).roles.cache.has(modRoleId); }
+      catch { hasModRole = interaction.member?.roles?.cache?.has(modRoleId) ?? false; }
+    }
+    if (!hasModRole) return interaction.reply({ content: "❌ This command is only for MODs.", flags: MessageFlags.Ephemeral });
+
+    const aliasRaw = interaction.options.getString("alias", true);
+    const canonicalRaw = interaction.options.getString("canonical", true);
+    try {
+      const { alias, canonical } = upsertScorerAlias(aliasRaw, canonicalRaw, interaction.user.id);
+      return interaction.reply({
+        content: `✅ Scorer alias saved: **${alias}** → **${canonical}**\nTakes effect immediately for future scoring. Use \`/adjustpoints\` if someone already missed points.`,
+        flags: MessageFlags.Ephemeral,
+      });
+    } catch (err) {
+      return interaction.reply({ content: `❌ ${err.message || "Could not save alias."}`, flags: MessageFlags.Ephemeral });
+    }
   }
 
   if (interaction.isChatInputCommand() && interaction.commandName === "resetleaderboard") {

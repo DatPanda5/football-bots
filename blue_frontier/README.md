@@ -160,6 +160,8 @@ Use this OAuth2 URL to add the bot to a different Discord server:
 | `/myprediction` | View your own predictions | You only |
 | `/clearprediction` | Delete one of your predictions | You only |
 | `/final` | MOD only: enter final score + optional scorers; awards points | MODs |
+| `/adjustpoints` | MOD only: add or subtract points for a user (logged reason; optional fixture) | MODs |
+| `/addscoreralias` | MOD only: add a scorer nickname so it matches immediately (no redeploy) | MODs |
 | `/leaderboard` | View prediction leaderboard (current season or all-time) | Everyone |
 | `/resetleaderboard` | MOD only: reset **current season** or **all-time** points (all-time asks for confirm) | MODs |
 | `/help` | Show all Blue Frontier Committee commands and how they work (ephemeral, only visible to you) | You only |
@@ -172,7 +174,7 @@ Use this OAuth2 URL to add the bot to a different Discord server:
 - **2 pts** — correct result (win/draw/loss)
 - **1 pt** — per correct goal scorer
 
-Points are awarded when a MOD uses `/final` or when the auto result checker posts. Use `/leaderboard` for **current season** or **all-time** standings.
+Points are awarded when a MOD uses `/final` or when the auto result checker posts. Use `/leaderboard` for **current season** or **all-time** standings. MODs can fix misses with `/adjustpoints` and add nicknames with `/addscoreralias` (aliases apply to future scoring only).
 
 ---
 
