@@ -10,6 +10,7 @@ const {
   ButtonStyle,
   StringSelectMenuBuilder,
   ModalBuilder,
+  TextDisplayBuilder,
   TextInputBuilder,
   TextInputStyle,
   EmbedBuilder,
@@ -386,7 +387,7 @@ const ALL_FIXTURES = [
     competition: "premier_league",
     home: "Everton", away: "Crystal Palace", opponent: "Crystal Palace",
     evertonHome: true, venue: "Hill Dickinson Stadium", srMatchId: null,
-    broadcast: "USA",
+    broadcast: "USA", mainReferee: "Paul Tierney", varReferee: "Tim Wood",
   },
   {
     id: "MW2", kickoffUTC: "2026-08-29T14:00:00Z", label: "Sat 29 Aug 10:00 AM EDT",
@@ -2063,6 +2064,11 @@ client.on("interactionCreate", async (interaction) => {
     const f = getFixtureById(fixtureId);
     if (!f) return null;
     const modal = new ModalBuilder().setCustomId(`tbfc_score_modal_${fixtureId}`).setTitle(`${f.home} vs ${f.away}`);
+    if (f.mainReferee && f.varReferee) {
+      modal.addComponents(
+        new TextDisplayBuilder().setContent(`👮🏻‍♂️Ref: ${f.mainReferee} | VAR: ${f.varReferee}`)
+      );
+    }
     modal.addComponents(
       new ActionRowBuilder().addComponents(
         new TextInputBuilder().setCustomId("everton_score").setLabel("Everton — how many goals?")
