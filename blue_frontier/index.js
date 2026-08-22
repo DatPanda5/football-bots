@@ -834,13 +834,45 @@ const OPPONENT_SQUADS_2025_26 = {
 function buildScorerAliases() {
   const aliases = {
     "kdh": "kiernan dewsbury-hall",
+    "dewsbury": "kiernan dewsbury-hall",
+    "dewsbury hall": "kiernan dewsbury-hall",
+    "dewsburyhall": "kiernan dewsbury-hall",
     "job": "jake o'brien",
     "jake o brien": "jake o'brien",
     "rohl": "merlin röhl",
+    "merlin": "merlin röhl",
     "ndiaye": "iliman ndiaye",
+    "iliman": "iliman ndiaye",
     "skiliman ndiaye": "iliman ndiaye",
     "skilliman ndiaye": "iliman ndiaye",
     "skilliman": "iliman ndiaye",
+    "barry": "thierno barry",
+    "thierno": "thierno barry",
+    "dibling": "tyler dibling",
+    "johnson": "brennan johnson",
+    "brennan": "brennan johnson",
+    "bj": "brennan johnson",
+    "jarrad": "jarrad branthwaite",
+    "branthwaite": "jarrad branthwaite",
+    "mcneil": "dwight mcneil",
+    "dwight": "dwight mcneil",
+    "munoz": "daniel muñoz",
+    "muñoz": "daniel muñoz",
+    "daniel munoz": "daniel muñoz",
+    "devine": "alfie devine",
+    "alfie": "alfie devine",
+    "strand larsen": "jørgen strand larsen",
+    "strand": "jørgen strand larsen",
+    "larsen": "jørgen strand larsen",
+    "jorgen strand larsen": "jørgen strand larsen",
+    "jorgen larsen": "jørgen strand larsen",
+    "ismaila": "ismaïla sarr",
+    "ismaila sarr": "ismaïla sarr",
+    "ismailla sarr": "ismaïla sarr",
+    "ismailla": "ismaïla sarr",
+    // Bare "sarr" = Palace's Ismaila (common goalscorer nickname). Spurs: type "pape sarr".
+    "sarr": "ismaïla sarr",
+    "pape matar sarr": "pape sarr",
     "big mick": "michael keane",
     "keggers": "michael keane",
     "big mick keggers": "michael keane",
@@ -853,7 +885,9 @@ function buildScorerAliases() {
     "jb32": "jarrad branthwaite",
     "james branthwaite": "jarrad branthwaite",
     "evil saka": "tyrique george",
+    "tyrique": "tyrique george",
     "tark": "james tarkowski",
+    "tarkowski": "james tarkowski",
     "le fee": "enzo le fée",
     "lefee": "enzo le fée",
     "amad": "amad diallo",
@@ -875,10 +909,7 @@ function buildScorerAliases() {
     "richy": "richarlison",
     "richie": "richarlison",
     "pigeon": "richarlison",
-    "sarr": "pape sarr",
-    "pape matar sarr": "pape sarr",
     "awb": "aaron wan-bissaka",
-    "bj": "brennan johnson",
     "taty": "valentin castellanos",
     "tatty": "valentin castellanos",
     "kov": "mateo kovacic",
@@ -1171,7 +1202,10 @@ function normalizeScorers(str) {
 /** Remove common middle interjections so "seamus fucking coleman" matches Séamus Coleman. */
 function stripScorerInterjections(s) {
   return String(s)
-    .replace(/\b(fucking|fuckin|bloody|damn|dammit|frickin|fricking)\b/gi, " ")
+    .replace(/\([^)]*\)/g, " ")                                 // "Munoz (of course)"
+    .replace(/\b\d{1,3}\s*[''`´’′]/g, " ")                      // "KDH 27'" / "KDH 27’"
+    .replace(/[''`´’′]\s*\d{1,3}\b/g, " ")                      // "KDH '54"
+    .replace(/\b(fucking|fuckin|bloody|damn|dammit|frickin|fricking|of course)\b/gi, " ")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -1224,20 +1258,27 @@ function expandScorerSegment(segment) {
   return Array.from({ length: count }, () => ({ display: displayCore, norm }));
 }
 
+function isMultiplierScorerSegment(part) {
+  return /^.+\s+(hat[\s-]*trick|hattrick|hatty)$/i.test(part)
+    || /^.+\s+brace$/i.test(part)
+    || /^.+\s+x\s*\d+$/i.test(part);
+}
+
 function parseScorerSegmentsRaw(str) {
   if (!str?.trim()) return [];
   const parts = String(str)
-    .split(/[,./;\n]+/)                                       // period/semicolon are valid separators (e.g. "KDH. Igor Thiago Brace", "beto;")
+    .split(/[,./;&\n]+|\s+\band\s+/i)                         // "Ndiaye and Barry", "Johnson,Dibling", "KDH. Igor Thiago Brace"
     .map((s) => s.replace(/^\s*[^:,]+:\s*/, "").trim())      // strip "Everton: " / "Burnley: " prefixes
     .filter(Boolean);
 
   // Space-split fallback: if a segment has spaces but isn't a known multi-word player name
   // (e.g. MOD enters "Soucek Wilson KDH" without commas), split it into individual tokens.
+  // Keep "Ndiaye x 2" / "Beto brace" intact so expandScorerSegment can duplicate slots.
   const result = [];
   for (const part of parts) {
     if (!part.includes(" ")) { result.push(part); continue; }
     const norm = normalizeSingleScorerToken(part);
-    if (KNOWN_SCORER_NORMS.has(norm)) {
+    if (KNOWN_SCORER_NORMS.has(norm) || isMultiplierScorerSegment(part)) {
       result.push(part);  // recognised multi-word name like "Kiernan Dewsbury-Hall"
     } else {
       result.push(...part.split(/\s+/).filter(Boolean));

@@ -1,6 +1,6 @@
 # Everton Bot — Squads & Aliases (2026–27)
 
-**Last updated:** 2026-08-15  
+**Last updated:** 2026-08-22  
 **Source of truth:** `index.js` — run `node scripts/regenerate-reference-md.js` after squad or alias changes.
 
 ---
@@ -152,25 +152,45 @@ José Sá, Dan Bentley, Sam Johnstone, Matt Doherty, Hugo Bueno, Santiago Bueno,
 
 | Alias | Maps to |
 |-------|----------|
+| `alfie` | alfie devine |
 | `amad` | amad diallo |
 | `araujo` | ronald araujo |
 | `awb` | aaron wan-bissaka |
+| `barry` | thierno barry |
 | `ben doak` | ben gannon-doak |
 | `big mick` | michael keane |
 | `big mick keggers` | michael keane |
 | `bj` | brennan johnson |
+| `branthwaite` | jarrad branthwaite |
+| `brennan` | brennan johnson |
+| `daniel munoz` | daniel muñoz |
+| `devine` | alfie devine |
+| `dewsbury` | kiernan dewsbury-hall |
+| `dewsbury hall` | kiernan dewsbury-hall |
+| `dewsburyhall` | kiernan dewsbury-hall |
+| `dibling` | tyler dibling |
 | `doak` | ben gannon-doak |
+| `dwight` | dwight mcneil |
 | `evil saka` | tyrique george |
 | `gakpo` | cody gakpo |
+| `iliman` | iliman ndiaye |
 | `isidor` | wilson isidor |
+| `ismaila` | ismaïla sarr |
+| `ismaila sarr` | ismaïla sarr |
+| `ismailla` | ismaïla sarr |
+| `ismailla sarr` | ismaïla sarr |
 | `jake o brien` | jake o'brien |
 | `james branthwaite` | jarrad branthwaite |
+| `jarrad` | jarrad branthwaite |
 | `jb` | jarrad branthwaite |
 | `jb32` | jarrad branthwaite |
 | `jb4` | jarrad branthwaite |
 | `jg` | james garner |
 | `jimmy g` | james garner |
 | `job` | jake o'brien |
+| `johnson` | brennan johnson |
+| `jorgen larsen` | jørgen strand larsen |
+| `jorgen strand larsen` | jørgen strand larsen |
 | `kdh` | kiernan dewsbury-hall |
 | `keano` | michael keane |
 | `keggers` | michael keane |
@@ -178,11 +198,16 @@ José Sá, Dan Bentley, Sam Johnstone, Matt Doherty, Hugo Bueno, Santiago Bueno,
 | `kolo muani` | randal kolo muani |
 | `kov` | mateo kovacic |
 | `kovacic` | mateo kovacic |
+| `larsen` | jørgen strand larsen |
 | `le fee` | enzo le fée |
 | `lefee` | enzo le fée |
 | `maddison` | james maddison |
 | `madison` | james maddison |
+| `mcneil` | dwight mcneil |
+| `merlin` | merlin röhl |
 | `michael keen` | michael keane |
+| `munoz` | daniel muñoz |
+| `muñoz` | daniel muñoz |
 | `ndiaye` | iliman ndiaye |
 | `norgaard` | christian nørgaard |
 | `nørgaard` | christian nørgaard |
@@ -196,13 +221,18 @@ José Sá, Dan Bentley, Sam Johnstone, Matt Doherty, Hugo Bueno, Santiago Bueno,
 | `richie` | richarlison |
 | `richy` | richarlison |
 | `rohl` | merlin röhl |
-| `sarr` | pape sarr |
+| `sarr` | ismaïla sarr |
 | `skiliman ndiaye` | iliman ndiaye |
 | `skilliman` | iliman ndiaye |
 | `skilliman ndiaye` | iliman ndiaye |
+| `strand` | jørgen strand larsen |
+| `strand larsen` | jørgen strand larsen |
 | `tark` | james tarkowski |
+| `tarkowski` | james tarkowski |
 | `tatty` | valentin castellanos |
 | `taty` | valentin castellanos |
+| `thierno` | thierno barry |
+| `tyrique` | tyrique george |
 | `tzolis` | christos tzolis |
 | `van de ven` | micky van de ven |
 | `van dijk` | virgil van dijk |
