@@ -1777,8 +1777,11 @@ async function buildFinalResultEmbed(fixture, everton, opponent, actualScorers, 
   const entries    = predStore.values().filter((p) => sameFixture(p.fixture, fixtureId));
   const eStr       = String(everton), oStr = String(opponent);
   const correctAll = entries.filter((p) => p.evertonScore === eStr && p.opponentScore === oStr);
-  const withScorers= actualScorers ? correctAll.filter((p) => p.scorers?.trim() && scorersMatch(actualScorers, p.scorers)) : [];
-  const scoreOnly  = correctAll.filter((p) => !withScorers.includes(p));
+  const withAllScorers = actualScorers ? correctAll.filter((p) => p.scorers?.trim() && scorersMatch(actualScorers, p.scorers)) : [];
+  const withSomeScorers = actualScorers
+    ? correctAll.filter((p) => !withAllScorers.includes(p) && p.scorers?.trim() && scorersMatchAtLeastOne(actualScorers, p.scorers))
+    : [];
+  const scoreOnly = correctAll.filter((p) => !withAllScorers.includes(p) && !withSomeScorers.includes(p));
   const scoreLine = fixture.evertonHome
     ? `Everton **${everton}** – **${opponent}** ${fixture.opponent}`
     : `${fixture.opponent} **${opponent}** – **${everton}** Everton`;
@@ -1794,10 +1797,12 @@ async function buildFinalResultEmbed(fixture, everton, opponent, actualScorers, 
     .setTitle(`🏁 Final Score — ${fixture.home} vs ${fixture.away}`)
     .setDescription(`📅 ${fixture.label}\n\n**${scoreLine}**${actualScorers ? `\n\n⚽ _Actual scorers:_ ${actualScorers}` : ""}${descExtra}`)
     .setFooter({ text: `${BOT_FOOTER} • Entered by MOD` }).setTimestamp();
-  const nWith = await Promise.all(withScorers.map((p) => getDisplayName(guild, p.userId, p.displayName)));
+  const nAll = await Promise.all(withAllScorers.map((p) => getDisplayName(guild, p.userId, p.displayName)));
+  const nSome = await Promise.all(withSomeScorers.map((p) => getDisplayName(guild, p.userId, p.displayName)));
   const nOnly = await Promise.all(scoreOnly.map((p) => getDisplayName(guild, p.userId, p.displayName)));
   embed.addFields(
-    { name: "✅ Correct score + goal scorers", value: nWith.length ? nWith.join(", ") : "_None_", inline: false },
+    { name: "✅ Correct score + all goal scorers", value: nAll.length ? nAll.join(", ") : "_None_", inline: false },
+    { name: "✅ Correct score + some goal scorers", value: nSome.length ? nSome.join(", ") : "_None_", inline: false },
     { name: "✅ Correct score only", value: nOnly.length ? nOnly.join(", ") : "_None_", inline: false }
   );
   if (actualScorers) {

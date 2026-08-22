@@ -6,6 +6,7 @@ Reverse chronological (newest first). Entries may be prefixed with `[blue_fronti
 
 ## 22 Aug 2026
 
+- **[blue_frontier] v3.6.2** — **`/final` embed:** split “correct score only” into **correct score + some goal scorers** (exact score plus at least one scorer, not all) vs **correct score only** (no scorers hit). Renamed top tier to **correct score + all goal scorers** for clarity.
 - **[blue_frontier] v3.6.1** — Scorer aliases from TBF predictions so far (MW2 Palace + League Cup Preston): Barry, Dibling, Johnson, Jarrad, Munoz/Muñoz, McNeil, Merlin/Röhl, Strand Larsen, Ismaila Sarr (bare `sarr` now maps to Palace’s Ismaila; type `pape sarr` for Spurs), Alfie Devine, Tyrique, Iliman, KDH variants. Parser: keep `Ndiaye x 2` as a brace, split on `and`/`&`, strip minutes (`27'`, `'54`) and parentheticals (`Munoz (of course)`).
 
 ## 18 Jul 2026
