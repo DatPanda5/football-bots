@@ -343,8 +343,9 @@ function getFixtureBroadcast(fixture) {
 }
 
 function getFixtureRefereeLine(fixture) {
-  if (!fixture.mainReferee || !fixture.varReferee) return "";
-  return `\n　👮🏻‍♂️Ref: ${fixture.mainReferee} | VAR: ${fixture.varReferee}`;
+  if (!fixture.mainReferee) return "";
+  const varPart = fixture.varReferee ? ` | VAR: ${fixture.varReferee}` : "";
+  return `\n　👮🏻‍♂️Ref: ${fixture.mainReferee}${varPart}`;
 }
 
 const ALL_FIXTURES = [
@@ -385,6 +386,7 @@ const ALL_FIXTURES = [
     competition: "efl_cup",
     home: "Preston North End", away: "Everton", opponent: "Preston North End",
     evertonHome: false, venue: "Deepdale", srMatchId: null,
+    mainReferee: "Tony Harrington",
   },
   // Add EFLR3 here after R2 win + R3 draw (id: "EFLR3", competition: "efl_cup", …).
   // ── Premier League ──
