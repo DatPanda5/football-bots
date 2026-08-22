@@ -289,6 +289,47 @@ function awardPoints(userId, displayName, fixtureId, points, reason) {
   `).run(fixtureId, String(userId), displayName, points, reason, now);
 }
 
+/** Undo auto-awarded points for one fixture (keeps `/adjustpoints` entries). */
+function reverseScoringPointsForFixture(fixtureId) {
+  const season = _seasonYear();
+  const rows = db.prepare(`
+    SELECT userId, SUM(points_awarded) as total
+    FROM points_log
+    WHERE fixtureId = ? AND reason NOT LIKE 'mod_adjust:%'
+    GROUP BY userId
+  `).all(fixtureId);
+  const update = db.prepare(`
+    UPDATE points
+    SET season_points = season_points + ?, alltime_points = alltime_points + ?
+    WHERE userId = ? AND season_year = ?
+  `);
+  const reversed = [];
+  for (const row of rows) {
+    const delta = -row.total;
+    if (!delta) continue;
+    update.run(delta, delta, String(row.userId), season);
+    reversed.push({ userId: row.userId, delta });
+  }
+  const del = db.prepare("DELETE FROM points_log WHERE fixtureId = ? AND reason NOT LIKE 'mod_adjust:%'").run(fixtureId);
+  return { reversed, logRowsRemoved: del.changes };
+}
+
+/** Re-score a finalised fixture from stored result + current predictions/aliases. */
+function recalculatePointsForFixture(fixtureId) {
+  const stored = getStoredResult(fixtureId);
+  if (!stored) throw new Error("No stored result for this fixture — cannot recalculate.");
+  const summary = reverseScoringPointsForFixture(fixtureId);
+  awardPointsForFixture(
+    fixtureId,
+    stored.evertonGoals,
+    stored.opponentGoals,
+    stored.scorers || "",
+    stored.yellowCards,
+    stored.redCards
+  );
+  return summary;
+}
+
 /** Current-season points for a user (0 if none). */
 function getUserSeasonPoints(userId) {
   const row = db.prepare(
@@ -1586,6 +1627,18 @@ const commands = [
       if (kickedOff.length) opt.addChoices(...kickedOff);
       return opt;
     }),
+  new SlashCommandBuilder().setName("recalculatepoints")
+    .setDescription("MOD only: Re-award points for a finalised fixture (e.g. after alias fixes)")
+    .addStringOption((o) => {
+      const kickedOff = ALL_FIXTURES
+        .filter((f) => new Date(f.kickoffUTC).getTime() <= Date.now())
+        .slice(-25)
+        .reverse()
+        .map((f) => ({ name: `${f.home} vs ${f.away} (${f.label})`, value: f.id }));
+      const opt = o.setName("fixture").setDescription("Fixture to re-score from stored result").setRequired(true);
+      if (kickedOff.length) opt.addChoices(...kickedOff);
+      return opt;
+    }),
   new SlashCommandBuilder().setName("addscoreralias")
     .setDescription("MOD only: Add a scorer nickname so it matches immediately (no redeploy)")
     .addStringOption((o) => o.setName("alias").setDescription("Nickname users type (e.g. big beto)").setRequired(true).setMaxLength(80))
@@ -2055,6 +2108,7 @@ client.on("interactionCreate", async (interaction) => {
       "**/clearprediction** — delete one of your predictions.",
       "**/final** — MOD only; enter final score + scorers to award points.",
       "**/adjustpoints** — MOD only; add or subtract points for a user (with a logged reason).",
+      "**/recalculatepoints** — MOD only; re-award points for a finalised match from stored result.",
       "**/addscoreralias** — MOD only; add a scorer nickname so it matches without redeploying.",
       "**/leaderboard [scope]** — view current-season or all-time points.",
       "**/resetleaderboard [scope]** — MOD only; reset season or all-time (all-time asks for confirm).",
@@ -2477,6 +2531,51 @@ client.on("interactionCreate", async (interaction) => {
       content: `✅ Adjusted **${displayName}** by **${signed}** pts${fixtureNote}.\nSeason total: **${before}** → **${after}**.\nReason: ${reasonRaw}`,
       flags: MessageFlags.Ephemeral,
     });
+  }
+
+  if (interaction.isChatInputCommand() && interaction.commandName === "recalculatepoints") {
+    const modRoleId = getModRoleIdForGuild(interaction.guildId);
+    let hasModRole = false;
+    if (modRoleId) {
+      try { hasModRole = (await interaction.guild.members.fetch(interaction.user.id)).roles.cache.has(modRoleId); }
+      catch { hasModRole = interaction.member?.roles?.cache?.has(modRoleId) ?? false; }
+    }
+    if (!hasModRole) return interaction.reply({ content: "❌ This command is only for MODs.", flags: MessageFlags.Ephemeral });
+
+    const fixtureId = interaction.options.getString("fixture", true);
+    const fixture = getFixtureById(fixtureId);
+    if (!fixture) return interaction.reply({ content: "❌ Unknown fixture.", flags: MessageFlags.Ephemeral });
+    if (new Date(fixture.kickoffUTC).getTime() > Date.now()) {
+      return interaction.reply({ content: "❌ That fixture hasn't kicked off yet.", flags: MessageFlags.Ephemeral });
+    }
+    const alreadyFinalised = !!db.prepare("SELECT 1 FROM finalised WHERE fixtureId = ?").get(fixtureId);
+    if (!alreadyFinalised) {
+      return interaction.reply({ content: "❌ That fixture isn't finalised yet. Use `/final` first.", flags: MessageFlags.Ephemeral });
+    }
+
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+    try {
+      const { reversed, logRowsRemoved } = recalculatePointsForFixture(fixtureId);
+      const lines = await Promise.all(reversed.map(async (r) => {
+        const pred = predStore.values().find((p) => sameFixture(p.fixture, fixtureId) && p.userId === r.userId);
+        const name = await getDisplayName(interaction.guild, r.userId, pred?.displayName || r.userId);
+        const signed = r.delta > 0 ? `+${r.delta}` : String(r.delta);
+        return `• **${name}** ${signed} (reversed before re-award)`;
+      }));
+      const body = lines.length ? lines.join("\n") : "_No prior auto-awarded entries for this fixture._";
+      return interaction.editReply({
+        content: [
+          `✅ Recalculated points for **${fixture.home} vs ${fixture.away}** (\`${fixtureId}\`).`,
+          `Removed **${logRowsRemoved}** scoring log row(s), then re-awarded from the stored result.`,
+          "",
+          body,
+          "",
+          "Check `/leaderboard`. Manual `/adjustpoints` entries for this fixture were left unchanged.",
+        ].join("\n"),
+      });
+    } catch (err) {
+      return interaction.editReply({ content: `❌ ${err.message || "Could not recalculate points."}` });
+    }
   }
 
   if (interaction.isChatInputCommand() && interaction.commandName === "addscoreralias") {

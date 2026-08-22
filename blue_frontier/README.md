@@ -161,6 +161,7 @@ Use this OAuth2 URL to add the bot to a different Discord server:
 | `/clearprediction` | Delete one of your predictions | You only |
 | `/final` | MOD only: enter final score + optional scorers; awards points | MODs |
 | `/adjustpoints` | MOD only: add or subtract points for a user (logged reason; optional fixture) | MODs |
+| `/recalculatepoints` | MOD only: re-award points for a finalised fixture from stored result (after alias fixes) | MODs |
 | `/addscoreralias` | MOD only: add a scorer nickname so it matches immediately (no redeploy) | MODs |
 | `/leaderboard` | View prediction leaderboard (current season or all-time) | Everyone |
 | `/resetleaderboard` | MOD only: reset **current season** or **all-time** points (all-time asks for confirm) | MODs |
@@ -174,7 +175,7 @@ Use this OAuth2 URL to add the bot to a different Discord server:
 - **2 pts** — correct result (win/draw/loss)
 - **1 pt** — per correct goal scorer
 
-Points are awarded when a MOD uses `/final` or when the auto result checker posts. Use `/leaderboard` for **current season** or **all-time** standings. MODs can fix misses with `/adjustpoints` and add nicknames with `/addscoreralias` (aliases apply to future scoring only).
+Points are awarded when a MOD uses `/final` or when the auto result checker posts. Use `/leaderboard` for **current season** or **all-time** standings. MODs can fix one-off misses with `/adjustpoints`, or re-score a whole match with `/recalculatepoints` (e.g. after `/addscoreralias` fixes for Palace MW1).
 
 ---
 
