@@ -330,6 +330,7 @@ function adminResetAllTimePoints() {
 //             API ~2 weeks before kick-off).
 //  competition: preseason | premier_league | efl_cup
 //  broadcast: optional US TV override; efl_cup defaults to Paramount+ when omitted.
+//  mainReferee, varReferee: optional — shown in /fixtures (after broadcast) and /predict modal.
 //  unlisted: optional — omit from /fixtures, /predict, and other fixture menus (e.g. future cup ties).
 // ───────────────────────────────────────────────────────────────
 const DEFAULT_BROADCAST_BY_COMPETITION = {
@@ -339,6 +340,11 @@ const DEFAULT_BROADCAST_BY_COMPETITION = {
 function getFixtureBroadcast(fixture) {
   if (fixture.broadcast) return fixture.broadcast;
   return DEFAULT_BROADCAST_BY_COMPETITION[fixture.competition] || null;
+}
+
+function getFixtureRefereeLine(fixture) {
+  if (!fixture.mainReferee || !fixture.varReferee) return "";
+  return `\n　👮🏻‍♂️Ref: ${fixture.mainReferee} | VAR: ${fixture.varReferee}`;
 }
 
 const ALL_FIXTURES = [
@@ -1618,7 +1624,8 @@ function buildFixturesEmbed(fixtures, rangeLabel) {
     const venueLine = f.venue ? `\n　${venueEmoji} ${f.venue}` : "";
     const broadcast = getFixtureBroadcast(f);
     const broadcastLine = broadcast ? `\n　📺 ${broadcast}` : "";
-    return `**${f.id}.** ${matchup}\n　📅 ${f.label}${venueLine}${broadcastLine}`;
+    const refereeLine = getFixtureRefereeLine(f);
+    return `**${f.id}.** ${matchup}\n　📅 ${f.label}${venueLine}${broadcastLine}${refereeLine}`;
   });
   return new EmbedBuilder().setColor(BOT_COLOUR).setTitle(title)
     .setDescription(rows.join("\n\n") || "_No upcoming fixtures found._")
