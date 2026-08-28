@@ -4,6 +4,10 @@ Reverse chronological (newest first). Entries may be prefixed with `[blue_fronti
 
 ---
 
+## 28 Aug 2026
+
+- **[blue_frontier] v3.6.4** — **EFL Cup R3:** Everton vs Wolverhampton Wanderers at Hill Dickinson Stadium, Wed 09 Sep **2:45 PM EDT** (`EFLR3`, 19:45 BST). Wolves opponent squad refreshed from FotMob (Championship 2026–27). Scorer aliases for Hwang name order.
+
 ## 22 Aug 2026
 
 - **[blue_frontier] v3.6.3** — **`/recalculatepoints`** (MOD): reverse auto-awarded points for a finalised fixture and re-score from the stored `/final` result using current predictions and scorer aliases. Use after alias fixes (e.g. MW1 Palace). Manual `/adjustpoints` entries are preserved.

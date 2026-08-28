@@ -1,6 +1,6 @@
 # Everton Bot — Squads & Aliases (2026–27)
 
-**Last updated:** 2026-08-22  
+**Last updated:** 2026-08-28  
 **Source of truth:** `index.js` — run `node scripts/regenerate-reference-md.js` after squad or alias changes.
 
 ---
@@ -144,7 +144,7 @@ Kyle Walker-Peters, Malick Diouf, Konstantinos Mavropanos, Jean-Clair Todibo, Aa
 
 ### Wolverhampton Wanderers
 
-José Sá, Dan Bentley, Sam Johnstone, Matt Doherty, Hugo Bueno, Santiago Bueno, David Møller Wolfe, Yerson Mosquera, Pedro Lima, Rodrigo Gomes, Toti Gomes, Ladislav Krejcí, Jackson Tchatchoua, André, João Gomes, Jean-Ricner Bellegarde, Angel Gomes, Adam Armstrong, Hwang Hee-Chan, Tolu Arokodare, Enso González, Jørgen Strand Larsen
+João Virgínia, John Ruddy, José Sá, Sam Johnstone, Kieran Trippier, Santiago Bueno, David Møller Wolfe, Yerson Mosquera, Pedro Lima, Toti Gomes, Nasser Djiga, Ladislav Krejcí, Hugo Bueno, Marshall Munetsi, André, Jordan James, Boubacar Traoré, Tommy Doyle, Jean-Ricner Bellegarde, Fer López, Mateus Mané, Jackson Tchatchoua, Tom Edozie, Rafiki Saïd, Raul Jiménez, Adam Armstrong, Hee-Chan Hwang, Sasa Kalajdzic, Rodrigo Gomes, Tawanda Chirewa, Nathan Fraser
 
 ---
 
@@ -173,6 +173,11 @@ José Sá, Dan Bentley, Sam Johnstone, Matt Doherty, Hugo Bueno, Santiago Bueno,
 | `dwight` | dwight mcneil |
 | `evil saka` | tyrique george |
 | `gakpo` | cody gakpo |
+| `hee chan` | hee-chan hwang |
+| `hee-chan` | hee-chan hwang |
+| `hwang` | hee-chan hwang |
+| `hwang hee chan` | hee-chan hwang |
+| `hwang hee-chan` | hee-chan hwang |
 | `iliman` | iliman ndiaye |
 | `isidor` | wilson isidor |
 | `ismaila` | ismaïla sarr |
@@ -191,6 +196,7 @@ José Sá, Dan Bentley, Sam Johnstone, Matt Doherty, Hugo Bueno, Santiago Bueno,
 | `johnson` | brennan johnson |
 | `jorgen larsen` | jørgen strand larsen |
 | `jorgen strand larsen` | jørgen strand larsen |
+| `kalajdzic` | sasa kalajdzic |
 | `kdh` | kiernan dewsbury-hall |
 | `keano` | michael keane |
 | `keggers` | michael keane |

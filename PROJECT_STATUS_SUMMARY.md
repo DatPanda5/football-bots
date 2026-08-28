@@ -1,7 +1,7 @@
 # Football Bots — Project Status Summary
 
 **Project root:** `football-bots/`  
-**Last updated:** 19 Jun 2026
+**Last updated:** 28 Aug 2026
 
 ---
 
@@ -20,6 +20,7 @@
 
 | Version    | Date        | Changes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | ---------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **v3.6.4** | 28 Aug 2026 | **EFL Cup R3** vs Wolves (home, 09 Sep 2:45 PM EDT); Wolves squad from FotMob. |
 | **v3.5.0** | 19 Jun 2026 | **2026–27 schedule:** 5 pre-season + 38 PL fixtures in `ALL_FIXTURES`; new opponent squads; **26-27fixtures.md** / **squad.md** + `npm run sync-docs`. |
 | **v3.4.0** | 17 Apr 2026 | **Derby bonus predictors:** 🟨 yellow cards + 🟥 red cards (1pt each) added to `/predict` modal for `fix07` (Everton vs Liverpool) only. New DB columns auto-migrated on startup. `/final` gains `yellow_cards` and `red_cards` options. All embeds updated to show bonus predictions and results. |
 | **v3.3.1** | 16 Mar 2026 | **GUILD_ID** optional; **[predict]** logs username before userId; logPredictError includes username. **Scorer matching:** extra words after name allowed (e.g. "Branthwaite at the death" → Branthwaite); aliases: Ndiaye/Skiliman/Skilliman → Iliman Ndiaye; Keano/BIG MICK/Keggers → Michael Keane. Deploy pipeline check log line removed. **/final UX:** fixture dropdown now shows only the most recent played match plus future fixtures; played status comes from `/final` result (or 48h+ after kickoff). Lab: MOD role ID updated in `.env.lab` for correct permissions. |

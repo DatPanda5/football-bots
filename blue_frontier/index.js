@@ -429,7 +429,13 @@ const ALL_FIXTURES = [
     evertonHome: false, venue: "Deepdale", srMatchId: null,
     mainReferee: "Tony Harrington",
   },
-  // Add EFLR3 here after R2 win + R3 draw (id: "EFLR3", competition: "efl_cup", …).
+  {
+    id: "EFLR3", kickoffUTC: "2026-09-09T18:45:00Z", label: "Wed 09 Sep 2:45 PM EDT",
+    competition: "efl_cup",
+    home: "Everton", away: "Wolverhampton Wanderers", opponent: "Wolverhampton Wanderers",
+    evertonHome: true, venue: "Hill Dickinson Stadium", srMatchId: null,
+  },
+  // Add EFLR4 here after R3 win + R4 draw (id: "EFLR4", competition: "efl_cup", …).
   // ── Premier League ──
   {
     id: "MW1", kickoffUTC: "2026-08-22T14:00:00Z", label: "Sat 22 Aug 10:00 AM EDT",
@@ -839,10 +845,10 @@ const OPPONENT_SQUADS_2025_26 = {
     "Daniel James", "Dominic Calvert-Lewin", "Joël Piroe", "Lukas Nmecha", "Harry Wilson", "Noah Okafor", "Wilfried Gnonto", "Joe Gelhardt", "Largie Ramazani",
   ],
   "Wolverhampton Wanderers": [
-    "José Sá", "Dan Bentley", "Sam Johnstone",
-    "Matt Doherty", "Hugo Bueno", "Santiago Bueno", "David Møller Wolfe", "Yerson Mosquera", "Pedro Lima", "Rodrigo Gomes", "Toti Gomes", "Ladislav Krejcí", "Jackson Tchatchoua",
-    "André", "João Gomes", "Jean-Ricner Bellegarde", "Angel Gomes",
-    "Adam Armstrong", "Hwang Hee-Chan", "Tolu Arokodare", "Enso González", "Jørgen Strand Larsen",
+    "João Virgínia", "John Ruddy", "José Sá", "Sam Johnstone",
+    "Kieran Trippier", "Santiago Bueno", "David Møller Wolfe", "Yerson Mosquera", "Pedro Lima", "Toti Gomes", "Nasser Djiga", "Ladislav Krejcí",
+    "Hugo Bueno", "Marshall Munetsi", "André", "Jordan James", "Boubacar Traoré", "Tommy Doyle", "Jean-Ricner Bellegarde", "Fer López", "Mateus Mané", "Jackson Tchatchoua", "Tom Edozie",
+    "Rafiki Saïd", "Raul Jiménez", "Adam Armstrong", "Hee-Chan Hwang", "Sasa Kalajdzic", "Rodrigo Gomes", "Tawanda Chirewa", "Nathan Fraser",
   ],
   "AFC Bournemouth": [
     "Djordje Petrovic", "Fraser Forster", "Will Dennis",
@@ -909,6 +915,12 @@ function buildScorerAliases() {
     "larsen": "jørgen strand larsen",
     "jorgen strand larsen": "jørgen strand larsen",
     "jorgen larsen": "jørgen strand larsen",
+    "hwang": "hee-chan hwang",
+    "hee chan": "hee-chan hwang",
+    "hee-chan": "hee-chan hwang",
+    "hwang hee-chan": "hee-chan hwang",
+    "hwang hee chan": "hee-chan hwang",
+    "kalajdzic": "sasa kalajdzic",
     "ismaila": "ismaïla sarr",
     "ismaila sarr": "ismaïla sarr",
     "ismailla sarr": "ismaïla sarr",
