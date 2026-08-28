@@ -155,7 +155,7 @@ Use this OAuth2 URL to add the bot to a different Discord server:
 | Command | Description | Visible to? |
 |---|---|---|
 | `/fixtures` | Show the next 5 upcoming Everton matches | Everyone |
-| `/predict` | Submit a score prediction (rolling next-5 window) | Everyone |
+| `/predict` | Submit a score prediction (rolling next-5 window). Cup ties are labelled **EFL:** or **FA:** | Everyone |
 | `/listpredictions` | List everyone's predictions for the current/next fixture | Everyone (MODs see extra) |
 | `/myprediction` | View your own predictions | You only |
 | `/clearprediction` | Delete one of your predictions | You only |
@@ -215,7 +215,7 @@ Source: [evertonfc.com](https://www.evertonfc.com/matches/men/fixtures) (Jun 202
 
 Squads and scorer/team aliases: **[squad.md](squad.md)** (sync with `index.js`).
 
-**EFL Cup:** when added to `ALL_FIXTURES`, use `competition: "efl_cup"` — `/fixtures` shows **Paramount+** as the US stream automatically (no per-match `broadcast` needed unless overriding).
+**EFL Cup / FA Cup:** use `competition: "efl_cup"` or `"fa_cup"` on `ALL_FIXTURES`. `/predict` prefixes those matches with **EFL:** or **FA:**. EFL Cup `/fixtures` shows **Paramount+** as the US stream automatically (no per-match `broadcast` needed unless overriding).
 
 ---
 

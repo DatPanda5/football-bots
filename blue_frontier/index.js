@@ -369,7 +369,7 @@ function adminResetAllTimePoints() {
 //  srMatchId: SportRadar event ID — used by the auto result checker.
 //             Fill these in as fixtures get closer (IDs appear in the
 //             API ~2 weeks before kick-off).
-//  competition: preseason | premier_league | efl_cup
+//  competition: preseason | premier_league | efl_cup | fa_cup
 //  broadcast: optional US TV override; efl_cup defaults to Paramount+ when omitted.
 //  mainReferee, varReferee: optional — shown in /fixtures (after broadcast) and /predict modal.
 //  unlisted: optional — omit from /fixtures, /predict, and other fixture menus (e.g. future cup ties).
@@ -381,6 +381,18 @@ const DEFAULT_BROADCAST_BY_COMPETITION = {
 function getFixtureBroadcast(fixture) {
   if (fixture.broadcast) return fixture.broadcast;
   return DEFAULT_BROADCAST_BY_COMPETITION[fixture.competition] || null;
+}
+
+const COMPETITION_TITLE_PREFIX = {
+  efl_cup: "EFL: ",
+  fa_cup: "FA: ",
+};
+
+/** "EFL: Everton vs Wolverhampton Wanderers" for cup ties; otherwise "Home vs Away". */
+function getFixtureMatchTitle(fixture) {
+  if (!fixture) return "";
+  const prefix = COMPETITION_TITLE_PREFIX[fixture.competition] || "";
+  return `${prefix}${fixture.home} vs ${fixture.away}`;
 }
 
 function getFixtureRefereeLine(fixture) {
@@ -2164,7 +2176,7 @@ client.on("interactionCreate", async (interaction) => {
       const row = new ActionRowBuilder().addComponents(
         new StringSelectMenuBuilder().setCustomId("tbfc_select_fixture")
           .setPlaceholder("Click here to choose a match…")
-          .addOptions(upcoming.map((f) => ({ label: `${f.home} vs ${f.away}`, description: f.label, value: f.id })))
+          .addOptions(upcoming.map((f) => ({ label: getFixtureMatchTitle(f).slice(0, 100), description: f.label, value: f.id })))
       );
       await interaction.reply({
         content: `## 🔵 ${BOT_NAME} — Score Predictor\nWhich fixture do you want to predict?\n\n_↓ **Click the menu below** to pick a match → a form will open for score + optional scorers._`,
@@ -2186,7 +2198,7 @@ client.on("interactionCreate", async (interaction) => {
   function buildScoreModal(fixtureId) {
     const f = getFixtureById(fixtureId);
     if (!f) return null;
-    const modal = new ModalBuilder().setCustomId(`tbfc_score_modal_${fixtureId}`).setTitle(`${f.home} vs ${f.away}`);
+    const modal = new ModalBuilder().setCustomId(`tbfc_score_modal_${fixtureId}`).setTitle(getFixtureMatchTitle(f).slice(0, 45));
     if (f.mainReferee && f.varReferee) {
       modal.addComponents(
         new TextDisplayBuilder().setContent(`👮🏻‍♂️Ref: ${f.mainReferee} | VAR: ${f.varReferee}`)

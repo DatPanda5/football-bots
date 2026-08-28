@@ -6,6 +6,7 @@ Reverse chronological (newest first). Entries may be prefixed with `[blue_fronti
 
 ## 28 Aug 2026
 
+- **[blue_frontier] v3.6.5** — `/predict` match menu (and score modal title) prefixes cup ties: **EFL:** for `efl_cup`, **FA:** for `fa_cup` (e.g. `EFL: Everton vs Wolverhampton Wanderers`).
 - **[blue_frontier] v3.6.4** — **EFL Cup R3:** Everton vs Wolverhampton Wanderers at Hill Dickinson Stadium, Wed 09 Sep **2:45 PM EDT** (`EFLR3`, 19:45 BST). Wolves opponent squad refreshed from FotMob (Championship 2026–27). Scorer aliases for Hwang name order.
 
 ## 22 Aug 2026
