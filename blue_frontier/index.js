@@ -443,6 +443,8 @@ const ALL_FIXTURES = [
     competition: "premier_league",
     home: "AFC Bournemouth", away: "Everton", opponent: "AFC Bournemouth",
     evertonHome: false, venue: "Vitality Stadium", srMatchId: null,
+    broadcast: "Peacock",
+    mainReferee: "Chris Kavanagh", varReferee: "John Brooks",
   },
   {
     id: "MW3", kickoffUTC: "2026-09-05T14:00:00Z", label: "Sat 05 Sep 10:00 AM EDT",

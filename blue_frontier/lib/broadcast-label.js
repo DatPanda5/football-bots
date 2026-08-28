@@ -10,7 +10,8 @@ const CANONICAL = [
   { test: /usa\s*network/i, label: "USA" },
   { test: /^usa$/i, label: "USA" },
   { test: /espn/i, label: "ESPN" },
-  { test: /nbc/i, label: "NBC" },
+  // Over-the-air NBC only — do NOT map "NBC Sports Network" / NBCSN (cable) to NBC
+  { test: /^nbc$/i, label: "NBC" },
   { test: /fox\s*(one|sports|deportes)?/i, label: "FOX" },
   { test: /cbs\s*sports/i, label: "CBS" },
   { test: /telemundo/i, label: "Telemundo" },
