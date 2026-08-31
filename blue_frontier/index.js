@@ -1952,6 +1952,10 @@ function buildFixturesEmbed(fixtures, rangeLabel) {
     .setFooter({ text: BOT_FOOTER }).setTimestamp();
 }
 
+function formatTransferSection(lines) {
+  return lines.join("\n").slice(0, 1024);
+}
+
 function buildTransfersEmbed(scope = "all") {
   const data = EVERTON_TRANSFERS_2026_27;
   const showCompleted = scope === "all" || scope === "completed";
@@ -1985,13 +1989,13 @@ function buildTransfersEmbed(scope = "all") {
     if (ins.length) {
       embed.addFields({
         name: `✅ Incoming · ${inTotal}`,
-        value: ins.map(formatTransferInLine).join("\n\n").slice(0, 1024),
+        value: formatTransferSection(ins.map(formatTransferInLine)),
       });
     }
     if (outs.length) {
       embed.addFields({
         name: `✅ Outgoing · ${outTotal}`,
-        value: outs.map(formatTransferOutLine).join("\n\n").slice(0, 1024),
+        value: formatTransferSection(outs.map(formatTransferOutLine)),
       });
     }
   }
@@ -2003,13 +2007,13 @@ function buildTransfersEmbed(scope = "all") {
     if (pin?.length) {
       embed.addFields({
         name: `🟡 Incoming (rumoured) · ${pinTotal}`,
-        value: pin.map(formatTransferInLine).join("\n\n").slice(0, 1024),
+        value: formatTransferSection(pin.map(formatTransferInLine)),
       });
     }
     if (pout?.length) {
       embed.addFields({
         name: `🟡 Outgoing (rumoured) · ${poutTotal}`,
-        value: pout.map(formatTransferOutLine).join("\n\n").slice(0, 1024),
+        value: formatTransferSection(pout.map(formatTransferOutLine)),
       });
     }
     if (!pin?.length && !pout?.length) {
