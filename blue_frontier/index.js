@@ -684,10 +684,12 @@ const ALL_FIXTURES = [
 
 // ───────────────────────────────────────────────────────────────
 //  EVERTON TRANSFERS 2026-27 (summer window)
-//  Source: FotMob team page id=8668 (31 Aug 2026 / deadline day).
-//  Fees stored in EUR as reported by FotMob; GBP via ECB ref rate.
-//  For /transfers (not registered yet) — season summary of business.
+//  Completed: FotMob team page id=8668 (31 Aug 2026 / deadline day).
+//  Pending: Bobble / The Athletic (31 Aug 2026).
+//  Completed fees in EUR as reported by FotMob; GBP via ECB ref rate.
+//  Pending fees in GBP as reported. For /transfers (not registered yet).
 //  window: summer | winter; type: permanent | loan | free | undisclosed
+//  status: completed (in/out) | pending (pending.in / pending.out)
 // ───────────────────────────────────────────────────────────────
 const TRANSFER_EUR_GBP_RATE = 0.85648; // ECB EUR→GBP, 31 Aug 2026
 const TRANSFER_EUR_GBP_AS_OF = "2026-08-31";
@@ -762,6 +764,46 @@ const EVERTON_TRANSFERS_2026_27 = {
       feeEur: 0, feeGbp: 0, feeGbpText: "Free",
     },
   ],
+  pending: {
+    source: "Bobble/Athletic",
+    fetchedUTC: "2026-08-31T23:15:00Z",
+    in: [
+      {
+        player: "Folarin Balogun", pos: "ST", from: "Monaco",
+        status: "pending", window: "summer", type: "permanent",
+        feeGbp: 50_000_000, feeGbpText: "£50m",
+      },
+      {
+        player: "Retention fee", from: "Fulham",
+        status: "pending", window: "summer", type: "permanent",
+        feeGbp: 9_000_000, feeGbpText: "£9m",
+        notes: "Retention payment to Fulham (per Bobble/Athletic).",
+      },
+      {
+        player: "Jack Grealish", pos: "AM", from: "Manchester City",
+        status: "pending", window: "summer", type: "loan",
+        feeGbp: null, feeGbpText: "Loan",
+      },
+    ],
+    out: [
+      {
+        player: "Beto", pos: "ST", to: "Fiorentina",
+        status: "pending", window: "summer", type: "permanent",
+        feeGbpMax: 15_000_000, feeGbpText: "Up to £15m",
+      },
+      {
+        player: "Iliman Ndiaye", pos: "SS/RW", to: "Manchester City",
+        status: "pending", window: "summer", type: "permanent",
+        feeGbp: 60_000_000, feeGbpAddons: 5_000_000, feeGbpText: "£60m + £5m add-ons",
+      },
+      {
+        player: "Tim Iroegbunam", pos: "CM/DM",
+        status: "pending", window: "summer", type: "permanent",
+        feeGbpMax: 22_000_000, feeGbpText: "Up to £22m",
+        notes: "Destination not specified in Bobble/Athletic report.",
+      },
+    ],
+  },
 };
 
 // ───────────────────────────────────────────────────────────────
