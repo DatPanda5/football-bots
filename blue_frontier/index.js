@@ -772,7 +772,7 @@ const EVERTON_TRANSFERS_2026_27 = {
       {
         player: "Folarin Balogun", pos: "ST", from: "Monaco",
         status: "pending", window: "summer", type: "permanent",
-        feeGbp: 50_000_000, feeGbpText: "£50m",
+        feeGbp: 40_000_000, feeGbpText: "£40m",
       },
       {
         player: "Kenny Tete", pos: "RB", from: "Fulham",
