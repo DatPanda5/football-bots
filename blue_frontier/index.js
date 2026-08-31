@@ -684,10 +684,12 @@ const ALL_FIXTURES = [
 
 // ───────────────────────────────────────────────────────────────
 //  EVERTON TRANSFERS 2026-27 (summer window)
-//  Source: FotMob team page id=8668 (31 Aug 2026 / deadline day).
-//  Fees stored in EUR as reported by FotMob; GBP via ECB ref rate.
-//  For /transfers (not registered yet) — season summary of business.
-//  window: summer | winter; type: permanent | loan | free | undisclosed
+//  Completed: FotMob team page id=8668 (31 Aug 2026 / deadline day).
+//  Pending: Bobble / The Athletic (31 Aug 2026).
+//  Completed fees in EUR as reported by FotMob; GBP via ECB ref rate.
+//  Pending fees in GBP as reported. For /transfers (not registered yet).
+//  window: summer | winter; type: permanent | loan | free | undisclosed | swap
+//  status: completed (in/out) | pending (pending.in / pending.out)
 // ───────────────────────────────────────────────────────────────
 const TRANSFER_EUR_GBP_RATE = 0.85648; // ECB EUR→GBP, 31 Aug 2026
 const TRANSFER_EUR_GBP_AS_OF = "2026-08-31";
@@ -713,8 +715,9 @@ const EVERTON_TRANSFERS_2026_27 = {
   in: [
     {
       player: "Brennan Johnson", pos: "AM", from: "Crystal Palace",
-      date: "2026-08-11", window: "summer", type: "undisclosed",
-      feeEur: null, feeGbp: null, feeGbpText: "Undisclosed",
+      date: "2026-08-11", window: "summer", type: "swap",
+      feeEur: null, feeGbp: null, feeGbpText: "Straight swap",
+      notes: "Straight swap with Dwight McNeil (to Crystal Palace).",
     },
     {
       player: "Christian Nørgaard", pos: "DM", from: "Arsenal",
@@ -742,9 +745,9 @@ const EVERTON_TRANSFERS_2026_27 = {
     },
     {
       player: "Dwight McNeil", pos: "RW", to: "Crystal Palace",
-      date: "2026-08-11", window: "summer", type: "undisclosed",
-      feeEur: null, feeGbp: null, feeGbpText: "Undisclosed",
-      notes: "Part of Brennan Johnson deal.",
+      date: "2026-08-11", window: "summer", type: "swap",
+      feeEur: null, feeGbp: null, feeGbpText: "Straight swap",
+      notes: "Straight swap with Brennan Johnson (from Crystal Palace).",
     },
     {
       player: "Séamus Coleman", pos: "RWB", to: "Free agent",
@@ -762,7 +765,113 @@ const EVERTON_TRANSFERS_2026_27 = {
       feeEur: 0, feeGbp: 0, feeGbpText: "Free",
     },
   ],
+  pending: {
+    source: "Bobble/Athletic",
+    fetchedUTC: "2026-08-31T23:15:00Z",
+    in: [
+      {
+        player: "Folarin Balogun", pos: "ST", from: "Monaco",
+        status: "pending", window: "summer", type: "permanent",
+        feeGbp: 50_000_000, feeGbpText: "£50m",
+      },
+      {
+        player: "Kenny Tete", pos: "RB", from: "Fulham",
+        status: "pending", window: "summer", type: "permanent",
+        feeGbp: 9_000_000, feeGbpText: "£9m",
+      },
+      {
+        player: "Jack Grealish", pos: "AM", from: "Manchester City",
+        status: "pending", window: "summer", type: "loan",
+        feeGbp: null, feeGbpText: "Loan",
+      },
+    ],
+    out: [
+      {
+        player: "Beto", pos: "ST", to: "Fiorentina",
+        status: "pending", window: "summer", type: "permanent",
+        feeGbpMax: 15_000_000, feeGbpText: "Up to £15m",
+      },
+      {
+        player: "Iliman Ndiaye", pos: "SS/RW", to: "Manchester City",
+        status: "pending", window: "summer", type: "permanent",
+        feeGbp: 60_000_000, feeGbpAddons: 5_000_000, feeGbpText: "£60m + £5m add-ons",
+      },
+      {
+        player: "Tim Iroegbunam", pos: "CM/DM", to: "Hull City",
+        status: "pending", window: "summer", type: "permanent",
+        feeGbpMax: 22_000_000, feeGbpText: "Up to £22m",
+      },
+    ],
+  },
 };
+
+function formatTransferShortDate(dateStr) {
+  if (!dateStr) return null;
+  return new Date(`${dateStr}T12:00:00Z`).toLocaleDateString("en-GB", {
+    day: "numeric", month: "short", timeZone: "UTC",
+  });
+}
+
+function formatTransferLoanUntil(loanUntil) {
+  if (!loanUntil) return null;
+  return new Date(`${loanUntil}T12:00:00Z`).toLocaleDateString("en-GB", {
+    month: "short", year: "numeric", timeZone: "UTC",
+  });
+}
+
+function formatTransferInLine(t) {
+  const fee = t.feeGbpText || "—";
+  const lines = [`**${t.player}** (${t.pos}) ← ${t.from}`];
+  const meta = [t.date ? formatTransferShortDate(t.date) : null, fee].filter(Boolean).join(" · ");
+  lines.push(`　${meta}`);
+  if (t.notes) lines.push(`　_${t.notes}_`);
+  return lines.join("\n");
+}
+
+function formatTransferOutLine(t) {
+  const fee = t.feeGbpText || "—";
+  const dest = t.to || "TBC";
+  const lines = [`**${t.player}** (${t.pos}) → ${dest}`];
+  const metaParts = [t.date ? formatTransferShortDate(t.date) : null, fee];
+  if (t.loanUntil) metaParts.push(`until ${formatTransferLoanUntil(t.loanUntil)}`);
+  lines.push(`　${metaParts.filter(Boolean).join(" · ")}`);
+  if (t.notes) lines.push(`　_${t.notes}_`);
+  return lines.join("\n");
+}
+
+function sortTransfersByDateDesc(list) {
+  return [...list].sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+}
+
+/** Sum cash fees on a transfer list (excludes loan/swap/free). */
+function sumTransferListFees(list) {
+  let fixed = 0;
+  let upTo = 0;
+  let addons = 0;
+  for (const t of list) {
+    if (t.type === "loan" || t.type === "swap" || t.type === "free") continue;
+    if (t.feeGbp != null && t.feeGbp > 0) {
+      fixed += t.feeGbp;
+      if (t.feeGbpAddons) addons += t.feeGbpAddons;
+    } else if (t.feeGbpMax != null) {
+      upTo += t.feeGbpMax;
+    }
+  }
+  return { fixed, upTo, addons, max: fixed + upTo + addons };
+}
+
+function formatFeeTotalSummary(list) {
+  const { fixed, upTo, addons, max } = sumTransferListFees(list);
+  if (fixed === 0 && upTo === 0) return "£0";
+  if (upTo > 0 && fixed === 0 && addons === 0) return `up to ${gbpMillionsText(max)}`;
+  if (upTo > 0) return `up to ${gbpMillionsText(max)}`;
+  if (addons > 0) return `${gbpMillionsText(fixed)} + ${gbpMillionsText(addons)} add-ons`;
+  return gbpMillionsText(fixed);
+}
+
+function sumCompletedSpendIn(transfers = EVERTON_TRANSFERS_2026_27) {
+  return sumTransferListFees(transfers.in).fixed;
+}
 
 // ───────────────────────────────────────────────────────────────
 //  EVERTON SQUAD 2026-27 — keep in sync with squad.md
@@ -1688,6 +1797,13 @@ const commands = [
       // Discord caps addChoices at 25 — show only the next 25 upcoming fixtures (or all if fewer).
       .addChoices(...ALL_FIXTURES.filter(isUpcomingFixture).slice(0, 25).map((f) => ({ name: `${f.home} vs ${f.away} (${f.label})`, value: f.id })))),
   new SlashCommandBuilder().setName("fixtures").setDescription("Show the next 5 upcoming Everton fixtures"),
+  new SlashCommandBuilder().setName("transfers").setDescription("Everton 2026-27 summer transfer window")
+    .addStringOption((o) => o.setName("scope").setDescription("Completed deals, pending rumours, or both").setRequired(false)
+      .addChoices(
+        { name: "All (completed + pending)", value: "all" },
+        { name: "Completed only", value: "completed" },
+        { name: "Pending rumours only", value: "pending" },
+      )),
   new SlashCommandBuilder().setName("help")
     .setDescription("Show Blue Frontier Committee commands (only visible to you)"),
   new SlashCommandBuilder().setName("clearprediction").setDescription("Delete one of your predictions")
@@ -1834,6 +1950,93 @@ function buildFixturesEmbed(fixtures, rangeLabel) {
   return new EmbedBuilder().setColor(BOT_COLOUR).setTitle(title)
     .setDescription(rows.join("\n\n") || "_No upcoming fixtures found._")
     .setFooter({ text: BOT_FOOTER }).setTimestamp();
+}
+
+function buildTransfersEmbed(scope = "all") {
+  const data = EVERTON_TRANSFERS_2026_27;
+  const showCompleted = scope === "all" || scope === "completed";
+  const showPending = scope === "all" || scope === "pending";
+
+  const title = scope === "completed"
+    ? "🔵 Everton Transfers 2026-27 — Completed"
+    : scope === "pending"
+      ? "🔵 Everton Transfers 2026-27 — Pending"
+      : "🔵 Everton Transfers 2026-27 (Summer)";
+
+  const embed = new EmbedBuilder()
+    .setColor(BOT_COLOUR)
+    .setTitle(title)
+    .setFooter({ text: BOT_FOOTER })
+    .setTimestamp(new Date(data.pending?.fetchedUTC || data.fetchedUTC));
+
+  if (showCompleted && showPending) {
+    embed.setDescription("_Completed (FotMob) · Pending rumours (Bobble/Athletic)_");
+  } else if (showCompleted) {
+    embed.setDescription(`_Source: ${data.source} · ECB rate ${data.eurGbpAsOf}_`);
+  } else if (showPending && data.pending) {
+    embed.setDescription(`_Source: ${data.pending.source}_`);
+  }
+
+  if (showCompleted) {
+    const ins = sortTransfersByDateDesc(data.in);
+    const outs = sortTransfersByDateDesc(data.out);
+    const inTotal = formatFeeTotalSummary(data.in);
+    const outTotal = formatFeeTotalSummary(data.out);
+    if (ins.length) {
+      embed.addFields({
+        name: `✅ Incoming · ${inTotal}`,
+        value: ins.map(formatTransferInLine).join("\n\n").slice(0, 1024),
+      });
+    }
+    if (outs.length) {
+      embed.addFields({
+        name: `✅ Outgoing · ${outTotal}`,
+        value: outs.map(formatTransferOutLine).join("\n\n").slice(0, 1024),
+      });
+    }
+  }
+
+  if (showPending && data.pending) {
+    const { in: pin, out: pout } = data.pending;
+    const pinTotal = pin?.length ? formatFeeTotalSummary(pin) : null;
+    const poutTotal = pout?.length ? formatFeeTotalSummary(pout) : null;
+    if (pin?.length) {
+      embed.addFields({
+        name: `🟡 Incoming (rumoured) · ${pinTotal}`,
+        value: pin.map(formatTransferInLine).join("\n\n").slice(0, 1024),
+      });
+    }
+    if (pout?.length) {
+      embed.addFields({
+        name: `🟡 Outgoing (rumoured) · ${poutTotal}`,
+        value: pout.map(formatTransferOutLine).join("\n\n").slice(0, 1024),
+      });
+    }
+    if (!pin?.length && !pout?.length) {
+      embed.addFields({ name: "🟡 Pending", value: "_No pending rumours on file._" });
+    }
+  } else if (showPending) {
+    embed.addFields({ name: "🟡 Pending", value: "_No pending rumours on file._" });
+  }
+
+  const summaryLines = [];
+  if (showCompleted) {
+    summaryLines.push(`✅ In **${formatFeeTotalSummary(data.in)}** · Out **${formatFeeTotalSummary(data.out)}**`);
+  }
+  if (showPending && data.pending) {
+    const pin = data.pending.in || [];
+    const pout = data.pending.out || [];
+    if (pin.length || pout.length) {
+      summaryLines.push(
+        `🟡 Pending in **${pin.length ? formatFeeTotalSummary(pin) : "£0"}** · Pending out **${pout.length ? formatFeeTotalSummary(pout) : "£0"}**`
+      );
+    }
+  }
+  if (summaryLines.length) {
+    embed.addFields({ name: "💷 Totals", value: summaryLines.join("\n") });
+  }
+
+  return embed;
 }
 
 async function buildListEmbed(fixture, guild) {
@@ -2183,6 +2386,11 @@ client.on("interactionCreate", async (interaction) => {
     });
   }
 
+  if (interaction.isChatInputCommand() && interaction.commandName === "transfers") {
+    const scope = interaction.options.getString("scope") || "all";
+    return interaction.reply({ embeds: [buildTransfersEmbed(scope)] });
+  }
+
   if (interaction.isButton() && (
     interaction.customId.startsWith("tbfc_fixtures_prev:") ||
     interaction.customId.startsWith("tbfc_fixtures_next:")
@@ -2210,6 +2418,7 @@ client.on("interactionCreate", async (interaction) => {
     const isBlueFrontierGuild = BLUE_FRONTIER_GUILD_ID && interaction.guildId === BLUE_FRONTIER_GUILD_ID;
     const descLines = [
       "**/fixtures** — show the next 5 Everton matches.",
+      "**/transfers [scope]** — summer window ins/outs (completed + rumours).",
       "**/predict** — submit a score prediction (Everton vs opponent).",
       "**/myprediction** — view your own predictions (only you can see).",
       "**/listpredictions** — list predictions (one fixture, or last 2 completed matches).",
