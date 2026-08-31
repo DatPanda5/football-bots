@@ -1956,6 +1956,12 @@ function formatTransferSection(lines) {
   return lines.join("\n").slice(0, 1024);
 }
 
+function appendTransferSection(lines, header, players, formatter) {
+  if (lines.length) lines.push("");
+  lines.push(header);
+  for (const player of players) lines.push(formatter(player));
+}
+
 function buildTransfersEmbed(scope = "all") {
   const data = EVERTON_TRANSFERS_2026_27;
   const showCompleted = scope === "all" || scope === "completed";
@@ -1967,60 +1973,45 @@ function buildTransfersEmbed(scope = "all") {
       ? "🔵 Everton Transfers 2026-27 — Pending"
       : "🔵 Everton Transfers 2026-27 (Summer)";
 
-  const embed = new EmbedBuilder()
-    .setColor(BOT_COLOUR)
-    .setTitle(title)
-    .setFooter({ text: BOT_FOOTER })
-    .setTimestamp(new Date(data.pending?.fetchedUTC || data.fetchedUTC));
-
+  const lines = [];
   if (showCompleted && showPending) {
-    embed.setDescription("_Completed (FotMob) · Pending rumours (Bobble/Athletic)_");
+    lines.push("_Completed (FotMob) · Pending rumours (Bobble/Athletic)_");
   } else if (showCompleted) {
-    embed.setDescription(`_Source: ${data.source} · ECB rate ${data.eurGbpAsOf}_`);
+    lines.push(`_Source: ${data.source} · ECB rate ${data.eurGbpAsOf}_`);
   } else if (showPending && data.pending) {
-    embed.setDescription(`_Source: ${data.pending.source}_`);
+    lines.push(`_Source: ${data.pending.source}_`);
   }
 
   if (showCompleted) {
     const ins = sortTransfersByDateDesc(data.in);
     const outs = sortTransfersByDateDesc(data.out);
-    const inTotal = formatFeeTotalSummary(data.in);
-    const outTotal = formatFeeTotalSummary(data.out);
-    if (ins.length) {
-      embed.addFields({
-        name: `✅ Incoming · ${inTotal}`,
-        value: formatTransferSection(ins.map(formatTransferInLine)),
-      });
-    }
-    if (outs.length) {
-      embed.addFields({
-        name: `✅ Outgoing · ${outTotal}`,
-        value: formatTransferSection(outs.map(formatTransferOutLine)),
-      });
-    }
+    appendTransferSection(lines, `**✅ Incoming · ${formatFeeTotalSummary(data.in)}**`, ins, formatTransferInLine);
+    appendTransferSection(lines, `**✅ Outgoing · ${formatFeeTotalSummary(data.out)}**`, outs, formatTransferOutLine);
   }
 
   if (showPending && data.pending) {
     const { in: pin, out: pout } = data.pending;
-    const pinTotal = pin?.length ? formatFeeTotalSummary(pin) : null;
-    const poutTotal = pout?.length ? formatFeeTotalSummary(pout) : null;
     if (pin?.length) {
-      embed.addFields({
-        name: `🟡 Incoming (rumoured) · ${pinTotal}`,
-        value: formatTransferSection(pin.map(formatTransferInLine)),
-      });
+      appendTransferSection(
+        lines,
+        `**🟡 Incoming (rumoured) · ${formatFeeTotalSummary(pin)}**`,
+        pin,
+        formatTransferInLine
+      );
     }
     if (pout?.length) {
-      embed.addFields({
-        name: `🟡 Outgoing (rumoured) · ${poutTotal}`,
-        value: formatTransferSection(pout.map(formatTransferOutLine)),
-      });
+      appendTransferSection(
+        lines,
+        `**🟡 Outgoing (rumoured) · ${formatFeeTotalSummary(pout)}**`,
+        pout,
+        formatTransferOutLine
+      );
     }
     if (!pin?.length && !pout?.length) {
-      embed.addFields({ name: "🟡 Pending", value: "_No pending rumours on file._" });
+      appendTransferSection(lines, "**🟡 Pending**", ["_No pending rumours on file._"], (s) => s);
     }
   } else if (showPending) {
-    embed.addFields({ name: "🟡 Pending", value: "_No pending rumours on file._" });
+    appendTransferSection(lines, "**🟡 Pending**", ["_No pending rumours on file._"], (s) => s);
   }
 
   const summaryLines = [];
@@ -2037,10 +2028,15 @@ function buildTransfersEmbed(scope = "all") {
     }
   }
   if (summaryLines.length) {
-    embed.addFields({ name: "💷 Totals", value: summaryLines.join("\n") });
+    appendTransferSection(lines, "**💷 Totals**", summaryLines, (s) => s);
   }
 
-  return embed;
+  return new EmbedBuilder()
+    .setColor(BOT_COLOUR)
+    .setTitle(title)
+    .setDescription(lines.join("\n").slice(0, 4096) || "_No transfers on file._")
+    .setFooter({ text: BOT_FOOTER })
+    .setTimestamp(new Date(data.pending?.fetchedUTC || data.fetchedUTC));
 }
 
 async function buildListEmbed(fixture, guild) {
