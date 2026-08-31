@@ -683,6 +683,88 @@ const ALL_FIXTURES = [
 ];
 
 // ───────────────────────────────────────────────────────────────
+//  EVERTON TRANSFERS 2026-27 (summer window)
+//  Source: FotMob team page id=8668 (31 Aug 2026 / deadline day).
+//  Fees stored in EUR as reported by FotMob; GBP via ECB ref rate.
+//  For /transfers (not registered yet) — season summary of business.
+//  window: summer | winter; type: permanent | loan | free | undisclosed
+// ───────────────────────────────────────────────────────────────
+const TRANSFER_EUR_GBP_RATE = 0.85648; // ECB EUR→GBP, 31 Aug 2026
+const TRANSFER_EUR_GBP_AS_OF = "2026-08-31";
+const TRANSFER_SEASON = "2026-27";
+
+function eurToGbp(eur) {
+  if (eur == null) return null;
+  return Math.round(eur * TRANSFER_EUR_GBP_RATE);
+}
+
+function gbpMillionsText(gbp) {
+  if (gbp == null) return null;
+  return `£${(gbp / 1e6).toFixed(2)}m`;
+}
+
+const EVERTON_TRANSFERS_2026_27 = {
+  season: TRANSFER_SEASON,
+  source: "FotMob",
+  sourceTeamId: 8668,
+  fetchedUTC: "2026-08-31T22:25:00Z",
+  eurGbpRate: TRANSFER_EUR_GBP_RATE,
+  eurGbpAsOf: TRANSFER_EUR_GBP_AS_OF,
+  in: [
+    {
+      player: "Brennan Johnson", pos: "AM", from: "Crystal Palace",
+      date: "2026-08-11", window: "summer", type: "undisclosed",
+      feeEur: null, feeGbp: null, feeGbpText: "Undisclosed",
+    },
+    {
+      player: "Christian Nørgaard", pos: "DM", from: "Arsenal",
+      date: "2026-08-05", window: "summer", type: "permanent",
+      feeEur: 8_000_000, feeGbp: eurToGbp(8_000_000), feeGbpText: gbpMillionsText(eurToGbp(8_000_000)),
+    },
+    {
+      player: "Hayden Hackney", pos: "DM", from: "Middlesbrough",
+      date: "2026-07-02", window: "summer", type: "permanent",
+      feeEur: 19_300_000, feeGbp: eurToGbp(19_300_000), feeGbpText: gbpMillionsText(eurToGbp(19_300_000)),
+    },
+    {
+      player: "Merlin Röhl", pos: "RW", from: "Freiburg",
+      date: "2026-07-01", window: "summer", type: "permanent",
+      feeEur: 25_000_000, feeGbp: eurToGbp(25_000_000), feeGbpText: gbpMillionsText(eurToGbp(25_000_000)),
+      notes: "Made permanent after 2025-26 loan (€2m loan fee last season, not counted here).",
+    },
+  ],
+  out: [
+    {
+      player: "Adam Aznou", pos: "LB", to: "Málaga",
+      date: "2026-08-31", window: "summer", type: "loan",
+      loanUntil: "2027-06-30",
+      feeEur: null, feeGbp: null, feeGbpText: "Loan",
+    },
+    {
+      player: "Dwight McNeil", pos: "RW", to: "Crystal Palace",
+      date: "2026-08-11", window: "summer", type: "undisclosed",
+      feeEur: null, feeGbp: null, feeGbpText: "Undisclosed",
+      notes: "Part of Brennan Johnson deal.",
+    },
+    {
+      player: "Séamus Coleman", pos: "RWB", to: "Free agent",
+      date: "2026-07-01", window: "summer", type: "free",
+      feeEur: 0, feeGbp: 0, feeGbpText: "Free",
+    },
+    {
+      player: "Tyler Onyango", pos: "RWB", to: "Free agent",
+      date: "2026-07-01", window: "summer", type: "free",
+      feeEur: 0, feeGbp: 0, feeGbpText: "Free",
+    },
+    {
+      player: "Idrissa Gueye", pos: "DM", to: "Free agent",
+      date: "2026-07-01", window: "summer", type: "free",
+      feeEur: 0, feeGbp: 0, feeGbpText: "Free",
+    },
+  ],
+};
+
+// ───────────────────────────────────────────────────────────────
 //  EVERTON SQUAD 2026-27 — keep in sync with squad.md
 // ───────────────────────────────────────────────────────────────
 const EVERTON_SQUAD_2025_26 = [
