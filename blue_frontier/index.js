@@ -688,7 +688,7 @@ const ALL_FIXTURES = [
 //  Pending: Bobble / The Athletic (31 Aug 2026).
 //  Completed fees in EUR as reported by FotMob; GBP via ECB ref rate.
 //  Pending fees in GBP as reported. For /transfers (not registered yet).
-//  window: summer | winter; type: permanent | loan | free | undisclosed
+//  window: summer | winter; type: permanent | loan | free | undisclosed | swap
 //  status: completed (in/out) | pending (pending.in / pending.out)
 // ───────────────────────────────────────────────────────────────
 const TRANSFER_EUR_GBP_RATE = 0.85648; // ECB EUR→GBP, 31 Aug 2026
@@ -715,8 +715,9 @@ const EVERTON_TRANSFERS_2026_27 = {
   in: [
     {
       player: "Brennan Johnson", pos: "AM", from: "Crystal Palace",
-      date: "2026-08-11", window: "summer", type: "undisclosed",
-      feeEur: null, feeGbp: null, feeGbpText: "Undisclosed",
+      date: "2026-08-11", window: "summer", type: "swap",
+      feeEur: null, feeGbp: null, feeGbpText: "Straight swap",
+      notes: "Straight swap with Dwight McNeil (to Crystal Palace).",
     },
     {
       player: "Christian Nørgaard", pos: "DM", from: "Arsenal",
@@ -744,9 +745,9 @@ const EVERTON_TRANSFERS_2026_27 = {
     },
     {
       player: "Dwight McNeil", pos: "RW", to: "Crystal Palace",
-      date: "2026-08-11", window: "summer", type: "undisclosed",
-      feeEur: null, feeGbp: null, feeGbpText: "Undisclosed",
-      notes: "Part of Brennan Johnson deal.",
+      date: "2026-08-11", window: "summer", type: "swap",
+      feeEur: null, feeGbp: null, feeGbpText: "Straight swap",
+      notes: "Straight swap with Brennan Johnson (from Crystal Palace).",
     },
     {
       player: "Séamus Coleman", pos: "RWB", to: "Free agent",
