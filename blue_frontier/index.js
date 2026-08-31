@@ -797,10 +797,9 @@ const EVERTON_TRANSFERS_2026_27 = {
         feeGbp: 60_000_000, feeGbpAddons: 5_000_000, feeGbpText: "£60m + £5m add-ons",
       },
       {
-        player: "Tim Iroegbunam", pos: "CM/DM",
+        player: "Tim Iroegbunam", pos: "CM/DM", to: "Hull City",
         status: "pending", window: "summer", type: "permanent",
         feeGbpMax: 22_000_000, feeGbpText: "Up to £22m",
-        notes: "Destination not specified in Bobble/Athletic report.",
       },
     ],
   },
@@ -844,10 +843,34 @@ function sortTransfersByDateDesc(list) {
   return [...list].sort((a, b) => (b.date || "").localeCompare(a.date || ""));
 }
 
+/** Sum cash fees on a transfer list (excludes loan/swap/free). */
+function sumTransferListFees(list) {
+  let fixed = 0;
+  let upTo = 0;
+  let addons = 0;
+  for (const t of list) {
+    if (t.type === "loan" || t.type === "swap" || t.type === "free") continue;
+    if (t.feeGbp != null && t.feeGbp > 0) {
+      fixed += t.feeGbp;
+      if (t.feeGbpAddons) addons += t.feeGbpAddons;
+    } else if (t.feeGbpMax != null) {
+      upTo += t.feeGbpMax;
+    }
+  }
+  return { fixed, upTo, addons, max: fixed + upTo + addons };
+}
+
+function formatFeeTotalSummary(list) {
+  const { fixed, upTo, addons, max } = sumTransferListFees(list);
+  if (fixed === 0 && upTo === 0) return "£0";
+  if (upTo > 0 && fixed === 0 && addons === 0) return `up to ${gbpMillionsText(max)}`;
+  if (upTo > 0) return `up to ${gbpMillionsText(max)}`;
+  if (addons > 0) return `${gbpMillionsText(fixed)} + ${gbpMillionsText(addons)} add-ons`;
+  return gbpMillionsText(fixed);
+}
+
 function sumCompletedSpendIn(transfers = EVERTON_TRANSFERS_2026_27) {
-  return transfers.in
-    .filter((t) => t.feeGbp != null && t.feeGbp > 0)
-    .reduce((sum, t) => sum + t.feeGbp, 0);
+  return sumTransferListFees(transfers.in).fixed;
 }
 
 // ───────────────────────────────────────────────────────────────
@@ -1957,39 +1980,35 @@ function buildTransfersEmbed(scope = "all") {
   if (showCompleted) {
     const ins = sortTransfersByDateDesc(data.in);
     const outs = sortTransfersByDateDesc(data.out);
+    const inTotal = formatFeeTotalSummary(data.in);
+    const outTotal = formatFeeTotalSummary(data.out);
     if (ins.length) {
       embed.addFields({
-        name: "✅ Incoming",
+        name: `✅ Incoming · ${inTotal}`,
         value: ins.map(formatTransferInLine).join("\n\n").slice(0, 1024),
       });
     }
     if (outs.length) {
       embed.addFields({
-        name: "✅ Outgoing",
+        name: `✅ Outgoing · ${outTotal}`,
         value: outs.map(formatTransferOutLine).join("\n\n").slice(0, 1024),
-      });
-    }
-    const spend = sumCompletedSpendIn(data);
-    if (spend > 0) {
-      embed.addFields({
-        name: "💷 Disclosed spend (in)",
-        value: `**${gbpMillionsText(spend)}** on permanent signings`,
-        inline: true,
       });
     }
   }
 
   if (showPending && data.pending) {
     const { in: pin, out: pout } = data.pending;
+    const pinTotal = pin?.length ? formatFeeTotalSummary(pin) : null;
+    const poutTotal = pout?.length ? formatFeeTotalSummary(pout) : null;
     if (pin?.length) {
       embed.addFields({
-        name: "🟡 Incoming (rumoured)",
+        name: `🟡 Incoming (rumoured) · ${pinTotal}`,
         value: pin.map(formatTransferInLine).join("\n\n").slice(0, 1024),
       });
     }
     if (pout?.length) {
       embed.addFields({
-        name: "🟡 Outgoing (rumoured)",
+        name: `🟡 Outgoing (rumoured) · ${poutTotal}`,
         value: pout.map(formatTransferOutLine).join("\n\n").slice(0, 1024),
       });
     }
@@ -1998,6 +2017,23 @@ function buildTransfersEmbed(scope = "all") {
     }
   } else if (showPending) {
     embed.addFields({ name: "🟡 Pending", value: "_No pending rumours on file._" });
+  }
+
+  const summaryLines = [];
+  if (showCompleted) {
+    summaryLines.push(`✅ In **${formatFeeTotalSummary(data.in)}** · Out **${formatFeeTotalSummary(data.out)}**`);
+  }
+  if (showPending && data.pending) {
+    const pin = data.pending.in || [];
+    const pout = data.pending.out || [];
+    if (pin.length || pout.length) {
+      summaryLines.push(
+        `🟡 Pending in **${pin.length ? formatFeeTotalSummary(pin) : "£0"}** · Pending out **${pout.length ? formatFeeTotalSummary(pout) : "£0"}**`
+      );
+    }
+  }
+  if (summaryLines.length) {
+    embed.addFields({ name: "💷 Totals", value: summaryLines.join("\n") });
   }
 
   return embed;
