@@ -775,10 +775,9 @@ const EVERTON_TRANSFERS_2026_27 = {
         feeGbp: 50_000_000, feeGbpText: "£50m",
       },
       {
-        player: "Retention fee", from: "Fulham",
+        player: "Kenny Tete", pos: "RB", from: "Fulham",
         status: "pending", window: "summer", type: "permanent",
         feeGbp: 9_000_000, feeGbpText: "£9m",
-        notes: "Retention payment to Fulham (per Bobble/Athletic).",
       },
       {
         player: "Jack Grealish", pos: "AM", from: "Manchester City",
