@@ -1,6 +1,6 @@
 #!/bin/bash
 # Open Terminal and run the given lab action so you see output (and for start: live log tail).
-# Usage: run-in-terminal.sh start | stop | restart | port
+# Usage: run-in-terminal.sh start | stop | restart | port | deploy
 # Called from Alfred so Terminal opens and shows progress (e.g. tbflabport → see DB synced).
 
 REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
@@ -30,8 +30,13 @@ EOF
 echo '' && echo '  📥 Porting production DB to lab...' && echo '' && cd "$REPO_ROOT" && ./blue_frontier/lab/port-production-to-lab.sh; echo ''; echo '  Press Enter to close...'; read
 EOF
     ;;
+  deploy)
+    cat > "$CMD_FILE" << EOF
+echo '' && echo '  🚀 Deploying Blue Frontier LAB (branch lab → Railway)...' && echo '' && cd "$REPO_ROOT" && ./blue_frontier/lab/deploy-lab.sh; echo ''; echo '  Press Enter to close...'; read
+EOF
+    ;;
   *)
-    echo "Usage: $0 {start|stop|restart|port}"
+    echo "Usage: $0 {start|stop|restart|port|deploy}"
     exit 1
     ;;
 esac

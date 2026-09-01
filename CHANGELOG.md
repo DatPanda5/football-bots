@@ -4,6 +4,10 @@ Reverse chronological (newest first). Entries may be prefixed with `[blue_fronti
 
 ---
 
+## 1 Sep 2026
+
+- **[blue_frontier lab]** — Lab is Railway-first (service **Blue-Frontier-LAB**, Git branch **`lab`**), matching WokeDyche-LAB. Added **`deploy-lab.sh`** (merge main → lab, push `origin/lab` only) and **[lab/RAILWAY_VARIABLES_LAB.md](blue_frontier/lab/RAILWAY_VARIABLES_LAB.md)**. Optional `BLUE_FRONTIER_ENV=lab` logs `(lab)` on ready and skips the missing results-channel warning. Local `lab-frontier.sh` remains a fallback. Production still deploys from **main** via `./deploy.sh`.
+
 ## 28 Aug 2026
 
 - **[blue_frontier] v3.6.5** — `/predict` match menu (and score modal title) prefixes cup ties: **EFL:** for `efl_cup`, **FA:** for `fa_cup` (e.g. `EFL: Everton vs Wolverhampton Wanderers`).

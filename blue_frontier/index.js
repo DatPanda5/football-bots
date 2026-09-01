@@ -51,6 +51,8 @@ function validateEnv() {
 
 validateEnv();
 
+const IS_LAB = (process.env.BLUE_FRONTIER_ENV || "").toLowerCase() === "lab";
+
 // ═══════════════════════════════════════════════════════════════
 //  THE BLUE FRONTIER COMMITTEE — Discord Bot
 // ═══════════════════════════════════════════════════════════════
@@ -2336,7 +2338,7 @@ client.on("disconnect", () => {
 
 client.on("clientReady", () => {
   if (wasDisconnected) { wasDisconnected = false; console.log(`[${BOT_NAME}] ✅ Reconnected!`); }
-  else console.log(`[${BOT_NAME}] ✅ Online as ${client.user.tag}`);
+  else console.log(`[${BOT_NAME}] ✅ Online as ${client.user.tag}${IS_LAB ? " (lab)" : ""}`);
 
   // On startup: re-schedule auto-checkers for any kicked-off, not-yet-finalised fixtures
   const resultsChannelId = getResultsChannelId();
@@ -2361,7 +2363,7 @@ client.on("clientReady", () => {
     }, 5000);
     console.log(`[${BOT_NAME}] Kickoff lock catch-up: ${kickoffCatchUpFixtures.length} fixture(s) (post in 5s).`);
   }
-  if (!resultsChannelId && !process.env.DOTENV_CONFIG_PATH) {
+  if (!resultsChannelId && !process.env.DOTENV_CONFIG_PATH && !IS_LAB) {
     console.warn(`[${BOT_NAME}] ⚠️ No RESULTS_CHANNEL_ID / PREDICTIONS_CHANNEL_ID in .env — auto result checker disabled.`);
   }
 });

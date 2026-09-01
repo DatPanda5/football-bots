@@ -23,7 +23,7 @@ npm start
 
 Run the bot on your Mac and test it in your test server **before** deploying to Railway.
 
-**For the Blue Frontier Lab** (Alfred **tbflabon** / **tbflabpush** / **tbflaboff**): use **`blue_frontier/lab/.env.lab`** so the lab never uses production credentials. Copy `lab/.env.lab.example` to `lab/.env.lab` and fill in the lab bot’s token/IDs — see [lab/README.md](lab/README.md).
+**For the Blue Frontier Lab** (Railway **Blue-Frontier-LAB**, branch `lab`): use a **separate Discord app** and the variables in [lab/RAILWAY_VARIABLES_LAB.md](lab/RAILWAY_VARIABLES_LAB.md). Local fallback still uses **`blue_frontier/lab/.env.lab`** — see [lab/README.md](lab/README.md).
 
 ### Step 1: One-time setup
 
@@ -133,10 +133,10 @@ From the **football-bots** repo root, run `./deploy.sh` or `./deploy.sh "Your co
 
 | Environment | Where it runs | Alfred keyword |
 |-------------|---------------|----------------|
-| **Production** | Railway → The Blue Frontier server | **updatetbf** — commit + push main → Railway deploys |
-| **Blue Frontier Lab** | Local (your Mac); test in server **DATPANDA BOT TESTING** | **tbflabon** = start lab, **tbflabpush** = restart lab, **tbflaboff** = stop lab |
+| **Production** | Railway (branch **main**) → The Blue Frontier server | **updatetbf** — `./deploy.sh` commit + push **main** |
+| **Blue Frontier Lab** | Railway **Blue-Frontier-LAB** (branch **lab**) → **DATPANDA BOT TESTING** | **tbflabpush** → `deploy-lab.sh` (push **lab** only). Local start/stop still available as fallback. |
 
-**tbf** = The Blue Frontier (so you can reuse the pattern for other bots, e.g. wdlabon for WokeDyche). Lab uses a separate Discord app and **`blue_frontier/lab/.env.lab`** (never `.env`); production uses Railway variables only. Lab-only script and runtime files live in **blue_frontier/lab/** (see [lab/README.md](lab/README.md)). Run the regression checklist in the lab before **updatetbf** (see PROJECT_STATUS_SUMMARY or the plan in `.cursor/plans`).
+**tbf** = The Blue Frontier (same pattern as WokeDyche-LAB). Lab uses a separate Discord app; **never** put the production token on the lab service. Variable list: [lab/RAILWAY_VARIABLES_LAB.md](lab/RAILWAY_VARIABLES_LAB.md). Lab-only files live in **blue_frontier/lab/**. Run the regression checklist in the lab before **updatetbf**.
 
 ---
 

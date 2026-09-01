@@ -1,9 +1,8 @@
 #!/bin/bash
 set -e
 
-# Blue Frontier Bot — Update & Deploy Script (PRODUCTION only).
-# Run from football-bots repo root or any subfolder. Pushing triggers Railway auto-deploy.
-# Alfred: updatetbf. For local lab (DATPANDA BOT TESTING), use blue_frontier/lab/lab-frontier.sh via ./lab-frontier.sh and tbflabon/tbflabpush/tbflaboff.
+# Blue Frontier Bot — Update & Deploy Script (PRODUCTION only — pushes current branch, usually main).
+# Alfred: updatetbf. Lab Railway: blue_frontier/lab/deploy-lab.sh (branch lab only). Optional local lab: ./lab-frontier.sh.
 # If git push fails from Alfred (e.g. "Permission denied"), run the same commands in Terminal so SSH/credential helper is available.
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
