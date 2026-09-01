@@ -14,7 +14,6 @@
 | 5 | Michael Keane | CB |
 | 6 | James Tarkowski | CB |
 | 8 | Kiernan Dewsbury-Hall | CM |
-| 10 | Iliman Ndiaye | SS/RW |
 | 11 | Thierno Barry | ST |
 | 12 | Mark Travers | GK |
 | 15 | Jake O'Brien | CB |
