@@ -754,6 +754,11 @@ const EVERTON_TRANSFERS_2026_27 = {
       feeGbpMax: 15_000_000, feeGbpText: "Up to £15m",
     },
     {
+      player: "Nathan Patterson", pos: "RB", to: "Torino",
+      date: "2026-09-01", window: "summer", type: "undisclosed",
+      feeEur: null, feeGbp: null, feeGbpText: "Undisclosed",
+    },
+    {
       player: "Dwight McNeil", pos: "RW", to: "Crystal Palace",
       date: "2026-08-11", window: "summer", type: "swap",
       feeEur: null, feeGbp: null, feeGbpText: "Straight swap",
@@ -883,7 +888,6 @@ function sumCompletedSpendIn(transfers = EVERTON_TRANSFERS_2026_27) {
 // ───────────────────────────────────────────────────────────────
 const EVERTON_SQUAD_2025_26 = [
   { number: 1,  name: "Jordan Pickford",       positions: "GK" },
-  { number: 2,  name: "Nathan Patterson",       positions: "RB" },
   { number: 4,  name: "Jarrad Branthwaite",     positions: "CB" },
   { number: 5,  name: "Michael Keane",          positions: "CB" },
   { number: 6,  name: "James Tarkowski",        positions: "CB" },

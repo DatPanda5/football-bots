@@ -10,7 +10,6 @@
 | # | Player | Positions |
 |---|--------|-----------|
 | 1 | Jordan Pickford | GK |
-| 2 | Nathan Patterson | RB |
 | 4 | Jarrad Branthwaite | CB |
 | 5 | Michael Keane | CB |
 | 6 | James Tarkowski | CB |
