@@ -14,7 +14,6 @@
 | 5 | Michael Keane | CB |
 | 6 | James Tarkowski | CB |
 | 8 | Kiernan Dewsbury-Hall | CM |
-| 10 | Iliman Ndiaye | SS/RW |
 | 11 | Thierno Barry | ST |
 | 12 | Mark Travers | GK |
 | 15 | Jake O'Brien | CB |
@@ -106,7 +105,7 @@ Lucas Chevalier, Vito Mannone, Alexsandro, Tiago Santos, Mads Bjørbye, Leny Yor
 
 ### Manchester City
 
-Gerónimo Rulli, Gianluigi Donnarumma, Marcus Bettinelli, Rúben Dias, Marc Guéhi, Rayan Aït-Nouri, Vitor Reis, Josko Gvardiol, Matheus Nunes, Nico O'Reilly, Abdukodir Khusanov, Rico Lewis, Elliot Anderson, Tijjani Reijnders, Mateo Kovacic, Rayan Cherki, Nico González, Rodri, Phil Foden, Jack Grealish, Omar Marmoush, Erling Haaland, Jérémy Doku, Savinho, Claudio Echeverri, Antoine Semenyo
+Gerónimo Rulli, Gianluigi Donnarumma, Marcus Bettinelli, Rúben Dias, Marc Guéhi, Rayan Aït-Nouri, Vitor Reis, Josko Gvardiol, Matheus Nunes, Nico O'Reilly, Abdukodir Khusanov, Rico Lewis, Elliot Anderson, Tijjani Reijnders, Mateo Kovacic, Rayan Cherki, Nico González, Rodri, Phil Foden, Jack Grealish, Iliman Ndiaye, Omar Marmoush, Erling Haaland, Jérémy Doku, Savinho, Claudio Echeverri, Antoine Semenyo
 
 ### Manchester United
 
