@@ -749,6 +749,11 @@ const EVERTON_TRANSFERS_2026_27 = {
       feeEur: null, feeGbp: null, feeGbpText: "Loan",
     },
     {
+      player: "Beto", pos: "ST", to: "Fiorentina",
+      date: "2026-09-01", window: "summer", type: "permanent",
+      feeGbpMax: 15_000_000, feeGbpText: "Up to £15m",
+    },
+    {
       player: "Dwight McNeil", pos: "RW", to: "Crystal Palace",
       date: "2026-08-11", window: "summer", type: "swap",
       feeEur: null, feeGbp: null, feeGbpText: "Straight swap",
@@ -791,11 +796,6 @@ const EVERTON_TRANSFERS_2026_27 = {
       },
     ],
     out: [
-      {
-        player: "Beto", pos: "ST", to: "Fiorentina",
-        status: "pending", window: "summer", type: "permanent",
-        feeGbpMax: 15_000_000, feeGbpText: "Up to £15m",
-      },
       {
         player: "Iliman Ndiaye", pos: "SS/RW", to: "Manchester City",
         status: "pending", window: "summer", type: "permanent",
@@ -888,7 +888,6 @@ const EVERTON_SQUAD_2025_26 = [
   { number: 5,  name: "Michael Keane",          positions: "CB" },
   { number: 6,  name: "James Tarkowski",        positions: "CB" },
   { number: 8,  name: "Kiernan Dewsbury-Hall",  positions: "CM" },
-  { number: 9,  name: "Beto",                   positions: "ST" },
   { number: 10, name: "Iliman Ndiaye",          positions: "SS/RW" },
   { number: 11, name: "Thierno Barry",          positions: "ST" },
   { number: 12, name: "Mark Travers",           positions: "GK" },
