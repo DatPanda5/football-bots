@@ -10,6 +10,7 @@
 | # | Player | Positions |
 |---|--------|-----------|
 | 1 | Jordan Pickford | GK |
+| 2 | Ainsley Maitland-Niles | RB |
 | 4 | Jarrad Branthwaite | CB |
 | 5 | Michael Keane | CB |
 | 6 | James Tarkowski | CB |

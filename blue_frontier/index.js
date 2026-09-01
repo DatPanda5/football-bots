@@ -726,6 +726,12 @@ const EVERTON_TRANSFERS_2026_27 = {
       feeEur: null, feeGbp: null, feeGbpText: "Loan",
     },
     {
+      player: "Ainsley Maitland-Niles", pos: "RB", from: "Olympique Lyonnais",
+      date: "2026-09-01", window: "summer", type: "undisclosed",
+      feeEur: null, feeGbp: null, feeGbpText: "Undisclosed",
+      notes: "Three-year contract until Jun 2029.",
+    },
+    {
       player: "Tyrique George", pos: "Winger", from: "Chelsea",
       date: "2026-07-06", window: "summer", type: "permanent",
       feeEur: null, feeGbp: 24_000_000, feeGbpText: "£24m",
@@ -889,6 +895,7 @@ function sumCompletedSpendIn(transfers = EVERTON_TRANSFERS_2026_27) {
 // ───────────────────────────────────────────────────────────────
 const EVERTON_SQUAD_2025_26 = [
   { number: 1,  name: "Jordan Pickford",       positions: "GK" },
+  { number: 2,  name: "Ainsley Maitland-Niles", positions: "RB" },
   { number: 4,  name: "Jarrad Branthwaite",     positions: "CB" },
   { number: 5,  name: "Michael Keane",          positions: "CB" },
   { number: 6,  name: "James Tarkowski",        positions: "CB" },
