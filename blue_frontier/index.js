@@ -721,7 +721,7 @@ const EVERTON_TRANSFERS_2026_27 = {
     },
     {
       player: "Tyrique George", pos: "Winger", from: "Chelsea",
-      date: "2026-08-31", window: "summer", type: "permanent",
+      date: "2026-07-06", window: "summer", type: "permanent",
       feeEur: null, feeGbp: 24_000_000, feeGbpText: "£24m",
     },
     {
