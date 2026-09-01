@@ -720,6 +720,12 @@ const EVERTON_TRANSFERS_2026_27 = {
       notes: "Straight swap with Dwight McNeil (to Crystal Palace).",
     },
     {
+      player: "Jack Grealish", pos: "AM", from: "Manchester City",
+      date: "2026-09-01", window: "summer", type: "loan",
+      loanUntil: "2027-06-30",
+      feeEur: null, feeGbp: null, feeGbpText: "Loan",
+    },
+    {
       player: "Tyrique George", pos: "Winger", from: "Chelsea",
       date: "2026-07-06", window: "summer", type: "permanent",
       feeEur: null, feeGbp: 24_000_000, feeGbpText: "£24m",
@@ -798,11 +804,6 @@ const EVERTON_TRANSFERS_2026_27 = {
         player: "Kenny Tete", pos: "RB", from: "Fulham",
         status: "pending", window: "summer", type: "permanent",
         feeGbp: 9_000_000, feeGbpText: "£9m",
-      },
-      {
-        player: "Jack Grealish", pos: "AM", from: "Manchester City",
-        status: "pending", window: "summer", type: "loan",
-        feeGbp: null, feeGbpText: "Loan",
       },
     ],
     out: [
@@ -892,6 +893,7 @@ const EVERTON_SQUAD_2025_26 = [
   { number: 5,  name: "Michael Keane",          positions: "CB" },
   { number: 6,  name: "James Tarkowski",        positions: "CB" },
   { number: 8,  name: "Kiernan Dewsbury-Hall",  positions: "CM" },
+  { number: 10, name: "Jack Grealish",          positions: "AM" },
   { number: 11, name: "Thierno Barry",          positions: "ST" },
   { number: 12, name: "Mark Travers",           positions: "GK" },
   { number: 15, name: "Jake O'Brien",           positions: "CB" },
@@ -1003,7 +1005,7 @@ const OPPONENT_SQUADS_2025_26 = {
     "Gerónimo Rulli", "Gianluigi Donnarumma", "Marcus Bettinelli",
     "Rúben Dias", "Marc Guéhi", "Rayan Aït-Nouri", "Vitor Reis", "Josko Gvardiol", "Matheus Nunes", "Nico O'Reilly", "Abdukodir Khusanov", "Rico Lewis",
     "Elliot Anderson", "Tijjani Reijnders", "Mateo Kovacic", "Rayan Cherki", "Nico González", "Rodri", "Phil Foden",
-    "Jack Grealish", "Iliman Ndiaye", "Omar Marmoush", "Erling Haaland", "Jérémy Doku", "Savinho", "Claudio Echeverri", "Antoine Semenyo",
+    "Iliman Ndiaye", "Omar Marmoush", "Erling Haaland", "Jérémy Doku", "Savinho", "Claudio Echeverri", "Antoine Semenyo",
   ],
   "Crystal Palace": [
     "Dean Henderson", "Walter Benítez", "Remi Matthews", "Joe Whitworth",
