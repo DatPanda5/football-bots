@@ -1,6 +1,6 @@
 #!/bin/bash
-# Port production predictions DB into the lab, then start the lab.
-# Run from anywhere; Alfred keyword can call the repo-root wrapper that runs this.
+# Port production predictions DB into the LOCAL lab SQLite file, then start the local lab.
+# For Railway lab, set RESTORE_DB_BASE64 on Blue-Frontier-LAB instead (see lab/README.md).
 # Requires: Railway CLI linked to production service, lab/.env.lab configured.
 
 # Print immediately so output is visible in Terminal (no buffering)

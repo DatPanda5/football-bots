@@ -1,7 +1,7 @@
 #!/bin/bash
-# Blue Frontier Lab — start/stop/restart the bot locally (test in DATPANDA BOT TESTING server).
-# Called from repo root via wrapper lab-frontier.sh, or directly: blue_frontier/lab/lab-frontier.sh start|stop|restart.
-# Does NOT touch production (Railway); production uses its own token and deploy.sh / updatetbf.
+# Blue Frontier Lab — optional LOCAL start/stop/restart (DATPANDA BOT TESTING).
+# Primary lab is Railway (branch lab): blue_frontier/lab/deploy-lab.sh / run-in-terminal.sh deploy.
+# Does NOT touch production; production uses deploy.sh / updatetbf.
 
 LAB_DIR="$(cd "$(dirname "$0")" && pwd)"
 BLUE_FRONTIER="$(cd "$LAB_DIR/.." && pwd)"

@@ -1,7 +1,7 @@
 # Football Bots — Project Status Summary
 
 **Project root:** `football-bots/`  
-**Last updated:** 28 Aug 2026
+**Last updated:** 1 Sep 2026
 
 ---
 
@@ -61,7 +61,7 @@ Full history: **[CHANGELOG.md](CHANGELOG.md)** (this folder). Workspace-wide ent
 
 | Component         | Status        | Notes                                                                                                                                                                                                                                                       |
 | ----------------- | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Blue Frontier** | Ready         | **Production (Railway):** repo root, volume `/data`, `DATA_DIR=/data`; Build/Start in **blue_frontier**. **Blue Frontier Lab (local only):** credentials in **blue_frontier/lab/.env.lab** (script sets `DOTENV_CONFIG_PATH`); run `./lab-frontier.sh start |
+| **Blue Frontier** | Ready         | **Production (Railway, branch main):** volume `/data`, `DATA_DIR=/data`; Build/Start in **blue_frontier**. **Lab (Railway, branch lab):** second service **Blue-Frontier-LAB**, vars in **blue_frontier/lab/RAILWAY_VARIABLES_LAB.md**; deploy `./blue_frontier/lab/deploy-lab.sh`. Local `./lab-frontier.sh` is optional fallback. |
 | **Footy Bot**     | Ready         | Run from `football-bots`: `cd footy_bot && npm install && npm start`. Wire `fetchScores(league)` to your API for real fixtures. Discord name: **footy_bot**.                                                                                                |
 | **core**          | In use        | Shared by both bots; no standalone run.                                                                                                                                                                                                                     |
 | **SportRadar**    | Stub          | Blue Frontier: set `SPORTRADAR_KEY` and uncomment fetch in `_fetchFinalScore` to enable auto results.                                                                                                                                                       |
@@ -75,18 +75,10 @@ Known issues and fixes: see [DEBUG.md](../DEBUG.md) at Discord Bots root.
 
 ## Next steps
 
-1. **Confirm Railway redeploy (v3.5.0):** After push, verify bot online and `/fixtures` shows Dundee (pre01) as next match.
-2. **Pre-season predictions:** First friendly Sat 18 Jul — `/predict` rolling window will include pre01–pre05 then PL fixtures.
-3. **World Cup 2026:** Use WokeDyche only (TBF WC lab code removed).
-4. **Test locally**
-  - From **football-bots**: `cd blue_frontier && npm install && npm start` (Everton bot). Use `.env` with `DISCORD_TOKEN`, `CLIENT_ID`, `GUILD_ID`; optional `MOD_ROLE_ID`, `RESULTS_CHANNEL_ID`, `SPORTRADAR_KEY`.
-  - From **football-bots**: `cd footy_bot && npm install && npm start` (Footy Bot). Use `.env` with `FOOTY_BOT_`* or `DISCORD_TOKEN`/`CLIENT_ID`/`GUILD_ID` and `PREDICTIONS_CHANNEL_ID`.
-  - Verify slash commands, `!score`, prediction flow, and (for Blue Frontier) `/final` and auto result checker behaviour.
-5. **Deploy Everton bot (blue_frontier)** (production)
-  - **Primary** Everton bot is **football-bots/blue_frontier**. tbfbot is archived in **+Archive/tbfbot**.
-  - If you were deploying from tbfbot (e.g. Railway, GitHub), update the deployment to use **football-bots** as the repo root and **blue_frontier** as the app root (or set start command to `node blue_frontier/index.js` with working directory `football-bots`).
-  - Copy over any production `.env` / env vars from the old deployment; ensure `blue_frontier/.env.example` is reflected (e.g. `RESULTS_CHANNEL_ID`, `SPORTRADAR_KEY` if you use them).
-6. **Optional**
+1. **Blue Frontier Lab on Railway:** Create **Blue-Frontier-LAB** (branch `lab`, vars from [blue_frontier/lab/RAILWAY_VARIABLES_LAB.md](blue_frontier/lab/RAILWAY_VARIABLES_LAB.md)), then `./blue_frontier/lab/deploy-lab.sh`. Confirm DATPANDA `/fixtures` and log line `(lab)`.
+2. **World Cup 2026:** Use WokeDyche only (TBF WC lab code removed).
+3. **Production** remains `./deploy.sh` / **updatetbf** on **main** — do not point the production service at `lab`.
+4. **Optional**
   - Enable SportRadar: add `SPORTRADAR_KEY` and uncomment the fetch in `blue_frontier/index.js` (`_fetchFinalScore`).
   - Wire Footy Bot fixtures: replace `fetchScores(league)` stub in `footy_bot/index.js` with your sports API.
 
