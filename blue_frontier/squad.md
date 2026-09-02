@@ -14,24 +14,22 @@
 | 4 | Jarrad Branthwaite | CB |
 | 5 | Michael Keane | CB |
 | 6 | James Tarkowski | CB |
-| 8 | Kiernan Dewsbury-Hall | CM |
-| 10 | Jack Grealish | AM |
-| 11 | Thierno Barry | ST |
+| 8 | Kiernan Dewsbury-Hall | CAM |
+| 10 | Jack Grealish | LW |
+| 11 | Thierno Barry | CF |
 | 12 | Mark Travers | GK |
 | 15 | Jake O'Brien | CB |
 | 16 | Vitalii Mykolenko | LB |
-| 19 | Tyrique George | Winger |
-| 20 | Tyler Dibling | RW/AM |
-| 22 | Brennan Johnson | RW/AM |
+| 19 | Tyrique George | LW |
+| 20 | Tyler Dibling | RW |
+| 22 | Brennan Johnson | RW |
 | 23 | Christian Nørgaard | DM |
-| 24 | Charly Alcaraz | AM |
+| 24 | Charly Alcaraz | CAM |
 | 30 | Hayden Hackney | DM/CM |
 | 31 | Tom King | GK |
-| 34 | Merlin Röhl | CM |
-| 37 | James Garner | CM/DM |
-| 39 | Adam Aznou | LB |
-| 42 | Tim Iroegbunam | CM/DM |
-| 45 | Harrison Armstrong | CM |
+| 34 | Merlin Röhl | RB |
+| 37 | James Garner | DM/CM |
+| 45 | Harrison Armstrong | DM |
 
 ---
 
@@ -87,7 +85,7 @@ Bernd Leno, Benjamin Lecomte, Kenny Tete, Calvin Bassey, Jorge Cuenca, Joachim A
 
 ### Hull City
 
-Jack Butland, Konstantinos Tzolakis, Dillon Phillips, Nobel Mendy, Lewie Coyle, Ryan Giles, Charlie Hughes, Semi Ajayi, John Egan, Matty Jacob, Cody Drameh, Matt Targett, Brandon Williams, Paddy McNair, Hidemasa Morita, Jens Hjertø-Dahl, Eliot Matazo, Óscar Zambrano, Abdülkadir Ömür, Darko Gyabi, Matt Crooks, Kieran Dowell, Regan Slater, Liam Millar, Oli McBurnie, Mohamed Belloumi, Enis Destan, Elliot Stroud
+Jack Butland, Konstantinos Tzolakis, Dillon Phillips, Nobel Mendy, Lewie Coyle, Ryan Giles, Charlie Hughes, Semi Ajayi, John Egan, Matty Jacob, Cody Drameh, Matt Targett, Brandon Williams, Paddy McNair, Hidemasa Morita, Jens Hjertø-Dahl, Eliot Matazo, Óscar Zambrano, Abdülkadir Ömür, Darko Gyabi, Matt Crooks, Kieran Dowell, Regan Slater, Tim Iroegbunam, Liam Millar, Oli McBurnie, Mohamed Belloumi, Enis Destan, Elliot Stroud
 
 ### Ipswich Town
 
