@@ -686,12 +686,8 @@ const ALL_FIXTURES = [
 
 // ───────────────────────────────────────────────────────────────
 //  EVERTON TRANSFERS 2026-27 (summer window)
-//  Completed: FotMob team page id=8668 (31 Aug 2026 / deadline day).
-//  Pending: Bobble / The Athletic (31 Aug 2026).
-//  Completed fees in EUR as reported by FotMob; GBP via ECB ref rate.
-//  Pending fees in GBP as reported. For /transfers (not registered yet).
-//  window: summer | winter; type: permanent | loan | free | undisclosed | swap
-//  status: completed (in/out) | pending (pending.in / pending.out)
+//  Final summer window (2 Sep 2026). Fees in EUR; GBP via ECB ref rate for storage.
+//  window: summer | winter; type: permanent | loan | free | undisclosed
 // ───────────────────────────────────────────────────────────────
 const TRANSFER_EUR_GBP_RATE = 0.85648; // ECB EUR→GBP, 31 Aug 2026
 const TRANSFER_EUR_GBP_AS_OF = "2026-08-31";
@@ -707,40 +703,56 @@ function gbpMillionsText(gbp) {
   return `£${(gbp / 1e6).toFixed(2)}m`;
 }
 
+function eurMillionsText(eur) {
+  if (eur == null) return null;
+  const sign = eur < 0 ? "-" : "";
+  return `${sign}€${(Math.abs(eur) / 1e6).toFixed(2)}m`;
+}
+
 const EVERTON_TRANSFERS_2026_27 = {
   season: TRANSFER_SEASON,
-  source: "FotMob",
-  sourceTeamId: 8668,
-  fetchedUTC: "2026-08-31T22:25:00Z",
+  source: "Club records",
+  fetchedUTC: "2026-09-02T01:32:00Z",
   eurGbpRate: TRANSFER_EUR_GBP_RATE,
   eurGbpAsOf: TRANSFER_EUR_GBP_AS_OF,
   in: [
     {
-      player: "Brennan Johnson", pos: "AM", from: "Crystal Palace",
-      date: "2026-08-11", window: "summer", type: "swap",
-      feeEur: null, feeGbp: null, feeGbpText: "Straight swap",
-      notes: "Straight swap with Dwight McNeil (to Crystal Palace).",
-    },
-    {
-      player: "Tyrique George", pos: "Winger", from: "Chelsea",
-      date: "2026-07-06", window: "summer", type: "permanent",
-      feeEur: null, feeGbp: 24_000_000, feeGbpText: "£24m",
-    },
-    {
-      player: "Christian Nørgaard", pos: "DM", from: "Arsenal",
-      date: "2026-08-05", window: "summer", type: "permanent",
-      feeEur: 8_000_000, feeGbp: eurToGbp(8_000_000), feeGbpText: gbpMillionsText(eurToGbp(8_000_000)),
+      player: "Merlin Röhl", pos: "RB", from: "Freiburg",
+      date: "2026-07-01", window: "summer", type: "permanent",
+      feeEur: 25_000_000, feeGbp: eurToGbp(25_000_000), feeGbpText: eurMillionsText(25_000_000),
+      notes: "Made permanent after 2025-26 loan (€2m loan fee last season, not counted here).",
     },
     {
       player: "Hayden Hackney", pos: "DM", from: "Middlesbrough",
       date: "2026-07-02", window: "summer", type: "permanent",
-      feeEur: 19_300_000, feeGbp: eurToGbp(19_300_000), feeGbpText: gbpMillionsText(eurToGbp(19_300_000)),
+      feeEur: 20_000_000, feeGbp: eurToGbp(20_000_000), feeGbpText: eurMillionsText(20_000_000),
     },
     {
-      player: "Merlin Röhl", pos: "RW", from: "Freiburg",
-      date: "2026-07-01", window: "summer", type: "permanent",
-      feeEur: 25_000_000, feeGbp: eurToGbp(25_000_000), feeGbpText: gbpMillionsText(eurToGbp(25_000_000)),
-      notes: "Made permanent after 2025-26 loan (€2m loan fee last season, not counted here).",
+      player: "Tyrique George", pos: "LW", from: "Chelsea",
+      date: "2026-07-06", window: "summer", type: "permanent",
+      feeEur: 22_000_000, feeGbp: eurToGbp(22_000_000), feeGbpText: eurMillionsText(22_000_000),
+    },
+    {
+      player: "Christian Nørgaard", pos: "DM", from: "Arsenal",
+      date: "2026-08-05", window: "summer", type: "permanent",
+      feeEur: 8_500_000, feeGbp: eurToGbp(8_500_000), feeGbpText: eurMillionsText(8_500_000),
+    },
+    {
+      player: "Brennan Johnson", pos: "RW", from: "Crystal Palace",
+      date: "2026-08-11", window: "summer", type: "permanent",
+      feeEur: 25_000_000, feeGbp: eurToGbp(25_000_000), feeGbpText: eurMillionsText(25_000_000),
+    },
+    {
+      player: "Jack Grealish", pos: "LW", from: "Manchester City",
+      date: "2026-09-01", window: "summer", type: "loan",
+      loanUntil: "2027-06-30",
+      feeEur: null, feeGbp: null, feeGbpText: "Loan",
+    },
+    {
+      player: "Ainsley Maitland-Niles", pos: "RB", from: "Olympique Lyonnais",
+      date: "2026-09-01", window: "summer", type: "permanent",
+      feeEur: 5_000_000, feeGbp: eurToGbp(5_000_000), feeGbpText: eurMillionsText(5_000_000),
+      notes: "Three-year contract until Jun 2029.",
     },
   ],
   out: [
@@ -751,10 +763,29 @@ const EVERTON_TRANSFERS_2026_27 = {
       feeEur: null, feeGbp: null, feeGbpText: "Loan",
     },
     {
+      player: "Beto", pos: "ST", to: "Fiorentina",
+      date: "2026-09-01", window: "summer", type: "permanent",
+      feeEur: 18_000_000, feeGbp: eurToGbp(18_000_000), feeGbpText: eurMillionsText(18_000_000),
+    },
+    {
+      player: "Nathan Patterson", pos: "RB", to: "Torino",
+      date: "2026-09-01", window: "summer", type: "permanent",
+      feeEur: 1_000_000, feeGbp: eurToGbp(1_000_000), feeGbpText: eurMillionsText(1_000_000),
+    },
+    {
+      player: "Iliman Ndiaye", pos: "RW", to: "Manchester City",
+      date: "2026-09-01", window: "summer", type: "permanent",
+      feeEur: 75_000_000, feeGbp: eurToGbp(75_000_000), feeGbpText: eurMillionsText(75_000_000),
+    },
+    {
+      player: "Tim Iroegbunam", pos: "CM/DM", to: "Hull City",
+      date: "2026-09-01", window: "summer", type: "permanent",
+      feeEur: 15_000_000, feeGbp: eurToGbp(15_000_000), feeGbpText: eurMillionsText(15_000_000),
+    },
+    {
       player: "Dwight McNeil", pos: "RW", to: "Crystal Palace",
-      date: "2026-08-11", window: "summer", type: "swap",
-      feeEur: null, feeGbp: null, feeGbpText: "Straight swap",
-      notes: "Straight swap with Brennan Johnson (from Crystal Palace).",
+      date: "2026-08-11", window: "summer", type: "permanent",
+      feeEur: 25_000_000, feeGbp: eurToGbp(25_000_000), feeGbpText: eurMillionsText(25_000_000),
     },
     {
       player: "Séamus Coleman", pos: "RWB", to: "Free agent",
@@ -773,42 +804,10 @@ const EVERTON_TRANSFERS_2026_27 = {
     },
   ],
   pending: {
-    source: "Bobble/Athletic",
-    fetchedUTC: "2026-08-31T23:15:00Z",
-    in: [
-      {
-        player: "Folarin Balogun", pos: "ST", from: "Monaco",
-        status: "pending", window: "summer", type: "permanent",
-        feeGbp: 40_000_000, feeGbpText: "£40m",
-      },
-      {
-        player: "Kenny Tete", pos: "RB", from: "Fulham",
-        status: "pending", window: "summer", type: "permanent",
-        feeGbp: 9_000_000, feeGbpText: "£9m",
-      },
-      {
-        player: "Jack Grealish", pos: "AM", from: "Manchester City",
-        status: "pending", window: "summer", type: "loan",
-        feeGbp: null, feeGbpText: "Loan",
-      },
-    ],
-    out: [
-      {
-        player: "Beto", pos: "ST", to: "Fiorentina",
-        status: "pending", window: "summer", type: "permanent",
-        feeGbpMax: 15_000_000, feeGbpText: "Up to £15m",
-      },
-      {
-        player: "Iliman Ndiaye", pos: "SS/RW", to: "Manchester City",
-        status: "pending", window: "summer", type: "permanent",
-        feeGbp: 60_000_000, feeGbpAddons: 5_000_000, feeGbpText: "£60m + £5m add-ons",
-      },
-      {
-        player: "Tim Iroegbunam", pos: "CM/DM", to: "Hull City",
-        status: "pending", window: "summer", type: "permanent",
-        feeGbpMax: 22_000_000, feeGbpText: "Up to £22m",
-      },
-    ],
+    source: null,
+    fetchedUTC: null,
+    in: [],
+    out: [],
   },
 };
 
@@ -850,14 +849,19 @@ function sortTransfersByDateDesc(list) {
   return [...list].sort((a, b) => (b.date || "").localeCompare(a.date || ""));
 }
 
-/** Sum cash fees on a transfer list (excludes loan/swap/free). */
+/** Sum cash fees on a transfer list (excludes loan/free). Amounts in EUR. */
 function sumTransferListFees(list) {
   let fixed = 0;
   let upTo = 0;
   let addons = 0;
   for (const t of list) {
-    if (t.type === "loan" || t.type === "swap" || t.type === "free") continue;
-    if (t.feeGbp != null && t.feeGbp > 0) {
+    if (t.type === "loan" || t.type === "free") continue;
+    if (t.feeEur != null && t.feeEur > 0) {
+      fixed += t.feeEur;
+      if (t.feeEurAddons) addons += t.feeEurAddons;
+    } else if (t.feeEurMax != null) {
+      upTo += t.feeEurMax;
+    } else if (t.feeGbp != null && t.feeGbp > 0) {
       fixed += t.feeGbp;
       if (t.feeGbpAddons) addons += t.feeGbpAddons;
     } else if (t.feeGbpMax != null) {
@@ -869,11 +873,11 @@ function sumTransferListFees(list) {
 
 function formatFeeTotalSummary(list) {
   const { fixed, upTo, addons, max } = sumTransferListFees(list);
-  if (fixed === 0 && upTo === 0) return "£0";
-  if (upTo > 0 && fixed === 0 && addons === 0) return `up to ${gbpMillionsText(max)}`;
-  if (upTo > 0) return `up to ${gbpMillionsText(max)}`;
-  if (addons > 0) return `${gbpMillionsText(fixed)} + ${gbpMillionsText(addons)} add-ons`;
-  return gbpMillionsText(fixed);
+  if (fixed === 0 && upTo === 0) return "€0";
+  if (upTo > 0 && fixed === 0 && addons === 0) return `up to ${eurMillionsText(max)}`;
+  if (upTo > 0) return `up to ${eurMillionsText(max)}`;
+  if (addons > 0) return `${eurMillionsText(fixed)} + ${eurMillionsText(addons)} add-ons`;
+  return eurMillionsText(fixed);
 }
 
 function sumCompletedSpendIn(transfers = EVERTON_TRANSFERS_2026_27) {
@@ -884,30 +888,27 @@ function sumCompletedSpendIn(transfers = EVERTON_TRANSFERS_2026_27) {
 //  EVERTON SQUAD 2026-27 — keep in sync with squad.md
 // ───────────────────────────────────────────────────────────────
 const EVERTON_SQUAD_2025_26 = [
-  { number: 1,  name: "Jordan Pickford",       positions: "GK" },
-  { number: 2,  name: "Nathan Patterson",       positions: "RB" },
-  { number: 4,  name: "Jarrad Branthwaite",     positions: "CB" },
-  { number: 5,  name: "Michael Keane",          positions: "CB" },
-  { number: 6,  name: "James Tarkowski",        positions: "CB" },
-  { number: 8,  name: "Kiernan Dewsbury-Hall",  positions: "CM" },
-  { number: 9,  name: "Beto",                   positions: "ST" },
-  { number: 10, name: "Iliman Ndiaye",          positions: "SS/RW" },
-  { number: 11, name: "Thierno Barry",          positions: "ST" },
-  { number: 12, name: "Mark Travers",           positions: "GK" },
-  { number: 15, name: "Jake O'Brien",           positions: "CB" },
-  { number: 16, name: "Vitalii Mykolenko",      positions: "LB" },
-  { number: 19, name: "Tyrique George",         positions: "Winger" },
-  { number: 20, name: "Tyler Dibling",          positions: "RW/AM" },
-  { number: 22, name: "Brennan Johnson",        positions: "RW/AM" },
-  { number: 23, name: "Christian Nørgaard",     positions: "DM" },
-  { number: 24, name: "Charly Alcaraz",         positions: "AM" },
-  { number: 30, name: "Hayden Hackney",         positions: "DM/CM" },
-  { number: 31, name: "Tom King",               positions: "GK" },
-  { number: 34, name: "Merlin Röhl",            positions: "CM" },
-  { number: 37, name: "James Garner",           positions: "CM/DM" },
-  { number: 39, name: "Adam Aznou",             positions: "LB" },
-  { number: 42, name: "Tim Iroegbunam",         positions: "CM/DM" },
-  { number: 45, name: "Harrison Armstrong",     positions: "CM" },
+  { number: 1,  name: "Jordan Pickford",          positions: "GK" },
+  { number: 2,  name: "Ainsley Maitland-Niles",   positions: "RB" },
+  { number: 4,  name: "Jarrad Branthwaite",       positions: "CB" },
+  { number: 5,  name: "Michael Keane",            positions: "CB" },
+  { number: 6,  name: "James Tarkowski",          positions: "CB" },
+  { number: 8,  name: "Kiernan Dewsbury-Hall",     positions: "CAM" },
+  { number: 10, name: "Jack Grealish",            positions: "LW" },
+  { number: 11, name: "Thierno Barry",            positions: "CF" },
+  { number: 12, name: "Mark Travers",             positions: "GK" },
+  { number: 15, name: "Jake O'Brien",             positions: "CB" },
+  { number: 16, name: "Vitalii Mykolenko",        positions: "LB" },
+  { number: 19, name: "Tyrique George",           positions: "LW" },
+  { number: 20, name: "Tyler Dibling",            positions: "RW" },
+  { number: 22, name: "Brennan Johnson",          positions: "RW" },
+  { number: 23, name: "Christian Nørgaard",       positions: "DM" },
+  { number: 24, name: "Charly Alcaraz",           positions: "CAM" },
+  { number: 30, name: "Hayden Hackney",           positions: "DM/CM" },
+  { number: 31, name: "Tom King",                 positions: "GK" },
+  { number: 34, name: "Merlin Röhl",              positions: "RB" },
+  { number: 37, name: "James Garner",             positions: "DM/CM" },
+  { number: 45, name: "Harrison Armstrong",       positions: "DM" },
 ];
 
 // Diacritic normalization so "Merlin Rohl" and "Merlin Röhl" match (ASCII vs special chars).
@@ -1003,7 +1004,7 @@ const OPPONENT_SQUADS_2025_26 = {
     "Gerónimo Rulli", "Gianluigi Donnarumma", "Marcus Bettinelli",
     "Rúben Dias", "Marc Guéhi", "Rayan Aït-Nouri", "Vitor Reis", "Josko Gvardiol", "Matheus Nunes", "Nico O'Reilly", "Abdukodir Khusanov", "Rico Lewis",
     "Elliot Anderson", "Tijjani Reijnders", "Mateo Kovacic", "Rayan Cherki", "Nico González", "Rodri", "Phil Foden",
-    "Jack Grealish", "Omar Marmoush", "Erling Haaland", "Jérémy Doku", "Savinho", "Claudio Echeverri", "Antoine Semenyo",
+    "Iliman Ndiaye", "Omar Marmoush", "Erling Haaland", "Jérémy Doku", "Savinho", "Claudio Echeverri", "Antoine Semenyo",
   ],
   "Crystal Palace": [
     "Dean Henderson", "Walter Benítez", "Remi Matthews", "Joe Whitworth",
@@ -1075,7 +1076,7 @@ const OPPONENT_SQUADS_2025_26 = {
   "Hull City": [
     "Jack Butland", "Konstantinos Tzolakis", "Dillon Phillips",
     "Nobel Mendy", "Lewie Coyle", "Ryan Giles", "Charlie Hughes", "Semi Ajayi", "John Egan", "Matty Jacob", "Cody Drameh", "Matt Targett", "Brandon Williams", "Paddy McNair",
-    "Hidemasa Morita", "Jens Hjertø-Dahl", "Eliot Matazo", "Óscar Zambrano", "Abdülkadir Ömür", "Darko Gyabi", "Matt Crooks", "Kieran Dowell", "Regan Slater",
+    "Hidemasa Morita", "Jens Hjertø-Dahl", "Eliot Matazo", "Óscar Zambrano", "Abdülkadir Ömür", "Darko Gyabi", "Matt Crooks", "Kieran Dowell", "Regan Slater", "Tim Iroegbunam",
     "Liam Millar", "Oli McBurnie", "Mohamed Belloumi", "Enis Destan", "Elliot Stroud",
   ],
   "Coventry City": [
@@ -1973,6 +1974,9 @@ function buildTransfersEmbed(scope = "all") {
   const data = EVERTON_TRANSFERS_2026_27;
   const showCompleted = scope === "all" || scope === "completed";
   const showPending = scope === "all" || scope === "pending";
+  const pin = data.pending?.in || [];
+  const pout = data.pending?.out || [];
+  const hasPending = pin.length > 0 || pout.length > 0;
 
   const title = scope === "completed"
     ? "🔵 Everton Transfers 2026-27 — Completed"
@@ -1981,11 +1985,11 @@ function buildTransfersEmbed(scope = "all") {
       : "🔵 Everton Transfers 2026-27 (Summer)";
 
   const lines = [];
-  if (showCompleted && showPending) {
-    lines.push("_Completed (FotMob) · Pending rumours (Bobble/Athletic)_");
+  if (showCompleted && showPending && hasPending) {
+    lines.push("_Completed · Pending rumours_");
   } else if (showCompleted) {
-    lines.push(`_Source: ${data.source} · ECB rate ${data.eurGbpAsOf}_`);
-  } else if (showPending && data.pending) {
+    lines.push("_Summer 2026-27 window (final)_");
+  } else if (showPending && hasPending) {
     lines.push(`_Source: ${data.pending.source}_`);
   }
 
@@ -1996,9 +2000,8 @@ function buildTransfersEmbed(scope = "all") {
     appendTransferSection(lines, `**✅ Outgoing · ${formatFeeTotalSummary(data.out)}**`, outs, formatTransferOutLine);
   }
 
-  if (showPending && data.pending) {
-    const { in: pin, out: pout } = data.pending;
-    if (pin?.length) {
+  if (showPending && hasPending) {
+    if (pin.length) {
       appendTransferSection(
         lines,
         `**🟡 Incoming (rumoured) · ${formatFeeTotalSummary(pin)}**`,
@@ -2006,7 +2009,7 @@ function buildTransfersEmbed(scope = "all") {
         formatTransferInLine
       );
     }
-    if (pout?.length) {
+    if (pout.length) {
       appendTransferSection(
         lines,
         `**🟡 Outgoing (rumoured) · ${formatFeeTotalSummary(pout)}**`,
@@ -2014,25 +2017,20 @@ function buildTransfersEmbed(scope = "all") {
         formatTransferOutLine
       );
     }
-    if (!pin?.length && !pout?.length) {
-      appendTransferSection(lines, "**🟡 Pending**", ["_No pending rumours on file._"], (s) => s);
-    }
-  } else if (showPending) {
+  } else if (showPending && !hasPending) {
     appendTransferSection(lines, "**🟡 Pending**", ["_No pending rumours on file._"], (s) => s);
   }
 
   const summaryLines = [];
   if (showCompleted) {
     summaryLines.push(`✅ In **${formatFeeTotalSummary(data.in)}** · Out **${formatFeeTotalSummary(data.out)}**`);
+    const net = sumTransferListFees(data.in).fixed - sumTransferListFees(data.out).fixed;
+    summaryLines.push(`📊 Net **${eurMillionsText(net)}**`);
   }
-  if (showPending && data.pending) {
-    const pin = data.pending.in || [];
-    const pout = data.pending.out || [];
-    if (pin.length || pout.length) {
-      summaryLines.push(
-        `🟡 Pending in **${pin.length ? formatFeeTotalSummary(pin) : "£0"}** · Pending out **${pout.length ? formatFeeTotalSummary(pout) : "£0"}**`
-      );
-    }
+  if (showPending && hasPending) {
+    summaryLines.push(
+      `🟡 Pending in **${formatFeeTotalSummary(pin)}** · Pending out **${formatFeeTotalSummary(pout)}**`
+    );
   }
   if (summaryLines.length) {
     appendTransferSection(lines, "**💷 Totals**", summaryLines, (s) => s);
@@ -2043,7 +2041,7 @@ function buildTransfersEmbed(scope = "all") {
     .setTitle(title)
     .setDescription(lines.join("\n").slice(0, 4096) || "_No transfers on file._")
     .setFooter({ text: BOT_FOOTER })
-    .setTimestamp(new Date(data.pending?.fetchedUTC || data.fetchedUTC));
+    .setTimestamp(new Date(data.fetchedUTC));
 }
 
 async function buildListEmbed(fixture, guild) {
