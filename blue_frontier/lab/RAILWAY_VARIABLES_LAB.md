@@ -20,6 +20,11 @@ Do **not** copy production `DISCORD_TOKEN` or `BLUE_FRONTIER_GUILD_ID` onto this
 ## Optional variables
 
 - `PREDICTIONS_CHANNEL_ID` / `RESULTS_CHANNEL_ID` — lab channels only, if you want kickoff-lock posts / auto result checker. Leave unset to use `/final` only (same as local lab).
+- `MATCHDAY_CHANNEL_ID` — lab matchday channel for the 1-hour-before-kickoff lineup reminder (requires `PREDICTIONS_CHANNEL_ID` too).
+
+## Lab-only testing
+
+- `/testlineupreminder` — posts the lineup reminder to `MATCHDAY_CHANNEL_ID` immediately (does not mark the fixture as reminded, so scheduled posts still work). Only registered when `BLUE_FRONTIER_ENV=lab`.
 
 ## Variables to avoid on the lab service
 

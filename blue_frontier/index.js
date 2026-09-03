@@ -1854,6 +1854,11 @@ const commands = [
     .setDescription("[ADMIN] Reset season or all-time points")
     .addStringOption((o) => o.setName("scope").setDescription("What to reset").setRequired(true)
       .addChoices({ name: "Current season only", value: "season" }, { name: "All time (requires confirm)", value: "alltime" })),
+  ...(IS_LAB ? [
+    new SlashCommandBuilder()
+      .setName("testlineupreminder")
+      .setDescription("[LAB] Post the matchday lineup reminder now (test only; does not affect scheduled posts)"),
+  ] : []),
 ].map((c) => c.toJSON());
 
 // ───────────────────────────────────────────────────────────────
@@ -2203,19 +2208,30 @@ function markMatchdayReminderPosted(fixtureId) {
   db.prepare("INSERT OR REPLACE INTO matchday_reminder_posted (fixtureId, postedAt) VALUES (?, ?)").run(fixtureId, new Date().toISOString());
 }
 
+async function sendMatchdayLineupReminderMessage(botClient, matchdayChannelId, predictionsChannelId) {
+  let channel = botClient.channels?.cache?.get(matchdayChannelId);
+  if (!channel) {
+    try {
+      channel = await botClient.channels.fetch(matchdayChannelId);
+    } catch {
+      channel = null;
+    }
+  }
+  if (!channel) {
+    throw new Error(`Matchday channel ${matchdayChannelId} not found`);
+  }
+  const content = buildLineupReminderContent(predictionsChannelId);
+  await channel.send({ content });
+  return channel;
+}
+
 async function postMatchdayLineupReminder(fixture, botClient, matchdayChannelId, predictionsChannelId) {
   if (matchdayReminderAlreadyPosted(fixture.id)) {
     console.log(`[${BOT_NAME}] Matchday lineup reminder already posted for ${fixture.id}, skipping.`);
     return;
   }
-  const channel = botClient.channels?.cache?.get(matchdayChannelId);
-  if (!channel) {
-    console.warn(`[${BOT_NAME}] Matchday reminder: channel ${matchdayChannelId} not found.`);
-    return;
-  }
-  const content = buildLineupReminderContent(predictionsChannelId);
   try {
-    await channel.send({ content });
+    await sendMatchdayLineupReminderMessage(botClient, matchdayChannelId, predictionsChannelId);
     markMatchdayReminderPosted(fixture.id);
     console.log(`[${BOT_NAME}] Posted matchday lineup reminder for ${fixture.id} (${fixture.home} vs ${fixture.away}).`);
   } catch (err) {
@@ -2391,6 +2407,33 @@ client.on("interactionCreate", async (interaction) => {
     return interaction.reply({ embeds: [buildTransfersEmbed()] });
   }
 
+  if (interaction.isChatInputCommand() && interaction.commandName === "testlineupreminder") {
+    if (!IS_LAB) {
+      return interaction.reply({ content: "This command is only available in the lab environment.", flags: MessageFlags.Ephemeral });
+    }
+    const matchdayChannelId = getMatchdayChannelId();
+    const predictionsChannelId = getPredictionsChannelId();
+    if (!matchdayChannelId || !predictionsChannelId) {
+      return interaction.reply({
+        content: "Set `MATCHDAY_CHANNEL_ID` and `PREDICTIONS_CHANNEL_ID` in the lab env to test the lineup reminder.",
+        flags: MessageFlags.Ephemeral,
+      });
+    }
+    try {
+      const channel = await sendMatchdayLineupReminderMessage(client, matchdayChannelId, predictionsChannelId);
+      return interaction.reply({
+        content: `✅ Posted lineup reminder to ${channel} (test only — scheduled 1-hour-before posts are unchanged).`,
+        flags: MessageFlags.Ephemeral,
+      });
+    } catch (err) {
+      console.error(`[${BOT_NAME}] testlineupreminder failed:`, err?.message || err);
+      return interaction.reply({
+        content: `Failed to post lineup reminder: ${err?.message || err}`,
+        flags: MessageFlags.Ephemeral,
+      });
+    }
+  }
+
   if (interaction.isButton() && (
     interaction.customId.startsWith("tbfc_fixtures_prev:") ||
     interaction.customId.startsWith("tbfc_fixtures_next:")
@@ -2429,6 +2472,7 @@ client.on("interactionCreate", async (interaction) => {
       "**/addscoreralias** — MOD only; add a scorer nickname so it matches without redeploying.",
       "**/leaderboard [scope]** — view current-season or all-time points.",
       "**/resetleaderboard [scope]** — MOD only; reset season or all-time (all-time asks for confirm).",
+      ...(IS_LAB ? ["**/testlineupreminder** — [LAB] post the matchday lineup reminder to #matchday now (test only)."] : []),
       "",
       isBlueFrontierGuild
         ? "In this server, prediction commands work in the score-predictions channel (or mod-chat / mod-bot-logs for MODs)."
