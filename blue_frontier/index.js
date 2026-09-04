@@ -444,7 +444,7 @@ const ALL_FIXTURES = [
     mainReferee: "Tony Harrington",
   },
   {
-    id: "EFLR3", kickoffUTC: "2026-09-09T18:45:00Z", label: "Wed 09 Sep 2:45 PM EDT",
+    id: "EFLR3", kickoffUTC: "2026-09-16T18:45:00Z", label: "Wed 16 Sep 2:45 PM EDT",
     competition: "efl_cup",
     home: "Everton", away: "Wolverhampton Wanderers", opponent: "Wolverhampton Wanderers",
     evertonHome: true, venue: "Hill Dickinson Stadium", srMatchId: null,
@@ -467,13 +467,14 @@ const ALL_FIXTURES = [
     mainReferee: "Chris Kavanagh", varReferee: "John Brooks",
   },
   {
-    id: "MW3", kickoffUTC: "2026-09-05T14:00:00Z", label: "Sat 05 Sep 10:00 AM EDT",
+    id: "MW3", kickoffUTC: "2026-09-06T13:00:00Z", label: "Sun 06 Sep 9:00 AM EDT",
     competition: "premier_league",
     home: "Everton", away: "Manchester United", opponent: "Manchester United",
     evertonHome: true, venue: "Hill Dickinson Stadium", srMatchId: null,
+    mainReferee: "John Brooks", varReferee: "Paul Howard",
   },
   {
-    id: "MW4", kickoffUTC: "2026-09-12T14:00:00Z", label: "Sat 12 Sep 10:00 AM EDT",
+    id: "MW4", kickoffUTC: "2026-09-12T16:30:00Z", label: "Sat 12 Sep 12:30 PM EDT",
     competition: "premier_league",
     home: "Tottenham Hotspur", away: "Everton", opponent: "Tottenham Hotspur",
     evertonHome: false, venue: "Tottenham Hotspur Stadium", srMatchId: null,
@@ -485,13 +486,13 @@ const ALL_FIXTURES = [
     evertonHome: true, venue: "Hill Dickinson Stadium", srMatchId: null,
   },
   {
-    id: "MW6", kickoffUTC: "2026-10-10T14:00:00Z", label: "Sat 10 Oct 10:00 AM EDT",
+    id: "MW6", kickoffUTC: "2026-10-11T13:00:00Z", label: "Sun 11 Oct 9:00 AM EDT",
     competition: "premier_league",
     home: "Hull City", away: "Everton", opponent: "Hull City",
     evertonHome: false, venue: "The MKM Stadium", srMatchId: null,
   },
   {
-    id: "MW7", kickoffUTC: "2026-10-17T14:00:00Z", label: "Sat 17 Oct 10:00 AM EDT",
+    id: "MW7", kickoffUTC: "2026-10-17T11:30:00Z", label: "Sat 17 Oct 7:30 AM EDT",
     competition: "premier_league",
     home: "Everton", away: "Chelsea", opponent: "Chelsea",
     evertonHome: true, venue: "Hill Dickinson Stadium", srMatchId: null,
@@ -503,7 +504,7 @@ const ALL_FIXTURES = [
     evertonHome: false, venue: "Emirates Stadium", srMatchId: null,
   },
   {
-    id: "MW9", kickoffUTC: "2026-10-31T15:00:00Z", label: "Sat 31 Oct 11:00 AM EDT",
+    id: "MW9", kickoffUTC: "2026-11-02T20:00:00Z", label: "Mon 02 Nov 3:00 PM EST",
     competition: "premier_league",
     home: "Newcastle United", away: "Everton", opponent: "Newcastle United",
     evertonHome: false, venue: "St. James' Park", srMatchId: null,

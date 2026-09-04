@@ -1,6 +1,6 @@
 # Everton 2026–27 Fixtures
 
-**Last updated:** 2026-08-28  
+**Last updated:** 2026-09-04  
 **Source of truth:** `index.js` → `ALL_FIXTURES` — run `node scripts/regenerate-reference-md.js` after fixture changes.
 
 [evertonfc.com fixtures](https://www.evertonfc.com/matches/men/fixtures)
@@ -26,13 +26,13 @@
 |----|-----------|-------|-------|-----|
 | MW1 | Sat 22 Aug 10:00 AM EDT | Everton vs Crystal Palace | Hill Dickinson Stadium | H |
 | MW2 | Sat 29 Aug 10:00 AM EDT | AFC Bournemouth vs Everton | Vitality Stadium | A |
-| MW3 | Sat 05 Sep 10:00 AM EDT | Everton vs Manchester United | Hill Dickinson Stadium | H |
-| MW4 | Sat 12 Sep 10:00 AM EDT | Tottenham Hotspur vs Everton | Tottenham Hotspur Stadium | A |
+| MW3 | Sun 06 Sep 9:00 AM EDT | Everton vs Manchester United | Hill Dickinson Stadium | H |
+| MW4 | Sat 12 Sep 12:30 PM EDT | Tottenham Hotspur vs Everton | Tottenham Hotspur Stadium | A |
 | MW5 | Sat 19 Sep 10:00 AM EDT | Everton vs Ipswich Town | Hill Dickinson Stadium | H |
-| MW6 | Sat 10 Oct 10:00 AM EDT | Hull City vs Everton | The MKM Stadium | A |
-| MW7 | Sat 17 Oct 10:00 AM EDT | Everton vs Chelsea | Hill Dickinson Stadium | H |
+| MW6 | Sun 11 Oct 9:00 AM EDT | Hull City vs Everton | The MKM Stadium | A |
+| MW7 | Sat 17 Oct 7:30 AM EDT | Everton vs Chelsea | Hill Dickinson Stadium | H |
 | MW8 | Sat 24 Oct 10:00 AM EDT | Arsenal vs Everton | Emirates Stadium | A |
-| MW9 | Sat 31 Oct 11:00 AM EDT | Newcastle United vs Everton | St. James' Park | A |
+| MW9 | Mon 02 Nov 3:00 PM EST | Newcastle United vs Everton | St. James' Park | A |
 | MW10 | Sat 07 Nov 10:00 AM EST | Everton vs Coventry City | Hill Dickinson Stadium | H |
 | MW11 | Sat 21 Nov 10:00 AM EST | Brentford vs Everton | Gtech Community Stadium | A |
 | MW12 | Sat 28 Nov 10:00 AM EST | Everton vs Liverpool | Hill Dickinson Stadium | H |
@@ -70,7 +70,7 @@
 | ID | Date (ET) | Match | Venue | H/A |
 |----|-----------|-------|-------|-----|
 | EFLR2 | Wed 26 Aug 3:00 PM EDT | Preston North End vs Everton | Deepdale | A |
-| EFLR3 | Wed 09 Sep 2:45 PM EDT | Everton vs Wolverhampton Wanderers | Hill Dickinson Stadium | H |
+| EFLR3 | Wed 16 Sep 2:45 PM EDT | Everton vs Wolverhampton Wanderers | Hill Dickinson Stadium | H |
 
 ---
 
@@ -88,16 +88,16 @@
 - **Pre5** — `2026-08-12T16:15:00Z`
 - **Pre6** — `2026-08-15T14:00:00Z`
 - **EFLR2** — `2026-08-26T19:00:00Z`
-- **EFLR3** — `2026-09-09T18:45:00Z`
+- **EFLR3** — `2026-09-16T18:45:00Z`
 - **MW1** — `2026-08-22T14:00:00Z`
 - **MW2** — `2026-08-29T14:00:00Z`
-- **MW3** — `2026-09-05T14:00:00Z`
-- **MW4** — `2026-09-12T14:00:00Z`
+- **MW3** — `2026-09-06T13:00:00Z`
+- **MW4** — `2026-09-12T16:30:00Z`
 - **MW5** — `2026-09-19T14:00:00Z`
-- **MW6** — `2026-10-10T14:00:00Z`
-- **MW7** — `2026-10-17T14:00:00Z`
+- **MW6** — `2026-10-11T13:00:00Z`
+- **MW7** — `2026-10-17T11:30:00Z`
 - **MW8** — `2026-10-24T14:00:00Z`
-- **MW9** — `2026-10-31T15:00:00Z`
+- **MW9** — `2026-11-02T20:00:00Z`
 - **MW10** — `2026-11-07T15:00:00Z`
 - **MW11** — `2026-11-21T15:00:00Z`
 - **MW12** — `2026-11-28T15:00:00Z`
