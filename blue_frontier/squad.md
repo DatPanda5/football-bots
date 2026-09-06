@@ -1,6 +1,6 @@
 # Everton Bot — Squads & Aliases (2026–27)
 
-**Last updated:** 2026-09-04  
+**Last updated:** 2026-09-06  
 **Source of truth:** `index.js` — run `node scripts/regenerate-reference-md.js` after squad or alias changes.
 
 ---
@@ -151,6 +151,7 @@ João Virgínia, John Ruddy, José Sá, Sam Johnstone, Kieran Trippier, Santiago
 |-------|----------|
 | `alfie` | alfie devine |
 | `amad` | amad diallo |
+| `amn` | ainsley maitland-niles |
 | `araujo` | ronald araujo |
 | `awb` | aaron wan-bissaka |
 | `barry` | thierno barry |
