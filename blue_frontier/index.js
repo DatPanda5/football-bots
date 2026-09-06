@@ -2152,10 +2152,23 @@ function getMatchdayChannelId() {
 }
 
 const ONE_HOUR_MS = 60 * 60 * 1000;
+const MAX_SET_TIMEOUT_MS = 2_147_483_647; // Node setTimeout 32-bit limit (~24.8 days)
 
 function buildLineupReminderContent(predictionsChannelId) {
   const channelMention = predictionsChannelId ? `<#${predictionsChannelId}>` : "#score-predictions";
   return `Lineups should be out! Head over to ${channelMention} and post your predictions by typing '/predict' then clicking on it or hitting enter!`;
+}
+
+async function fetchTextChannel(botClient, channelId) {
+  let channel = botClient.channels?.cache?.get(channelId);
+  if (!channel) {
+    try {
+      channel = await botClient.channels.fetch(channelId);
+    } catch {
+      channel = null;
+    }
+  }
+  return channel;
 }
 
 // ── At kickoff: post "Predictions locked for Everton v [Opponent]!" + list of predictions (in score-predictions channel)
@@ -2210,17 +2223,8 @@ function markMatchdayReminderPosted(fixtureId) {
 }
 
 async function sendMatchdayLineupReminderMessage(botClient, matchdayChannelId, predictionsChannelId) {
-  let channel = botClient.channels?.cache?.get(matchdayChannelId);
-  if (!channel) {
-    try {
-      channel = await botClient.channels.fetch(matchdayChannelId);
-    } catch {
-      channel = null;
-    }
-  }
-  if (!channel) {
-    throw new Error(`Matchday channel ${matchdayChannelId} not found`);
-  }
+  const channel = await fetchTextChannel(botClient, matchdayChannelId);
+  if (!channel) throw new Error(`Matchday channel ${matchdayChannelId} not found`);
   const content = buildLineupReminderContent(predictionsChannelId);
   await channel.send({ content });
   return channel;
@@ -2246,11 +2250,16 @@ function scheduleMatchdayLineupReminder(fixture, botClient, matchdayChannelId, p
   const reminderMs = kickoffMs - ONE_HOUR_MS;
   const delayMs = reminderMs - now;
   if (delayMs <= 0) return;
+  const fireInMs = Math.min(delayMs, MAX_SET_TIMEOUT_MS);
   setTimeout(() => {
+    if (fireInMs < delayMs) {
+      scheduleMatchdayLineupReminder(fixture, botClient, matchdayChannelId, predictionsChannelId);
+      return;
+    }
     postMatchdayLineupReminder(fixture, botClient, matchdayChannelId, predictionsChannelId).catch((e) =>
       console.error(`[${BOT_NAME}] Matchday lineup reminder error for ${fixture.id}:`, e)
     );
-  }, delayMs);
+  }, fireInMs);
   console.log(`[${BOT_NAME}] Scheduled matchday lineup reminder for ${fixture.id} in ${Math.round(delayMs / 60000)} min.`);
 }
 
@@ -2374,6 +2383,9 @@ client.on("clientReady", () => {
     }, 5000);
     console.log(`[${BOT_NAME}] Matchday lineup reminder catch-up: ${matchdayReminderCatchUpFixtures.length} fixture(s) (post in 5s).`);
   }
+  if (!matchdayChannelId && predictionsChannelId && !process.env.DOTENV_CONFIG_PATH && !IS_LAB) {
+    console.warn(`[${BOT_NAME}] ⚠️ MATCHDAY_CHANNEL_ID not set — 1-hour lineup reminders disabled.`);
+  }
   if (!resultsChannelId && !process.env.DOTENV_CONFIG_PATH && !IS_LAB) {
     console.warn(`[${BOT_NAME}] ⚠️ No RESULTS_CHANNEL_ID / PREDICTIONS_CHANNEL_ID in .env — auto result checker disabled.`);
   }
@@ -2406,6 +2418,33 @@ client.on("interactionCreate", async (interaction) => {
 
   if (interaction.isChatInputCommand() && interaction.commandName === "transfers") {
     return interaction.reply({ embeds: [buildTransfersEmbed()] });
+  }
+
+  if (interaction.isChatInputCommand() && interaction.commandName === "testlineupreminder") {
+    if (!IS_LAB) {
+      return interaction.reply({ content: "This command is only available in the lab environment.", flags: MessageFlags.Ephemeral });
+    }
+    const matchdayChannelId = getMatchdayChannelId();
+    const predictionsChannelId = getPredictionsChannelId();
+    if (!matchdayChannelId || !predictionsChannelId) {
+      return interaction.reply({
+        content: "Set `MATCHDAY_CHANNEL_ID` and `PREDICTIONS_CHANNEL_ID` in the lab env to test the lineup reminder.",
+        flags: MessageFlags.Ephemeral,
+      });
+    }
+    try {
+      const channel = await sendMatchdayLineupReminderMessage(client, matchdayChannelId, predictionsChannelId);
+      return interaction.reply({
+        content: `✅ Posted lineup reminder to ${channel} (test only — scheduled 1-hour-before posts are unchanged).`,
+        flags: MessageFlags.Ephemeral,
+      });
+    } catch (err) {
+      console.error(`[${BOT_NAME}] testlineupreminder failed:`, err?.message || err);
+      return interaction.reply({
+        content: `Failed to post lineup reminder: ${err?.message || err}`,
+        flags: MessageFlags.Ephemeral,
+      });
+    }
   }
 
   if (interaction.isChatInputCommand() && interaction.commandName === "testlineupreminder") {
