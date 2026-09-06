@@ -1139,6 +1139,7 @@ function buildScorerAliases() {
     "le fee": "enzo le fée",
     "lefee": "enzo le fée",
     "amad": "amad diallo",
+    "amn": "ainsley maitland-niles",
     "doak": "ben gannon-doak",
     "ben doak": "ben gannon-doak",
     "tzolis": "christos tzolis",
