@@ -121,6 +121,12 @@ db.exec(`
     postedAt    TEXT NOT NULL
   );
 
+  -- Tracks which fixtures have had the 1-hour-before-kickoff lineup reminder posted in #matchday.
+  CREATE TABLE IF NOT EXISTS matchday_reminder_posted (
+    fixtureId   TEXT PRIMARY KEY,
+    postedAt    TEXT NOT NULL
+  );
+
   -- Points (same system as footy_bot): 5pt exact score, 2pt correct result, 1pt per correct scorer.
   -- Everton-only: single scope, season + all-time.
   CREATE TABLE IF NOT EXISTS points (
@@ -1880,6 +1886,11 @@ const commands = [
     .setDescription("[ADMIN] Reset season or all-time points")
     .addStringOption((o) => o.setName("scope").setDescription("What to reset").setRequired(true)
       .addChoices({ name: "Current season only", value: "season" }, { name: "All time (requires confirm)", value: "alltime" })),
+  ...(IS_LAB ? [
+    new SlashCommandBuilder()
+      .setName("testlineupreminder")
+      .setDescription("[LAB] Post the matchday lineup reminder now (test only; does not affect scheduled posts)"),
+  ] : []),
 ].map((c) => c.toJSON());
 
 // ───────────────────────────────────────────────────────────────
@@ -2219,6 +2230,31 @@ function getPredictionsChannelId() {
       || null;
 }
 
+/** Matchday channel: where 1-hour-before-kickoff lineup reminders are posted. */
+function getMatchdayChannelId() {
+  return process.env.MATCHDAY_CHANNEL_ID?.trim() || null;
+}
+
+const ONE_HOUR_MS = 60 * 60 * 1000;
+const MAX_SET_TIMEOUT_MS = 2_147_483_647; // Node setTimeout 32-bit limit (~24.8 days)
+
+function buildLineupReminderContent(predictionsChannelId) {
+  const channelMention = predictionsChannelId ? `<#${predictionsChannelId}>` : "#score-predictions";
+  return `Lineups should be out! Head over to ${channelMention} and post your predictions by typing '/predict' then clicking on it or hitting enter!`;
+}
+
+async function fetchTextChannel(botClient, channelId) {
+  let channel = botClient.channels?.cache?.get(channelId);
+  if (!channel) {
+    try {
+      channel = await botClient.channels.fetch(channelId);
+    } catch {
+      channel = null;
+    }
+  }
+  return channel;
+}
+
 // ── At kickoff: post "Predictions locked for Everton v [Opponent]!" + list of predictions (in score-predictions channel)
 function kickoffLockAlreadyPosted(fixtureId) {
   return !!db.prepare("SELECT 1 FROM kickoff_lock_posted WHERE fixtureId = ?").get(fixtureId);
@@ -2260,6 +2296,55 @@ function scheduleKickoffLockPost(fixture, botClient, channelId) {
     );
   }, delayMs);
   console.log(`[${BOT_NAME}] Scheduled kickoff lock for ${fixture.id} in ${Math.round(delayMs / 60000)} min.`);
+}
+
+// ── 1 hour before kickoff: post lineup reminder in #matchday with link to #score-predictions
+function matchdayReminderAlreadyPosted(fixtureId) {
+  return !!db.prepare("SELECT 1 FROM matchday_reminder_posted WHERE fixtureId = ?").get(fixtureId);
+}
+function markMatchdayReminderPosted(fixtureId) {
+  db.prepare("INSERT OR REPLACE INTO matchday_reminder_posted (fixtureId, postedAt) VALUES (?, ?)").run(fixtureId, new Date().toISOString());
+}
+
+async function sendMatchdayLineupReminderMessage(botClient, matchdayChannelId, predictionsChannelId) {
+  const channel = await fetchTextChannel(botClient, matchdayChannelId);
+  if (!channel) throw new Error(`Matchday channel ${matchdayChannelId} not found`);
+  const content = buildLineupReminderContent(predictionsChannelId);
+  await channel.send({ content });
+  return channel;
+}
+
+async function postMatchdayLineupReminder(fixture, botClient, matchdayChannelId, predictionsChannelId) {
+  if (matchdayReminderAlreadyPosted(fixture.id)) {
+    console.log(`[${BOT_NAME}] Matchday lineup reminder already posted for ${fixture.id}, skipping.`);
+    return;
+  }
+  try {
+    await sendMatchdayLineupReminderMessage(botClient, matchdayChannelId, predictionsChannelId);
+    markMatchdayReminderPosted(fixture.id);
+    console.log(`[${BOT_NAME}] Posted matchday lineup reminder for ${fixture.id} (${fixture.home} vs ${fixture.away}).`);
+  } catch (err) {
+    console.error(`[${BOT_NAME}] Matchday lineup reminder failed for ${fixture.id}:`, err?.message || err);
+  }
+}
+
+function scheduleMatchdayLineupReminder(fixture, botClient, matchdayChannelId, predictionsChannelId) {
+  const kickoffMs = new Date(fixture.kickoffUTC).getTime();
+  const now = Date.now();
+  const reminderMs = kickoffMs - ONE_HOUR_MS;
+  const delayMs = reminderMs - now;
+  if (delayMs <= 0) return;
+  const fireInMs = Math.min(delayMs, MAX_SET_TIMEOUT_MS);
+  setTimeout(() => {
+    if (fireInMs < delayMs) {
+      scheduleMatchdayLineupReminder(fixture, botClient, matchdayChannelId, predictionsChannelId);
+      return;
+    }
+    postMatchdayLineupReminder(fixture, botClient, matchdayChannelId, predictionsChannelId).catch((e) =>
+      console.error(`[${BOT_NAME}] Matchday lineup reminder error for ${fixture.id}:`, e)
+    );
+  }, fireInMs);
+  console.log(`[${BOT_NAME}] Scheduled matchday lineup reminder for ${fixture.id} in ${Math.round(delayMs / 60000)} min.`);
 }
 
 // Optional: restrict score-prediction commands to specific channels in The Blue Frontier server only.
@@ -2342,14 +2427,24 @@ client.on("clientReady", () => {
   // On startup: re-schedule auto-checkers for any kicked-off, not-yet-finalised fixtures
   const resultsChannelId = getResultsChannelId();
   const predictionsChannelId = getPredictionsChannelId();
+  const matchdayChannelId = getMatchdayChannelId();
   const now = Date.now();
   const kickoffCatchUpFixtures = [];
+  const matchdayReminderCatchUpFixtures = [];
   for (const fixture of ALL_FIXTURES) {
-    if (new Date(fixture.kickoffUTC).getTime() <= now) {
+    const kickoffMs = new Date(fixture.kickoffUTC).getTime();
+    if (kickoffMs <= now) {
       if (resultsChannelId) scheduleResultCheck(fixture, client, resultsChannelId);
       if (predictionsChannelId && !kickoffLockAlreadyPosted(fixture.id)) kickoffCatchUpFixtures.push(fixture);
     } else {
       if (predictionsChannelId) scheduleKickoffLockPost(fixture, client, predictionsChannelId);
+      if (matchdayChannelId && predictionsChannelId && !matchdayReminderAlreadyPosted(fixture.id)) {
+        if (kickoffMs - ONE_HOUR_MS <= now) {
+          matchdayReminderCatchUpFixtures.push(fixture);
+        } else {
+          scheduleMatchdayLineupReminder(fixture, client, matchdayChannelId, predictionsChannelId);
+        }
+      }
     }
   }
   if (kickoffCatchUpFixtures.length && predictionsChannelId) {
@@ -2361,6 +2456,19 @@ client.on("clientReady", () => {
       }
     }, 5000);
     console.log(`[${BOT_NAME}] Kickoff lock catch-up: ${kickoffCatchUpFixtures.length} fixture(s) (post in 5s).`);
+  }
+  if (matchdayReminderCatchUpFixtures.length && matchdayChannelId && predictionsChannelId) {
+    setTimeout(() => {
+      for (const fixture of matchdayReminderCatchUpFixtures) {
+        postMatchdayLineupReminder(fixture, client, matchdayChannelId, predictionsChannelId).catch((e) =>
+          console.error(`[${BOT_NAME}] Matchday lineup reminder catch-up error for ${fixture.id}:`, e)
+        );
+      }
+    }, 5000);
+    console.log(`[${BOT_NAME}] Matchday lineup reminder catch-up: ${matchdayReminderCatchUpFixtures.length} fixture(s) (post in 5s).`);
+  }
+  if (!matchdayChannelId && predictionsChannelId && !process.env.DOTENV_CONFIG_PATH && !IS_LAB) {
+    console.warn(`[${BOT_NAME}] ⚠️ MATCHDAY_CHANNEL_ID not set — 1-hour lineup reminders disabled.`);
   }
   if (!resultsChannelId && !process.env.DOTENV_CONFIG_PATH && !IS_LAB) {
     console.warn(`[${BOT_NAME}] ⚠️ No RESULTS_CHANNEL_ID / PREDICTIONS_CHANNEL_ID in .env — auto result checker disabled.`);
@@ -2395,6 +2503,33 @@ client.on("interactionCreate", async (interaction) => {
   if (interaction.isChatInputCommand() && interaction.commandName === "transfers") {
     const scope = interaction.options.getString("scope") || "all";
     return interaction.reply({ embeds: [buildTransfersEmbed(scope)] });
+  }
+
+  if (interaction.isChatInputCommand() && interaction.commandName === "testlineupreminder") {
+    if (!IS_LAB) {
+      return interaction.reply({ content: "This command is only available in the lab environment.", flags: MessageFlags.Ephemeral });
+    }
+    const matchdayChannelId = getMatchdayChannelId();
+    const predictionsChannelId = getPredictionsChannelId();
+    if (!matchdayChannelId || !predictionsChannelId) {
+      return interaction.reply({
+        content: "Set `MATCHDAY_CHANNEL_ID` and `PREDICTIONS_CHANNEL_ID` in the lab env to test the lineup reminder.",
+        flags: MessageFlags.Ephemeral,
+      });
+    }
+    try {
+      const channel = await sendMatchdayLineupReminderMessage(client, matchdayChannelId, predictionsChannelId);
+      return interaction.reply({
+        content: `✅ Posted lineup reminder to ${channel} (test only — scheduled 1-hour-before posts are unchanged).`,
+        flags: MessageFlags.Ephemeral,
+      });
+    } catch (err) {
+      console.error(`[${BOT_NAME}] testlineupreminder failed:`, err?.message || err);
+      return interaction.reply({
+        content: `Failed to post lineup reminder: ${err?.message || err}`,
+        flags: MessageFlags.Ephemeral,
+      });
+    }
   }
 
   if (interaction.isButton() && (
@@ -2435,6 +2570,7 @@ client.on("interactionCreate", async (interaction) => {
       "**/addscoreralias** — MOD only; add a scorer nickname so it matches without redeploying.",
       "**/leaderboard [scope]** — view current-season or all-time points.",
       "**/resetleaderboard [scope]** — MOD only; reset season or all-time (all-time asks for confirm).",
+      ...(IS_LAB ? ["**/testlineupreminder** — [LAB] post the matchday lineup reminder to #matchday now (test only)."] : []),
       "",
       isBlueFrontierGuild
         ? "In this server, prediction commands work in the score-predictions channel (or mod-chat / mod-bot-logs for MODs)."
