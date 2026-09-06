@@ -151,6 +151,7 @@ João Virgínia, John Ruddy, José Sá, Sam Johnstone, Kieran Trippier, Santiago
 |-------|----------|
 | `alfie` | alfie devine |
 | `amad` | amad diallo |
+| `amn` | ainsley maitland-niles |
 | `araujo` | ronald araujo |
 | `awb` | aaron wan-bissaka |
 | `barry` | thierno barry |

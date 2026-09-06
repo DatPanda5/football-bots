@@ -1,6 +1,6 @@
 # Everton 2026–27 Fixtures
 
-**Last updated:** 2026-09-04  
+**Last updated:** 2026-09-06  
 **Source of truth:** `index.js` → `ALL_FIXTURES` — run `node scripts/regenerate-reference-md.js` after fixture changes.
 
 [evertonfc.com fixtures](https://www.evertonfc.com/matches/men/fixtures)
