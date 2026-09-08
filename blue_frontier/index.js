@@ -484,6 +484,7 @@ const ALL_FIXTURES = [
     competition: "premier_league",
     home: "Tottenham Hotspur", away: "Everton", opponent: "Tottenham Hotspur",
     evertonHome: false, venue: "Tottenham Hotspur Stadium", srMatchId: null,
+    mainReferee: "Darren England", varReferee: "Paul Tierney",
   },
   {
     id: "MW5", kickoffUTC: "2026-09-19T14:00:00Z", label: "Sat 19 Sep 10:00 AM EDT",
