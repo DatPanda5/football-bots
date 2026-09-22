@@ -58,6 +58,7 @@ const VENUES = {
   MW38: "Portman Road",
   EFLR2: "Deepdale",
   EFLR3: "Hill Dickinson Stadium",
+  EFLR4: "Hill Dickinson Stadium",
 };
 
 const today = new Date().toISOString().slice(0, 10);

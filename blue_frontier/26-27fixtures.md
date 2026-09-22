@@ -1,6 +1,6 @@
 # Everton 2026–27 Fixtures
 
-**Last updated:** 2026-09-06  
+**Last updated:** 2026-09-22  
 **Source of truth:** `index.js` → `ALL_FIXTURES` — run `node scripts/regenerate-reference-md.js` after fixture changes.
 
 [evertonfc.com fixtures](https://www.evertonfc.com/matches/men/fixtures)
@@ -71,6 +71,7 @@
 |----|-----------|-------|-------|-----|
 | EFLR2 | Wed 26 Aug 3:00 PM EDT | Preston North End vs Everton | Deepdale | A |
 | EFLR3 | Wed 16 Sep 2:45 PM EDT | Everton vs Wolverhampton Wanderers | Hill Dickinson Stadium | H |
+| EFLR4 | Thu 29 Oct 3:45 PM EDT | Everton vs Newcastle United | Hill Dickinson Stadium | H |
 
 ---
 
@@ -89,6 +90,7 @@
 - **Pre6** — `2026-08-15T14:00:00Z`
 - **EFLR2** — `2026-08-26T19:00:00Z`
 - **EFLR3** — `2026-09-16T18:45:00Z`
+- **EFLR4** — `2026-10-29T19:45:00Z`
 - **MW1** — `2026-08-22T14:00:00Z`
 - **MW2** — `2026-08-29T14:00:00Z`
 - **MW3** — `2026-09-06T13:00:00Z`
