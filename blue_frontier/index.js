@@ -455,7 +455,12 @@ const ALL_FIXTURES = [
     home: "Everton", away: "Wolverhampton Wanderers", opponent: "Wolverhampton Wanderers",
     evertonHome: true, venue: "Hill Dickinson Stadium", srMatchId: null,
   },
-  // Add EFLR4 here after R3 win + R4 draw (id: "EFLR4", competition: "efl_cup", …).
+  {
+    id: "EFLR4", kickoffUTC: "2026-10-29T19:45:00Z", label: "Thu 29 Oct 3:45 PM EDT",
+    competition: "efl_cup",
+    home: "Everton", away: "Newcastle United", opponent: "Newcastle United",
+    evertonHome: true, venue: "Hill Dickinson Stadium", srMatchId: null,
+  },
   // ── Premier League ──
   {
     id: "MW1", kickoffUTC: "2026-08-22T14:00:00Z", label: "Sat 22 Aug 10:00 AM EDT",
