@@ -502,6 +502,8 @@ const ALL_FIXTURES = [
     competition: "premier_league",
     home: "Hull City", away: "Everton", opponent: "Hull City",
     evertonHome: false, venue: "The MKM Stadium", srMatchId: null,
+    broadcast: "Peacock",
+    mainReferee: "Michael Salisbury", varReferee: "Tim Wood",
   },
   {
     id: "MW7", kickoffUTC: "2026-10-17T11:30:00Z", label: "Sat 17 Oct 7:30 AM EDT",
