@@ -510,6 +510,7 @@ const ALL_FIXTURES = [
     competition: "premier_league",
     home: "Everton", away: "Chelsea", opponent: "Chelsea",
     evertonHome: true, venue: "Hill Dickinson Stadium", srMatchId: null,
+    broadcast: "USA", mainReferee: "Paul Tierney",
   },
   {
     id: "MW8", kickoffUTC: "2026-10-24T14:00:00Z", label: "Sat 24 Oct 10:00 AM EDT",
