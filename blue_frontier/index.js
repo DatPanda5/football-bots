@@ -1727,6 +1727,43 @@ function getLastCompletedFixtures(n) {
     .slice(0, n);
 }
 
+/** How many past kickoffs stay on the /final fixture menu (older ties drop off). */
+const FINAL_MENU_RECENT_KICKED_OFF = 2;
+
+/** Fixtures for /final dropdown: last N kicked-off ties (chronological) + next upcoming. */
+function getFixturesForFinalChoices() {
+  const now = Date.now();
+  const listed = ALL_FIXTURES
+    .filter((f) => !f.unlisted)
+    .slice()
+    .sort((a, b) => new Date(a.kickoffUTC) - new Date(b.kickoffUTC));
+
+  const kickedOff = listed.filter((f) => {
+    const kick = new Date(f.kickoffUTC).getTime();
+    return !Number.isNaN(kick) && kick <= now;
+  });
+  const recentKickedOff = kickedOff.slice(-FINAL_MENU_RECENT_KICKED_OFF);
+
+  const nextUp = listed.find((f) => new Date(f.kickoffUTC).getTime() > now);
+
+  const seen = new Set();
+  const out = [];
+  for (const f of [...recentKickedOff, ...(nextUp ? [nextUp] : [])]) {
+    if (!seen.has(f.id)) {
+      seen.add(f.id);
+      out.push(f);
+    }
+  }
+  return out;
+}
+
+function formatFinalFixtureChoiceName(fixture) {
+  const title = getFixtureMatchTitle(fixture);
+  const label = getFixtureLabelForFinal(fixture);
+  const name = `${title} (${label})`;
+  return name.length > 100 ? `${name.slice(0, 97)}…` : name;
+}
+
 // ───────────────────────────────────────────────────────────────
 //  POINTS EVALUATION (same as footy_bot: exact 5, result 2, each scorer 1)
 // ───────────────────────────────────────────────────────────────
@@ -1807,14 +1844,10 @@ const commands = [
   new SlashCommandBuilder().setName("final")
     .setDescription("MOD only: Enter final score or view result for a played fixture")
     .addStringOption((o) => {
-      const latestCompleted = getLatestCompletedFixture();
-      const choices = ALL_FIXTURES
-        .filter((f) => !isFixtureCompleted(f) || (latestCompleted && f.id === latestCompleted.id))
-        .map((f) => ({
-          name: `${f.home} vs ${f.away} (${getFixtureLabelForFinal(f)})`,
-          value: f.id,
-        }));
-      // Discord caps addChoices at 25 — slice to most recent completed + nearest upcoming.
+      const choices = getFixturesForFinalChoices().map((f) => ({
+        name: formatFinalFixtureChoiceName(f),
+        value: f.id,
+      }));
       return o
         .setName("fixture")
         .setDescription("Which fixture (must have kicked off)")
