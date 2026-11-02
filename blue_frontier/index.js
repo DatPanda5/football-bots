@@ -1671,6 +1671,11 @@ function isFixtureCompleted(fixture) {
   return now - kickoffMs >= FORTY_EIGHT_HOURS_MS;
 }
 
+function isFixtureFinalised(fixtureId) {
+  if (!fixtureId) return false;
+  return !!db.prepare("SELECT 1 FROM finalised WHERE fixtureId = ?").get(fixtureId);
+}
+
 function isUpcomingFixture(fixture) {
   if (!fixture || fixture.unlisted) return false;
   const kickoffMs = new Date(fixture.kickoffUTC).getTime();
@@ -1754,7 +1759,7 @@ function getLastCompletedFixtures(n) {
 /** How many past kickoffs stay on the /final fixture menu (older ties drop off). */
 const FINAL_MENU_RECENT_KICKED_OFF = 2;
 
-/** Fixtures for /final dropdown: last N kicked-off ties (chronological) + next upcoming. */
+/** Fixtures for /final: kicked-off ties still needing a result, else the latest kicked-off. */
 function getFixturesForFinalChoices() {
   const now = Date.now();
   const listed = ALL_FIXTURES
@@ -1766,19 +1771,11 @@ function getFixturesForFinalChoices() {
     const kick = new Date(f.kickoffUTC).getTime();
     return !Number.isNaN(kick) && kick <= now;
   });
-  const recentKickedOff = kickedOff.slice(-FINAL_MENU_RECENT_KICKED_OFF);
 
-  const nextUp = listed.find((f) => new Date(f.kickoffUTC).getTime() > now);
+  const open = kickedOff.filter((f) => !isFixtureFinalised(f.id));
+  if (open.length) return open.slice(-FINAL_MENU_RECENT_KICKED_OFF);
 
-  const seen = new Set();
-  const out = [];
-  for (const f of [...recentKickedOff, ...(nextUp ? [nextUp] : [])]) {
-    if (!seen.has(f.id)) {
-      seen.add(f.id);
-      out.push(f);
-    }
-  }
-  return out;
+  return kickedOff.slice(-1);
 }
 
 function formatFinalFixtureChoiceName(fixture) {
@@ -1786,6 +1783,17 @@ function formatFinalFixtureChoiceName(fixture) {
   const label = getFixtureLabelForFinal(fixture);
   const name = `${title} (${label})`;
   return name.length > 100 ? `${name.slice(0, 97)}…` : name;
+}
+
+function buildFinalFixtureAutocompleteChoices(query) {
+  const q = String(query || "").trim().toLowerCase();
+  return getFixturesForFinalChoices()
+    .map((f) => ({
+      name: formatFinalFixtureChoiceName(f),
+      value: f.id,
+    }))
+    .filter((c) => !q || c.name.toLowerCase().includes(q) || c.value.toLowerCase().includes(q))
+    .slice(0, 25);
 }
 
 // ───────────────────────────────────────────────────────────────
@@ -1873,17 +1881,13 @@ const commands = [
       .addChoices(...ALL_FIXTURES.filter(isUpcomingFixture).slice(0, 25).map((f) => ({ name: `${f.home} vs ${f.away} (${f.label})`, value: f.id })))),
   new SlashCommandBuilder().setName("final")
     .setDescription("MOD only: Enter final score or view result for a played fixture")
-    .addStringOption((o) => {
-      const choices = getFixturesForFinalChoices().map((f) => ({
-        name: formatFinalFixtureChoiceName(f),
-        value: f.id,
-      }));
-      return o
+    .addStringOption((o) =>
+      o
         .setName("fixture")
         .setDescription("Which fixture (must have kicked off)")
         .setRequired(true)
-        .addChoices(...choices.slice(0, 25));
-    })
+        .setAutocomplete(true),
+    )
     .addIntegerOption((o) => o.setName("everton").setDescription("Everton's goals (omit to just view stored result)").setRequired(false).setMinValue(0).setMaxValue(20))
     .addIntegerOption((o) => o.setName("opponent").setDescription("Opponent's goals (omit to just view stored result)").setRequired(false).setMinValue(0).setMaxValue(20))
     .addStringOption((o) => o.setName("scorers").setDescription("Actual goal scorers (optional)").setRequired(false))
@@ -2527,6 +2531,16 @@ client.on("messageCreate", async (message) => {
 
 // ── Slash commands ────────────────────────────────────────────
 client.on("interactionCreate", async (interaction) => {
+
+  if (interaction.isAutocomplete()) {
+    if (interaction.commandName === "final") {
+      const focused = interaction.options.getFocused(true);
+      if (focused.name === "fixture") {
+        return interaction.respond(buildFinalFixtureAutocompleteChoices(focused.value));
+      }
+    }
+    return;
+  }
 
   if (interaction.isChatInputCommand() && interaction.commandName === "fixtures") {
     const all = getAllUpcomingFixtures();
