@@ -1,6 +1,6 @@
 # Everton 2026–27 Fixtures
 
-**Last updated:** 2026-10-14  
+**Last updated:** 2026-11-06  
 **Source of truth:** `index.js` → `ALL_FIXTURES` — run `node scripts/regenerate-reference-md.js` after fixture changes.
 
 [evertonfc.com fixtures](https://www.evertonfc.com/matches/men/fixtures)
@@ -33,13 +33,13 @@
 | MW7 | Sat 17 Oct 7:30 AM EDT | Everton vs Chelsea | Hill Dickinson Stadium | H |
 | MW8 | Sat 24 Oct 10:00 AM EDT | Arsenal vs Everton | Emirates Stadium | A |
 | MW9 | Mon 02 Nov 3:00 PM EST | Newcastle United vs Everton | St. James' Park | A |
-| MW10 | Sat 07 Nov 10:00 AM EST | Everton vs Coventry City | Hill Dickinson Stadium | H |
-| MW11 | Sat 21 Nov 10:00 AM EST | Brentford vs Everton | Gtech Community Stadium | A |
-| MW12 | Sat 28 Nov 10:00 AM EST | Everton vs Liverpool | Hill Dickinson Stadium | H |
-| MW13 | Wed 02 Dec 3:00 PM EST | Aston Villa vs Everton | Villa Park | A |
-| MW14 | Sat 05 Dec 10:00 AM EST | Everton vs Fulham | Hill Dickinson Stadium | H |
-| MW15 | Sat 12 Dec 10:00 AM EST | Brighton & Hove Albion vs Everton | American Express Stadium | A |
-| MW16 | Sat 19 Dec 10:00 AM EST | Nottingham Forest vs Everton | The City Ground | A |
+| MW10 | Fri 06 Nov 3:00 PM EST | Everton vs Coventry City | Hill Dickinson Stadium | H |
+| MW11 | Mon 23 Nov 3:00 PM EST | Brentford vs Everton | Gtech Community Stadium | A |
+| MW12 | Sun 29 Nov 7:00 AM EST | Everton vs Liverpool | Hill Dickinson Stadium | H |
+| MW13 | Wed 02 Dec 3:15 PM EST | Aston Villa vs Everton | Villa Park | A |
+| MW14 | Sun 06 Dec 9:00 AM EST | Everton vs Fulham | Hill Dickinson Stadium | H |
+| MW15 | Sun 13 Dec 9:00 AM EST | Brighton & Hove Albion vs Everton | American Express Stadium | A |
+| MW16 | Sun 20 Dec 9:00 AM EST | Nottingham Forest vs Everton | The City Ground | A |
 | MW17 | Sat 26 Dec 10:00 AM EST | Everton vs Sunderland | Hill Dickinson Stadium | H |
 | MW18 | Wed 30 Dec 3:00 PM EST | Everton vs Manchester City | Hill Dickinson Stadium | H |
 | MW19 | Sat 02 Jan 10:00 AM EST | Leeds United vs Everton | Elland Road | A |
@@ -72,6 +72,7 @@
 | EFLR2 | Wed 26 Aug 3:00 PM EDT | Preston North End vs Everton | Deepdale | A |
 | EFLR3 | Wed 16 Sep 2:45 PM EDT | Everton vs Wolverhampton Wanderers | Hill Dickinson Stadium | H |
 | EFLR4 | Thu 29 Oct 3:45 PM EDT | Everton vs Newcastle United | Hill Dickinson Stadium | H |
+| EFLR5 | Thu 17 Dec 3:00 PM EST | Fleetwood Town vs Everton | Highbury Stadium | A |
 
 ---
 
@@ -91,6 +92,7 @@
 - **EFLR2** — `2026-08-26T19:00:00Z`
 - **EFLR3** — `2026-09-16T18:45:00Z`
 - **EFLR4** — `2026-10-29T19:45:00Z`
+- **EFLR5** — `2026-12-17T20:00:00Z`
 - **MW1** — `2026-08-22T14:00:00Z`
 - **MW2** — `2026-08-29T14:00:00Z`
 - **MW3** — `2026-09-06T13:00:00Z`
@@ -100,13 +102,13 @@
 - **MW7** — `2026-10-17T11:30:00Z`
 - **MW8** — `2026-10-24T14:00:00Z`
 - **MW9** — `2026-11-02T20:00:00Z`
-- **MW10** — `2026-11-07T15:00:00Z`
-- **MW11** — `2026-11-21T15:00:00Z`
-- **MW12** — `2026-11-28T15:00:00Z`
-- **MW13** — `2026-12-02T20:00:00Z`
-- **MW14** — `2026-12-05T15:00:00Z`
-- **MW15** — `2026-12-12T15:00:00Z`
-- **MW16** — `2026-12-19T15:00:00Z`
+- **MW10** — `2026-11-06T20:00:00Z`
+- **MW11** — `2026-11-23T20:00:00Z`
+- **MW12** — `2026-11-29T12:00:00Z`
+- **MW13** — `2026-12-02T20:15:00Z`
+- **MW14** — `2026-12-06T14:00:00Z`
+- **MW15** — `2026-12-13T14:00:00Z`
+- **MW16** — `2026-12-20T14:00:00Z`
 - **MW17** — `2026-12-26T15:00:00Z`
 - **MW18** — `2026-12-30T20:00:00Z`
 - **MW19** — `2027-01-02T15:00:00Z`
