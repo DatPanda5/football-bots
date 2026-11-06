@@ -1,6 +1,6 @@
 # Everton Bot — Squads & Aliases (2026–27)
 
-**Last updated:** 2026-10-14  
+**Last updated:** 2026-11-06  
 **Source of truth:** `index.js` — run `node scripts/regenerate-reference-md.js` after squad or alias changes.
 
 ---
@@ -78,6 +78,10 @@ Dean Henderson, Walter Benítez, Remi Matthews, Joe Whitworth, Takehiro Tomiyasu
 ### Dundee
 
 Kieran O'Hara, Harrison Sharp, Idris Odutayo, Owen Bevan, Ryan Astley, Aaron Donnelly, Drey Wright, Imari Samuels, Lewis Montsma, Charley Oosenbrugh, Alan Forrest, Ryan Finnigan, Zan Besir, Finlay Robertson, Bradley Halliday, Joel Cotterill, Callum Jones, Ethan Hamilton, Ethan Crombie, Ashley Hay, Simon Murray, Charlie Reilly, Joe Westley, Cameron Congreve, Joe Bevan, Finlay Allan
+
+### Fleetwood Town
+
+Jay Lynch, James Pradic, Luke Hewitson, Oliver Bellizia, Danny Andrew, Finley Potter, Rhys Bennett, Conor Haughey, Shaun Rooney, Kayden Hughes, Jake Batty, Mitch Clark, Harrison Neal, Andy Cannon, Kane Thompson-Sommers, Mark Helm, Lewis McCann, Crispin McLean, Matty Virtue, Will Davies, Josh Thomas, Ched Evans, Ronan Coughlan, James Norwood, Mikey Lane
 
 ### Fulham
 

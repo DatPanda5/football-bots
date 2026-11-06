@@ -461,6 +461,12 @@ const ALL_FIXTURES = [
     home: "Everton", away: "Newcastle United", opponent: "Newcastle United",
     evertonHome: true, venue: "Hill Dickinson Stadium", srMatchId: null,
   },
+  {
+    id: "EFLR5", kickoffUTC: "2026-12-17T20:00:00Z", label: "Thu 17 Dec 3:00 PM EST",
+    competition: "efl_cup",
+    home: "Fleetwood Town", away: "Everton", opponent: "Fleetwood Town",
+    evertonHome: false, venue: "Highbury Stadium", srMatchId: null,
+  },
   // ── Premier League ──
   {
     id: "MW1", kickoffUTC: "2026-08-22T14:00:00Z", label: "Sat 22 Aug 10:00 AM EDT",
@@ -525,43 +531,43 @@ const ALL_FIXTURES = [
     evertonHome: false, venue: "St. James' Park", srMatchId: null,
   },
   {
-    id: "MW10", kickoffUTC: "2026-11-07T15:00:00Z", label: "Sat 07 Nov 10:00 AM EST",
+    id: "MW10", kickoffUTC: "2026-11-06T20:00:00Z", label: "Fri 06 Nov 3:00 PM EST",
     competition: "premier_league",
     home: "Everton", away: "Coventry City", opponent: "Coventry City",
     evertonHome: true, venue: "Hill Dickinson Stadium", srMatchId: null,
   },
   {
-    id: "MW11", kickoffUTC: "2026-11-21T15:00:00Z", label: "Sat 21 Nov 10:00 AM EST",
+    id: "MW11", kickoffUTC: "2026-11-23T20:00:00Z", label: "Mon 23 Nov 3:00 PM EST",
     competition: "premier_league",
     home: "Brentford", away: "Everton", opponent: "Brentford",
     evertonHome: false, venue: "Gtech Community Stadium", srMatchId: null,
   },
   {
-    id: "MW12", kickoffUTC: "2026-11-28T15:00:00Z", label: "Sat 28 Nov 10:00 AM EST",
+    id: "MW12", kickoffUTC: "2026-11-29T12:00:00Z", label: "Sun 29 Nov 7:00 AM EST",
     competition: "premier_league",
     home: "Everton", away: "Liverpool", opponent: "Liverpool",
     evertonHome: true, venue: "Hill Dickinson Stadium", srMatchId: null,
   },
   {
-    id: "MW13", kickoffUTC: "2026-12-02T20:00:00Z", label: "Wed 02 Dec 3:00 PM EST",
+    id: "MW13", kickoffUTC: "2026-12-02T20:15:00Z", label: "Wed 02 Dec 3:15 PM EST",
     competition: "premier_league",
     home: "Aston Villa", away: "Everton", opponent: "Aston Villa",
     evertonHome: false, venue: "Villa Park", srMatchId: null,
   },
   {
-    id: "MW14", kickoffUTC: "2026-12-05T15:00:00Z", label: "Sat 05 Dec 10:00 AM EST",
+    id: "MW14", kickoffUTC: "2026-12-06T14:00:00Z", label: "Sun 06 Dec 9:00 AM EST",
     competition: "premier_league",
     home: "Everton", away: "Fulham", opponent: "Fulham",
     evertonHome: true, venue: "Hill Dickinson Stadium", srMatchId: null,
   },
   {
-    id: "MW15", kickoffUTC: "2026-12-12T15:00:00Z", label: "Sat 12 Dec 10:00 AM EST",
+    id: "MW15", kickoffUTC: "2026-12-13T14:00:00Z", label: "Sun 13 Dec 9:00 AM EST",
     competition: "premier_league",
     home: "Brighton & Hove Albion", away: "Everton", opponent: "Brighton & Hove Albion",
     evertonHome: false, venue: "American Express Stadium", srMatchId: null,
   },
   {
-    id: "MW16", kickoffUTC: "2026-12-19T15:00:00Z", label: "Sat 19 Dec 10:00 AM EST",
+    id: "MW16", kickoffUTC: "2026-12-20T14:00:00Z", label: "Sun 20 Dec 9:00 AM EST",
     competition: "premier_league",
     home: "Nottingham Forest", away: "Everton", opponent: "Nottingham Forest",
     evertonHome: false, venue: "The City Ground", srMatchId: null,
@@ -1076,6 +1082,12 @@ const OPPONENT_SQUADS_2025_26 = {
     "Milan van Ewijk", "Miguel Ángel Brau",
     "Jack Rudoni", "Matt Grimes", "Frank Onyeka", "Josh Eccles", "Victor Torp", "Caleb Yirenkyi",
     "Gustavo Hamer", "Tatsuhiro Sakamoto", "Ellis Simms", "Ephron Mason-Clark", "Haji Wright", "Loum Tchaouna", "Brandon Thomas-Asante",
+  ],
+  "Fleetwood Town": [
+    "Jay Lynch", "James Pradic", "Luke Hewitson", "Oliver Bellizia",
+    "Danny Andrew", "Finley Potter", "Rhys Bennett", "Conor Haughey", "Shaun Rooney", "Kayden Hughes", "Jake Batty", "Mitch Clark",
+    "Harrison Neal", "Andy Cannon", "Kane Thompson-Sommers", "Mark Helm", "Lewis McCann", "Crispin McLean", "Matty Virtue",
+    "Will Davies", "Josh Thomas", "Ched Evans", "Ronan Coughlan", "James Norwood", "Mikey Lane",
   ],
 };
 
