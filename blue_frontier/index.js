@@ -579,19 +579,19 @@ const ALL_FIXTURES = [
     evertonHome: true, venue: "Hill Dickinson Stadium", srMatchId: null,
   },
   {
-    id: "MW18", kickoffUTC: "2026-12-30T20:00:00Z", label: "Wed 30 Dec 3:00 PM EST",
+    id: "MW18", kickoffUTC: "2026-12-29T20:15:00Z", label: "Tue 29 Dec 3:15 PM EST",
     competition: "premier_league",
     home: "Everton", away: "Manchester City", opponent: "Manchester City",
     evertonHome: true, venue: "Hill Dickinson Stadium", srMatchId: null,
   },
   {
-    id: "MW19", kickoffUTC: "2027-01-02T15:00:00Z", label: "Sat 02 Jan 10:00 AM EST",
+    id: "MW19", kickoffUTC: "2027-01-01T20:00:00Z", label: "Fri 01 Jan 3:00 PM EST",
     competition: "premier_league",
     home: "Leeds United", away: "Everton", opponent: "Leeds United",
     evertonHome: false, venue: "Elland Road", srMatchId: null,
   },
   {
-    id: "MW20", kickoffUTC: "2027-01-06T20:00:00Z", label: "Wed 06 Jan 3:00 PM EST",
+    id: "MW20", kickoffUTC: "2027-01-05T19:30:00Z", label: "Tue 05 Jan 2:30 PM EST",
     competition: "premier_league",
     home: "Everton", away: "Aston Villa", opponent: "Aston Villa",
     evertonHome: true, venue: "Hill Dickinson Stadium", srMatchId: null,
