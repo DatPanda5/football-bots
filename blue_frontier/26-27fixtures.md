@@ -1,6 +1,6 @@
 # Everton 2026–27 Fixtures
 
-**Last updated:** 2026-11-17  
+**Last updated:** 2026-11-19  
 **Source of truth:** `index.js` → `ALL_FIXTURES` — run `node scripts/regenerate-reference-md.js` after fixture changes.
 
 [evertonfc.com fixtures](https://www.evertonfc.com/matches/men/fixtures)
@@ -44,9 +44,9 @@
 | MW18 | Tue 29 Dec 3:15 PM EST | Everton vs Manchester City | Hill Dickinson Stadium | H |
 | MW19 | Fri 01 Jan 3:00 PM EST | Leeds United vs Everton | Elland Road | A |
 | MW20 | Tue 05 Jan 2:30 PM EST | Everton vs Aston Villa | Hill Dickinson Stadium | H |
-| MW21 | Sat 16 Jan 10:00 AM EST | Coventry City vs Everton | The Coventry Building Society Arena | A |
-| MW22 | Sat 23 Jan 10:00 AM EST | Everton vs Brentford | Hill Dickinson Stadium | H |
-| MW23 | Sat 30 Jan 10:00 AM EST | Liverpool vs Everton | Anfield | A |
+| MW21 | Sat 16 Jan 7:30 AM EST | Coventry City vs Everton | The Coventry Building Society Arena | A |
+| MW22 | Sun 24 Jan 9:00 AM EST | Everton vs Brentford | Hill Dickinson Stadium | H |
+| MW23 | Sat 30 Jan 7:30 AM EST | Liverpool vs Everton | Anfield | A |
 | MW24 | Sat 06 Feb 10:00 AM EST | Everton vs Newcastle United | Hill Dickinson Stadium | H |
 | MW25 | Wed 10 Feb 3:00 PM EST | Everton vs Leeds United | Hill Dickinson Stadium | H |
 | MW26 | Sat 20 Feb 10:00 AM EST | Sunderland vs Everton | Stadium of Light | A |
@@ -113,9 +113,9 @@
 - **MW18** — `2026-12-29T20:15:00Z`
 - **MW19** — `2027-01-01T20:00:00Z`
 - **MW20** — `2027-01-05T19:30:00Z`
-- **MW21** — `2027-01-16T15:00:00Z`
-- **MW22** — `2027-01-23T15:00:00Z`
-- **MW23** — `2027-01-30T15:00:00Z`
+- **MW21** — `2027-01-16T12:30:00Z`
+- **MW22** — `2027-01-24T14:00:00Z`
+- **MW23** — `2027-01-30T12:30:00Z`
 - **MW24** — `2027-02-06T15:00:00Z`
 - **MW25** — `2027-02-10T20:00:00Z`
 - **MW26** — `2027-02-20T15:00:00Z`

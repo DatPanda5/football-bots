@@ -597,19 +597,19 @@ const ALL_FIXTURES = [
     evertonHome: true, venue: "Hill Dickinson Stadium", srMatchId: null,
   },
   {
-    id: "MW21", kickoffUTC: "2027-01-16T15:00:00Z", label: "Sat 16 Jan 10:00 AM EST",
+    id: "MW21", kickoffUTC: "2027-01-16T12:30:00Z", label: "Sat 16 Jan 7:30 AM EST",
     competition: "premier_league",
     home: "Coventry City", away: "Everton", opponent: "Coventry City",
     evertonHome: false, venue: "The Coventry Building Society Arena", srMatchId: null,
   },
   {
-    id: "MW22", kickoffUTC: "2027-01-23T15:00:00Z", label: "Sat 23 Jan 10:00 AM EST",
+    id: "MW22", kickoffUTC: "2027-01-24T14:00:00Z", label: "Sun 24 Jan 9:00 AM EST",
     competition: "premier_league",
     home: "Everton", away: "Brentford", opponent: "Brentford",
     evertonHome: true, venue: "Hill Dickinson Stadium", srMatchId: null,
   },
   {
-    id: "MW23", kickoffUTC: "2027-01-30T15:00:00Z", label: "Sat 30 Jan 10:00 AM EST",
+    id: "MW23", kickoffUTC: "2027-01-30T12:30:00Z", label: "Sat 30 Jan 7:30 AM EST",
     competition: "premier_league",
     home: "Liverpool", away: "Everton", opponent: "Liverpool",
     evertonHome: false, venue: "Anfield", srMatchId: null,
