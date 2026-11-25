@@ -1670,6 +1670,13 @@ function isUpcomingFixture(fixture) {
   return !Number.isNaN(kickoffMs) && kickoffMs > Date.now();
 }
 
+/** PL, EFL/FA cup, etc. — not pre-season friendlies. */
+function isFixtureListedForFinal(fixture) {
+  if (!fixture || fixture.unlisted) return false;
+  if (fixture.competition === "preseason") return false;
+  return true;
+}
+
 function getFixtureById(id) { return ALL_FIXTURES.find((f) => f.id === id); }
 
 function getLatestCompletedFixture() {
@@ -1751,7 +1758,7 @@ const FINAL_MENU_RECENT_KICKED_OFF = 2;
 function getFixturesForFinalChoices() {
   const now = Date.now();
   const listed = ALL_FIXTURES
-    .filter((f) => !f.unlisted)
+    .filter(isFixtureListedForFinal)
     .slice()
     .sort((a, b) => new Date(a.kickoffUTC) - new Date(b.kickoffUTC));
 
@@ -2900,6 +2907,9 @@ client.on("interactionCreate", async (interaction) => {
     const fixture       = getFixtureById(fixtureId);
 
     if (!fixture) return interaction.reply({ content: "❌ Unknown fixture.", flags: MessageFlags.Ephemeral });
+    if (!isFixtureListedForFinal(fixture)) {
+      return interaction.reply({ content: "❌ Pre-season friendlies are not entered with `/final`.", flags: MessageFlags.Ephemeral });
+    }
     if (new Date(fixture.kickoffUTC).getTime() > Date.now()) {
       return interaction.reply({ content: "❌ That fixture hasn't kicked off yet.", flags: MessageFlags.Ephemeral });
     }
